@@ -1,2 +1,2 @@
 # Engine
-Attempt to implement bullet in visual studio
+A Game Engine created as part of the 2SPIM131 course.
