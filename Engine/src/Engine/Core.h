@@ -10,6 +10,10 @@
 	#error The engine only supports Windows.
 #endif
 
+#ifdef E_DEBUG
+	#define E_ENABLE_ASSERTS
+#endif
+
 #ifdef E_ENABLE_ASSERTS
 	#define E_ASSERT(x, ...) { if(!(x)) { E_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); }}
 	#define E_CORE_ASSERT(x, ...) { if(!(x)) { E_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); }}
