@@ -1,5 +1,6 @@
 #include "epch.h"
 #include "Application.h"
+#include "Input.h"
 
 #include <glad/glad.h>
 
@@ -59,6 +60,9 @@ namespace Engine
 			{
 				layer->OnUpdate();
 			}
+
+			auto [x, y] = Input::GetMousePosition();
+			E_CORE_TRACE("{0}, {1}", x, y);
 
 			m_Window->OnUpdate();
 		}
