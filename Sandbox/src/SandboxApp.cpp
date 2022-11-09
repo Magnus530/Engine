@@ -3,6 +3,8 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 
 #include <Engine.h>
 
+#include "imgui/imgui.h"
+
 class ExampleLayer : public Engine::Layer
 {
 public:
@@ -16,6 +18,13 @@ public:
 		{
 			E_TRACE("Tab key is pressed (poll).");
 		}
+	}
+
+	virtual void OnImGuiRender() override
+	{
+		ImGui::Begin("Test");
+		ImGui::Text("Hello World");
+		ImGui::End();
 	}
 
 	void OnEvent(Engine::Event& event) override
