@@ -13,6 +13,9 @@
     <Filter Include="src\Engine\ImGui">
       <UniqueIdentifier>{BC1B88A8-A814-A7FA-D146-8C7FBD9E8606}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Pathfinding">
+      <UniqueIdentifier>{0D4C45E0-F945-6E32-E2B2-0443CE4BD49E}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
     </Filter>
@@ -45,9 +48,6 @@
     </Filter>
     <Filter Include="vendor\glm\glm\gtx">
       <UniqueIdentifier>{B3A6A76B-9F8A-68C1-08EB-6214F4ED5243}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Engine\Pathfinding">
-      <UniqueIdentifier>{43f212d8-9188-42c9-a6ca-1695fc0a0e2f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +95,9 @@
     </ClInclude>
     <ClInclude Include="src\Engine\MouseButtonCodes.h">
       <Filter>src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Pathfinding\PNode.h">
+      <Filter>src\Engine\Pathfinding</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
@@ -1374,9 +1377,6 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
-    <ClInclude Include="PNode.h">
-      <Filter>src\Engine\Pathfinding</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Application.cpp">
@@ -1396,6 +1396,9 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Log.cpp">
       <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
+      <Filter>src\Engine\Pathfinding</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp">
       <Filter>src\Engine\Renderer</Filter>
@@ -1420,9 +1423,6 @@
     </ClCompile>
     <ClCompile Include="src\epch.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="PNode.cpp">
-      <Filter>src\Engine\Pathfinding</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

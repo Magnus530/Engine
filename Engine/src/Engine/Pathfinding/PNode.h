@@ -8,9 +8,12 @@ namespace Pathfinding {
 
 	struct PPath
 	{
-		PPath(class PNode* start) { mStartNode = start; }
+		PPath() {};
+		PPath(class PNode* start, class PNode* target) { mStartNode = start; mTargetNode = target; }
 		class PNode* mStartNode;
-		std::vector<class PNode*> mNodes;
+		class PNode* mTargetNode;
+		std::vector<class PNode*> mNodes;	// Nodes on the path toward the target
+		std::vector<class PNode*> mCheckedNodes;
 		std::vector<struct PLine*> mLines;
 		int Value{};
 
@@ -22,20 +25,27 @@ namespace Pathfinding {
 		}
 		bool ContainsNode(class PNode* N)
 		{
+			if (N == mStartNode) { return true; }
 			for (const auto& it : mNodes) 
 				if (it == N) { return true; } 
 			return false;
 		}
+		void ClearPath()
+		{
+			mNodes.clear();
+			mCheckedNodes.clear();
+			mLines.clear();
+		}
 	};
 
-	enum PathSearch
+	enum EPathSearch
 	{
 		Start,
 		Search,
 		Found
 	};
 
-	class PNode
+	class ENGINE_API PNode
 	{
 	public:
 
@@ -46,9 +56,9 @@ namespace Pathfinding {
 		glm::vec3 mPosition;
 
 		/* The length from this node to the target node */
-		int GetInternalValue(PNode* target);
+		int GetInternalValue(const PNode* target);
 
-		PathSearch FindNextNode(PNode* nextnode, PPath* path, PNode* target);
+		PNode* FindNextNode(EPathSearch& SearchMode, PPath* path, const PNode* Start, const PNode* Target);
 	};
 
 	struct PLine
@@ -86,4 +96,6 @@ namespace Pathfinding {
 
 	/* Second use of pathfinding - Position to Position */
 	//void StartPathfinding(const glm::vec3& StartPos, const glm::vec3& TargetPos);
+
+	
 }
