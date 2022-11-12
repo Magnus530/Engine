@@ -7,6 +7,8 @@
 #include "Engine/Events/Event.h"
 #include "Engine/Events/ApplicationEvent.h"
 
+#include "Engine/Core/Timestep.h"
+
 #include "Engine/ImGui/ImGuiLayer.h"
 
 namespace Engine
@@ -31,12 +33,13 @@ namespace Engine
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
+	private:
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer = nullptr;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
+		float m_LastFrameTime = 0.0f;
 
-	private:
 		static Application* s_Instance;
 	};
 

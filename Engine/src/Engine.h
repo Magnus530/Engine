@@ -5,6 +5,7 @@
 #include "Engine/Application.h"
 #include "Engine/Layer.h"
 #include "Engine/Log.h"
+#include "Engine/Core/Timestep.h"
 
 #include "Engine/Input.h"
 #include "Engine/KeyCodes.h"
