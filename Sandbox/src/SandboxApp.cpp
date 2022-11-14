@@ -42,12 +42,12 @@ public:
 
 		m_SquareVA.reset(Engine::VertexArray::Create());
 
-		float squareVertices[3 * 4] =
+		float squareVertices[5 * 4] =
 		{
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.5f,  0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> SquareVB;
@@ -55,6 +55,7 @@ public:
 		SquareVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },
+			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
 			});
 		m_SquareVA->AddVertexBuffer(SquareVB);
 
@@ -133,6 +134,46 @@ public:
 		)";
 
 		m_FlatColorShader.reset(Engine::Shader::Create(flatColorShaderVertexSrc, flatColorShaderFragmentSrc));
+
+		std::string textureShaderVertexSrc = R"(
+			#version 330 core
+
+			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec2 a_TexCoord;
+
+			uniform mat4 u_ProjectionView;
+			uniform mat4 u_Transform;
+
+			out vec2 v_TexCoord;
+
+			void main()
+			{
+				v_TexCoord = a_TexCoord;
+				gl_Position = u_ProjectionView * u_Transform * vec4(a_Position, 1.0);
+			}
+		)";
+
+		std::string textureShaderFragmentSrc = R"(
+			#version 330 core
+
+			layout(location = 0) out vec4 color;
+
+			in vec2 v_TexCoord;
+			uniform sampler2D u_Texture;
+
+
+			void main()
+			{
+				color = texture(u_Texture, v_TexCoord);
+			}
+		)";
+
+		m_TextureShader.reset(Engine::Shader::Create(textureShaderVertexSrc, textureShaderFragmentSrc));
+
+		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
+
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_TextureShader)->Bind();
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -187,7 +228,10 @@ public:
 			}
 		}
 
-		Engine::Renderer::Submit(m_Shader, m_VertexArray);
+		m_Texture->Bind();
+		Engine::Renderer::Submit(m_TextureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
+		//Engine::Renderer::Submit(m_Shader, m_VertexArray);
 
 		Engine::Renderer::EndScene();
 	}
@@ -207,8 +251,10 @@ private:
 	std::shared_ptr<Engine::Shader> m_Shader;
 	std::shared_ptr<Engine::VertexArray> m_VertexArray;
 
-	std::shared_ptr<Engine::Shader> m_FlatColorShader;
+	std::shared_ptr<Engine::Shader> m_FlatColorShader, m_TextureShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA;
+
+	std::shared_ptr<Engine::Texture2D> m_Texture;
 
 	Engine::OrthographicCamera m_Camera;
 	glm::vec3 m_CameraPosition;
