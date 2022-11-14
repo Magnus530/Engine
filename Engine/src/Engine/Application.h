@@ -7,14 +7,13 @@
 #include "Engine/Events/Event.h"
 #include "Engine/Events/ApplicationEvent.h"
 
-#include "Engine/ImGui/ImGuiLayer.h"
+#include "Engine/Core/Timestep.h"
 
-#include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/Buffer.h"
+#include "Engine/ImGui/ImGuiLayer.h"
 
 namespace Engine
 {
-	class ENGINE_API Application
+	class Application
 	{
 	public:
 		Application();
@@ -34,17 +33,13 @@ namespace Engine
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
+	private:
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer = nullptr;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
+		float m_LastFrameTime = 0.0f;
 
-		unsigned int m_VertexArray;
-		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<VertexBuffer> m_VertexBuffer;
-		std::unique_ptr<IndexBuffer> m_IndexBuffer;
-
-	private:
 		static Application* s_Instance;
 	};
 
