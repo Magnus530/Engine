@@ -1,48 +1,20 @@
 #pragma once
-
+#include "Engine/Core.h"
+#include "Engine.h"
 #include "glm/glm.hpp"
 
-namespace Pathfinding {
+namespace Engine {
 	inline int floatConvert{ 10 };
-	//typedef std::pair<PNode*, PLine*>& Path;
 
-	struct PPath
+	enum class ENodeType
 	{
-		PPath() {};
-		PPath(class PNode* start, class PNode* target) { mStartNode = start; mTargetNode = target; }
-		class PNode* mStartNode;
-		class PNode* mTargetNode;
-		std::vector<class PNode*> mNodes;	// Nodes on the path toward the target
-		std::vector<class PNode*> mCheckedNodes;
-		std::vector<struct PLine*> mLines;
-		int Value{};
-
-		void AddPath(class PNode* N, struct PLine* L, int v)
-		{
-			mNodes.push_back(N);
-			mLines.push_back(L);
-			Value += v;
-		}
-		bool ContainsNode(class PNode* N)
-		{
-			if (N == mStartNode) { return true; }
-			for (const auto& it : mNodes) 
-				if (it == N) { return true; } 
-			return false;
-		}
-		void ClearPath()
-		{
-			mNodes.clear();
-			mCheckedNodes.clear();
-			mLines.clear();
-		}
-	};
-
-	enum EPathSearch
-	{
-		Start,
-		Search,
-		Found
+		NT_None,
+		NT_Start,
+		NT_Path,
+		NT_Target,
+		NT_Checked,
+		NT_Processed,
+		NT_Block
 	};
 
 	class ENGINE_API PNode
@@ -50,52 +22,68 @@ namespace Pathfinding {
 	public:
 
 		PNode();
+		PNode(glm::vec3 position);
 		~PNode();
 
-		std::vector<struct PLine*> mConnectedPaths;
-		glm::vec3 mPosition;
+		ENodeType NodeType = ENodeType::NT_None;
 
-		/* The length from this node to the target node */
-		int GetInternalValue(const PNode* target);
+		glm::vec3 m_Position;
+		std::vector<PNode*> mConnectedNodes;
+		void AddConnectedNode(PNode* node) { mConnectedNodes.push_back(node); }
+		/* Direct connection to next node when moving through the path from the end node */
+		PNode* m_Connection{ nullptr };
 
-		PNode* FindNextNode(EPathSearch& SearchMode, PPath* path, const PNode* Start, const PNode* Target);
+		int F;	// Total DistanceValue
+		int G;	// DistanceValue from StartNode to this
+		int H;	// DistanceValue from EndNode to this
+
+
+		int GetDistanceToNode(PNode* target);
+		void InitValues(PNode* start, PNode* target);
+
+		void SetG(int g) { G = g; F = G + H; }
+		void SetH(PNode* target) { H = GetDistanceToNode(target); }
+
+		bool IsBlock() const { return NodeType == ENodeType::NT_Block; }
+
 	};
 
-	struct PLine
-	{
-		PLine(){}
-		PLine(class PNode* a, class PNode* b)
-		{
-			Node_A = a;
-			Node_B = b;
-
-			SetLength();
-		}
-
-		class PNode* Node_A{ nullptr };
-		class PNode* Node_B{ nullptr };
-
-		int Length{};
-
-		void SetLength()
-		{
-			glm::vec3 v = Node_A->mPosition - Node_B->mPosition;
-			Length = (int)v.length() * floatConvert;
-		}
-
-		PNode* GetOtherNode(const PNode* current) 
-		{
-			PNode* p;
-			current == Node_A ? p = Node_A : p = Node_B;
-			return p;
-		}
-	};
-
-	/* First use of pathfinding - Node to Node */
-	bool FindPath(PPath* Path, PNode* Start, PNode* Target);
-
-	/* Second use of pathfinding - Position to Position */
-	//void StartPathfinding(const glm::vec3& StartPos, const glm::vec3& TargetPos);
-
+	std::vector<PNode*> FindPath(PNode* start, PNode* end);
 	
+
+	// Spawner noder for testing 
+	int GridSize{ 1000 };
+	float GridSpacing{ 100.f };
+	glm::vec3 Center(0, 0, 0);
+	std::vector<std::shared_ptr<PNode>> mNodes;
+	void SpawnGrid()
+	{
+		std::shared_ptr<PNode> a;
+		std::shared_ptr<PNode> b;
+
+		for (size_t x{}; x < 10; x++)
+		{
+			for (size_t y{}; y < 10; y++)
+			{
+				glm::vec3 location = glm::vec3(Center.x + (GridSpacing * x) - (float)GridSize / 2, Center.y + (GridSpacing * y) - (float)GridSize / 2, Center.z);
+				mNodes.emplace_back(std::make_shared<PNode>(location));
+			}
+		}
+		for (size_t i{ 1 }; i < mNodes.size(); i++)
+		{
+			if (mNodes.size() < i + 1) break;
+
+			a = mNodes[i - 1];
+			b = mNodes[i];
+			if (i % 10 != 0 || i == 0) {
+				a->AddConnectedNode(b.get());
+				b->AddConnectedNode(a.get());
+			}
+
+			if (mNodes.size() < i + 10) continue;
+			b = mNodes[i - 1 + 10];
+			a->AddConnectedNode(b.get());
+			b->AddConnectedNode(a.get());
+		}
+	}
 }

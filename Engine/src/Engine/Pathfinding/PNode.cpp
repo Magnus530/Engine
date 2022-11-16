@@ -1,73 +1,102 @@
 #include "epch.h"
 #include "PNode.h"
 
-namespace Pathfinding {
+namespace Engine {
 
     PNode::PNode()
     {
     }
 
+    PNode::PNode(glm::vec3 position)
+        : m_Position{position}
+    {
+    }
+
+
     PNode::~PNode()
     {
     }
 
-    int PNode::GetInternalValue(const PNode* target)
+    int PNode::GetDistanceToNode(PNode* target)
     {
-        return (int)(mPosition - target->mPosition).length() * floatConvert;
+        return (int)(m_Position - target->m_Position).length() * floatConvert;
     }
 
-    PNode* PNode::FindNextNode(EPathSearch& SearchMode, PPath* Path, const PNode* Start, const PNode* Target)
+    void PNode::InitValues(PNode* start, PNode* target)
     {
-        if (this == Target){
-            SearchMode = EPathSearch::Found;
-            return this;
-        }
+        H = GetDistanceToNode(target);
+        F = G + H;
+    }
 
-        int Final{ INT_MAX };
-        int Value{};
-        PNode* Node{ nullptr };
-        PLine* Linepath{ nullptr };
 
-        for (size_t i{}; i < mConnectedPaths.size(); i++)
+    std::vector<PNode*> FindPath(PNode* start, PNode* end)
+    {
+        std::vector<PNode*> path;
+
+        std::vector<PNode*> tosearch;
+        tosearch.push_back(start);
+        std::vector<PNode*> processed;
+
+        while (tosearch.size() > 0)
         {
-            PNode* tmpNode = mConnectedPaths[i]->GetOtherNode(this);
-            if (Path->ContainsNode(tmpNode)) { continue; }
+            PNode* current = tosearch[0];
+            current->InitValues(start, end);
             
-            if (tmpNode == Target) {
-                SearchMode = EPathSearch::Found;
-                return tmpNode;
-            }
+            for (auto& it : tosearch)
+            {
+                if (it == current) { continue; }
+                it->InitValues(start, end);
 
-            Value = mConnectedPaths[i]->Length + tmpNode->GetInternalValue(Target);
-            if (Value < Final) {
-                Final = Value;
-                Node = tmpNode;
-                Path->AddPath(tmpNode, mConnectedPaths[i], Value);
-                SearchMode = EPathSearch::Search;
+                if (it->F < current->F || it->F == current->F && it->H < current->H)
+                    current = it;
+
+                if (current == end) {
+                    /* Går bakover fra Target til Start */
+                    PNode* currentTile = end;
+                    while (currentTile != start) {
+                        path.push_back(currentTile);
+                        currentTile = currentTile->m_Connection;
+                    }
+                    return path;
+                }
+
+                /* Removes current node from the to search list and adds it to processed */
+                processed.push_back(current);
+                std::vector<PNode*>::iterator it = std::find(tosearch.begin(), tosearch.end(), current);
+                if (it != tosearch.end()){
+                    tosearch.erase(it);
+                }
+
+                /* Processes current node */
+                for (size_t t{}; t < current->mConnectedNodes.size(); t++)
+                {
+                    PNode* neighbor = current->mConnectedNodes[t];
+                    std::vector<PNode*>::iterator it = std::find(tosearch.begin(), tosearch.end(), neighbor);
+                    bool inSearch = (it != tosearch.end());
+
+
+                    if (neighbor->IsBlock()) { continue; }
+
+                    it = std::find(processed.begin(), processed.end(), neighbor);
+                    if (it != processed.end()) continue;
+
+                    int CostToNeighbor = current->G + current->GetDistanceToNode(neighbor);
+
+                    if (!inSearch || CostToNeighbor < neighbor->G)
+                    {
+                        neighbor->SetG(CostToNeighbor);
+                        neighbor->m_Connection = current;
+
+                        if (!inSearch) {
+                            neighbor->SetH(end);
+                            tosearch.push_back(neighbor);
+                        }
+                    }
+                }
             }
         }
-        if (Node) {
-            Path->AddPath(Node, Linepath, Value);
-            Node->FindNextNode(SearchMode, Path, Start, Target);
-        }
-        
-        return Node;
-    }
 
-    bool FindPath(PPath* Path, PNode* Start, const PNode* Target)
-    {
-        if (!Start || !Target) { return false; }
-
-        //PNode* current{ Start };
-        PNode* nextnode{ nullptr };
-        PLine* line{ nullptr };
-        EPathSearch Searchtype = EPathSearch::Start;
-
-        nextnode = Start->FindNextNode(Searchtype, Path, Start, Target);
-        
-        if (Searchtype == EPathSearch::Found){ return true; }
-        return false;
-        // else if cannot be found within the node grid - return false;
+        return path;
     }
 
 }
