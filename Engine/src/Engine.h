@@ -8,7 +8,7 @@
 #include "Engine/Core/Timestep.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Core/KeyCodes.h"
-#include "Engine/Core/MouseButtonCodes.h"
+#include "Engine/Core/MouseCodes.h"
 
 
 #include "Engine/ImGui/ImGuiLayer.h"

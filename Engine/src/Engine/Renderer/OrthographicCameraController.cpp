@@ -13,31 +13,31 @@ namespace Engine
 
 	void OrthographicCameraController::OnUpdate(Timestep ts)
 	{
-		if (Input::IsKeyPressed(E_KEY_A))
+		if (Input::IsKeyPressed(Engine::Key::A))
 		{
 			m_CameraPosition.x -= m_CameraTranslationSpeed * ts;
 		}
-		else if (Input::IsKeyPressed(E_KEY_D))
+		else if (Input::IsKeyPressed(Engine::Key::D))
 		{
 			m_CameraPosition.x += m_CameraTranslationSpeed * ts;
 		}
 
-		if (Input::IsKeyPressed(E_KEY_W))
+		if (Input::IsKeyPressed(Engine::Key::W))
 		{
 			m_CameraPosition.y += m_CameraTranslationSpeed * ts;
 		}
-		else if (Input::IsKeyPressed(E_KEY_S))
+		else if (Input::IsKeyPressed(Engine::Key::S))
 		{
 			m_CameraPosition.y -= m_CameraTranslationSpeed * ts;
 		}
 
 		if (m_Rotation)
 		{
-			if (Input::IsKeyPressed(E_KEY_Q))
+			if (Input::IsKeyPressed(Engine::Key::Q))
 			{
 				m_CameraRotation += m_CameraRotationSpeed * ts;
 			}
-			else if (Input::IsKeyPressed(E_KEY_E))
+			else if (Input::IsKeyPressed(Engine::Key::E))
 			{
 				m_CameraRotation -= m_CameraRotationSpeed * ts;
 			}

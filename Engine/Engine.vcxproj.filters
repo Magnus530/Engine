@@ -87,7 +87,7 @@
     <ClInclude Include="src\Engine\Core\Log.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Core\MouseButtonCodes.h">
+    <ClInclude Include="src\Engine\Core\MouseCodes.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Timestep.h">
@@ -1425,6 +1425,8 @@
     <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
       <Filter>src\Engine\AssetLoaders</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Camera.h" />
+    <ClInclude Include="src\Engine\Renderer\EditorCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1508,5 +1510,6 @@
     <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
       <Filter>src\Engine\AssetLoaders</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\EditorCamera.cpp" />
   </ItemGroup>
 </Project>
