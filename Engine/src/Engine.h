@@ -2,14 +2,14 @@
 
 // For use by applications.
 
-#include "Engine/Application.h"
-#include "Engine/Layer.h"
-#include "Engine/Log.h"
+#include "Engine/Core/Application.h"
+#include "Engine/Core/Layer.h"
+#include "Engine/Core/Log.h"
 #include "Engine/Core/Timestep.h"
+#include "Engine/Core/Input.h"
+#include "Engine/Core/KeyCodes.h"
+#include "Engine/Core/MouseButtonCodes.h"
 
-#include "Engine/Input.h"
-#include "Engine/KeyCodes.h"
-#include "Engine/MouseButtonCodes.h"
 
 #include "Engine/ImGui/ImGuiLayer.h"
 
@@ -19,9 +19,17 @@
 
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/VertexArray.h"
 
+#include "Engine/Renderer/OrthographicCameraController.h"
 #include "Engine/Renderer/OrthographicCamera.h"
 
+// --------------Pathfinding---------------
+#include "Engine/Pathfinding/PNode.h"
+
+// --------------Mesh Objects---------------
+#include "Engine/AssetLoaders/ObjLoader.h"
+
 // ---------------Entry Point---------------
-#include "Engine/EntryPoint.h"
+#include "Engine/Core/EntryPoint.h"
