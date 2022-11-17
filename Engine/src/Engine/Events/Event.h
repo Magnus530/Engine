@@ -1,7 +1,7 @@
 #pragma once
 
 #include "epch.h"
-#include "Engine/Core.h"
+#include "Engine/Core/Core.h"
 
 namespace Engine
 {
