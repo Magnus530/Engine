@@ -1425,6 +1425,9 @@
     <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
       <Filter>src\Engine\AssetLoaders</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Camera.h" />
+    <ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h" />
+    <ClInclude Include="src\Engine\Renderer\PerspectiveCameraController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1508,5 +1511,7 @@
     <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
       <Filter>src\Engine\AssetLoaders</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp" />
+    <ClCompile Include="src\Engine\Renderer\PerspectiveCameraController.cpp" />
   </ItemGroup>
 </Project>

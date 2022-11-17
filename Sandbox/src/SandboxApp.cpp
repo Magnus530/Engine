@@ -15,10 +15,9 @@ class ExampleLayer : public Engine::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), m_CameraController(1280.0f / 720.0f, true)
+		: Layer("Example"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
 		m_VertexArray.reset(Engine::VertexArray::Create());
-
 
 		float vertices[3 * 7] =
 		{
@@ -183,13 +182,13 @@ public:
 	void OnUpdate(Engine::Timestep ts) override
 	{
 		// Update
-		m_CameraController.OnUpdate(ts);
+		m_PCameraController.OnUpdate(ts);
 
 		// Render
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
-		Engine::Renderer::BeginScene(m_CameraController.GetCamera());
+		Engine::Renderer::BeginScene(m_PCameraController.GetCamera());
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -231,7 +230,7 @@ public:
 
 	void OnEvent(Engine::Event& e) override
 	{
-		m_CameraController.OnEvent(e);
+		m_PCameraController.OnEvent(e);
 	}
 
 private:
@@ -246,7 +245,8 @@ private:
 
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
-	Engine::OrthographicCameraController m_CameraController;
+	Engine::PerspectiveCameraController m_PCameraController;
+	Engine::OrthographicCameraController m_OCameraController;
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 };
 
