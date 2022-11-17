@@ -10,11 +10,12 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
 class ExampleLayer : public Engine::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPosition(0.0f)
+		: Layer("Example"), m_CameraController(1280.0f / 720.0f, true)
 	{
 		m_VertexArray.reset(Engine::VertexArray::Create());
 
@@ -42,12 +43,12 @@ public:
 
 		m_SquareVA.reset(Engine::VertexArray::Create());
 
-		float squareVertices[3 * 4] =
+		float squareVertices[5 * 4] =
 		{
-			-0.5f, -0.5f, 0.0f,
-			 0.5f, -0.5f, 0.0f,
-			 0.5f,  0.5f, 0.0f,
-			-0.5f,  0.5f, 0.0f
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> SquareVB;
@@ -55,6 +56,7 @@ public:
 		SquareVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },
+			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
 			});
 		m_SquareVA->AddVertexBuffer(SquareVB);
 
@@ -98,7 +100,7 @@ public:
 			}
 		)";
 
-		m_Shader.reset(Engine::Shader::Create(vertexSrc, fragmentSrc));
+		m_Shader = Engine::Shader::Create("VertexPosColor", vertexSrc, fragmentSrc);
 
 		std::string flatColorShaderVertexSrc = R"(
 			#version 330 core
@@ -132,45 +134,28 @@ public:
 			}
 		)";
 
-		m_FlatColorShader.reset(Engine::Shader::Create(flatColorShaderVertexSrc, flatColorShaderFragmentSrc));
+		m_FlatColorShader = Engine::Shader::Create("FlatColor", flatColorShaderVertexSrc, flatColorShaderFragmentSrc);
+
+		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+
+		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
+
+		m_WolfLogoTexture = Engine::Texture2D::Create("assets/textures/wolf.png");
+
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
 	{
-		if (Engine::Input::IsKeyPressed(E_KEY_LEFT))
-		{
-			m_CameraPosition.x -= m_CameraMoveSpeed * ts;
-		}
-		else if (Engine::Input::IsKeyPressed(E_KEY_RIGHT))
-		{
-			m_CameraPosition.x += m_CameraMoveSpeed * ts;
-		}
+		// Update
+		m_CameraController.OnUpdate(ts);
 
-		if (Engine::Input::IsKeyPressed(E_KEY_UP))
-		{
-			m_CameraPosition.y += m_CameraMoveSpeed * ts;
-		}
-		else if (Engine::Input::IsKeyPressed(E_KEY_DOWN))
-		{
-			m_CameraPosition.y -= m_CameraMoveSpeed * ts;
-		}
-
-		if (Engine::Input::IsKeyPressed(E_KEY_A))
-		{
-			m_CameraRotation += m_CameraRotationSpeed * ts;
-		}
-		else if (Engine::Input::IsKeyPressed(E_KEY_D))
-		{
-			m_CameraRotation -= m_CameraRotationSpeed * ts;
-		}
-
+		// Render
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
-		m_Camera.SetPosition(m_CameraPosition);
-		m_Camera.SetRotation(m_CameraRotation);
-
-		Engine::Renderer::BeginScene(m_Camera);
+		Engine::Renderer::BeginScene(m_CameraController.GetCamera());
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -187,7 +172,15 @@ public:
 			}
 		}
 
-		Engine::Renderer::Submit(m_Shader, m_VertexArray);
+		auto textureShader = m_ShaderLibrary.Get("Texture");
+
+		m_Texture->Bind();
+		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
+		m_WolfLogoTexture->Bind();
+		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
+		//Engine::Renderer::Submit(m_Shader, m_VertexArray);
 
 		Engine::Renderer::EndScene();
 	}
@@ -199,24 +192,22 @@ public:
 		ImGui::End();
 	}
 
-	void OnEvent(Engine::Event& event) override
+	void OnEvent(Engine::Event& e) override
 	{
+		m_CameraController.OnEvent(e);
 	}
 
 private:
+	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
 	std::shared_ptr<Engine::VertexArray> m_VertexArray;
 
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA;
 
-	Engine::OrthographicCamera m_Camera;
-	glm::vec3 m_CameraPosition;
-	float m_CameraMoveSpeed = 5.0f;
+	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
-	float m_CameraRotation = 0.0f;
-	float m_CameraRotationSpeed = 180.0f;
-
+	Engine::OrthographicCameraController m_CameraController;
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 };
 
