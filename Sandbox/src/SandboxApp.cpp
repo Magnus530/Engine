@@ -70,19 +70,23 @@ public:
 		//--------------------------ObjLoader Test-----------------------------
 		/* Loading obj */
 		std::vector<glm::vec3> objVertices;
+		std::vector<glm::vec2> objUv;
 		std::vector<uint32_t> objIndices;
-		Engine::ObjLoader::Get()->ReadFile("CubeCube", objVertices, objIndices);
+		Engine::ObjLoader::Get()->ReadFile("CubeCube", objVertices, objUv, objIndices);
 
 		/* Creating vertex buffer */
 		std::shared_ptr<Engine::VertexBuffer> objVB;
 		std::vector<float> data;
-		for (auto& it : objVertices) {
-			data.push_back(*glm::value_ptr(it));
+		for (size_t i{}; i < objVertices.size(); i++)	// Scuffed
+		{
+			data.push_back(*glm::value_ptr(objVertices[i]));
+			data.push_back(*glm::value_ptr(objUv[i]));
 		}
 		objVB.reset(Engine::VertexBuffer::Create(data.data(), sizeof(objVertices)));
 		objVB->SetLayout(
 			{
 				{ Engine::ShaderDataType::Float3, "a_Position" },
+				{ Engine::ShaderDataType::Float2, "a_TexCoord" }
 			});
 
 		/* Creating vertex array & adding vertex buffer*/
@@ -205,13 +209,15 @@ public:
 		auto textureShader = m_ShaderLibrary.Get("Texture");
 
 		m_Texture->Bind();
-		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
-		Engine::Renderer::Submit(textureShader, m_objVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		/* Test posisjonering */
+		static float sin{};
+		sin += ts;
+		float zPlane = sinf(sin);
+		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(zPlane)));
+		//Engine::Renderer::Submit(textureShader, m_objVA, glm::scale(glm::mat4(1.0f), glm::vec3(zPlane)));	// loaded obj //Omega scuffed
 
 		m_WolfLogoTexture->Bind();
 		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
-
-		//Engine::Renderer::Submit(m_Shader, m_VertexArray);
 
 		Engine::Renderer::EndScene();
 	}
@@ -244,13 +250,54 @@ private:
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 };
 
-class Pathfinder : public Engine::Layer
+class PathfinderLayer : public Engine::Layer
 {
 public:
-	Pathfinder();
-	~Pathfinder();
+	PathfinderLayer()
+	{
+		Engine::Pathfinder::SpawnGrid();
+		
+	}
+	~PathfinderLayer(){}
 
+	virtual void OnImGuiRender() override
+	{
+		ImGui::Begin("Pathfinder");
+		using namespace Engine;	// Tmp, for readability
 
+		static std::string currentStart{ NULL };
+		static std::string currentEnd{ NULL };
+		static std::shared_ptr<PNode> start;
+		static std::shared_ptr<PNode> end;
+		if (ImGui::BeginCombo("StartNode", currentStart.c_str())) {
+			for (const auto& it : Pathfinder::mNodes) 
+			{
+				if (ImGui::Selectable(it->m_name.c_str())) {
+					currentStart = it->m_name;
+					start = it;
+				}
+			}
+			ImGui::EndCombo();
+		}
+		if (ImGui::BeginCombo("EndNode", currentEnd.c_str())) {
+			for (const auto& it : Pathfinder::mNodes)
+			{
+				if (ImGui::Selectable(it->m_name.c_str())) {
+					currentEnd = it->m_name;
+					end = it;
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		if (ImGui::Button("Find path")) {
+			if (start.get() && end.get()) {
+				E_TRACE("Finding path between from {0} to {1}", start->m_name, end->m_name);
+				Pathfinder::FindPath(start.get(), end.get());
+			}
+		}
+		ImGui::End();
+	}
 };
 
 class Sandbox : public Engine::Application
@@ -259,7 +306,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		
+		PushOverlay(new PathfinderLayer());
 	}
 
 	~Sandbox()
