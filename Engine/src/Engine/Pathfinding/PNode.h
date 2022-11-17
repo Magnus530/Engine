@@ -1,7 +1,7 @@
 #pragma once
 //#include "Engine/Core.h"
-#include "Engine/Core/Core.h"
-#include "Engine.h"
+//#include "Engine/Core/Core.h"
+//#include "Engine.h"
 #include "glm/glm.hpp"
 
 namespace Engine {
@@ -23,8 +23,9 @@ namespace Engine {
 	public:
 
 		PNode();
-		PNode(glm::vec3 position);
+		PNode(std::string name, glm::vec3 position);
 		~PNode();
+		std::string m_name;
 
 		ENodeType NodeType = ENodeType::NT_None;
 
@@ -49,42 +50,50 @@ namespace Engine {
 
 	};
 
-	std::vector<PNode*> FindPath(PNode* start, PNode* end);
+	namespace Pathfinder {
+		std::vector<PNode*> FindPath(PNode* start, PNode* end);
 	
-
-	// Spawner noder for testing 
-	int GridSize{ 1000 };
-	float GridSpacing{ 100.f };
-	glm::vec3 Center(0, 0, 0);
-	std::vector<std::shared_ptr<PNode>> mNodes;
-	void SpawnGrid()
-	{
-		std::shared_ptr<PNode> a;
-		std::shared_ptr<PNode> b;
-
-		for (size_t x{}; x < 10; x++)
+		// Spawner noder for testing 
+		inline int GridSize{ 1000 };
+		inline float GridSpacing{ 100.f };
+		inline glm::vec3 Center(0, 0, 0);
+		inline std::vector<std::shared_ptr<PNode>> mNodes;
+		inline std::string GenerateNodeName()
 		{
-			for (size_t y{}; y < 10; y++)
-			{
-				glm::vec3 location = glm::vec3(Center.x + (GridSpacing * x) - (float)GridSize / 2, Center.y + (GridSpacing * y) - (float)GridSize / 2, Center.z);
-				mNodes.emplace_back(std::make_shared<PNode>(location));
-			}
+			std::string name = "PNode ";
+			name += std::to_string(mNodes.size());
+			return name;
 		}
-		for (size_t i{ 1 }; i < mNodes.size(); i++)
+		inline void SpawnGrid()
 		{
-			if (mNodes.size() < i + 1) break;
+			std::shared_ptr<PNode> a;
+			std::shared_ptr<PNode> b;
 
-			a = mNodes[i - 1];
-			b = mNodes[i];
-			if (i % 10 != 0 || i == 0) {
+			for (size_t x{}; x < 10; x++)
+			{
+				for (size_t y{}; y < 10; y++)
+				{
+					glm::vec3 location = glm::vec3(Center.x + (GridSpacing * x) - (float)GridSize / 2, Center.y + (GridSpacing * y) - (float)GridSize / 2, Center.z);
+					mNodes.emplace_back(std::make_shared<PNode>(GenerateNodeName(), location));
+				}
+			}
+			for (size_t i{ 1 }; i < mNodes.size(); i++)
+			{
+				if (mNodes.size() < i + 1) break;
+
+				a = mNodes[i - 1];
+				b = mNodes[i];
+				if (i % 10 != 0 || i == 0) {
+					a->AddConnectedNode(b.get());
+					b->AddConnectedNode(a.get());
+				}
+
+				if (mNodes.size() < i + 10) continue;
+				b = mNodes[i - 1 + 10];
 				a->AddConnectedNode(b.get());
 				b->AddConnectedNode(a.get());
 			}
-
-			if (mNodes.size() < i + 10) continue;
-			b = mNodes[i - 1 + 10];
-			a->AddConnectedNode(b.get());
-			b->AddConnectedNode(a.get());
+			E_TRACE("Created A* grid");
 		}
 	}
 }
