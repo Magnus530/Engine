@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include <glm/glm.hpp>
+
 #include "Engine/Core/Log.h"
 
 #ifdef E_PLATFORM_WINDOWS

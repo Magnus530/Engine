@@ -25,5 +25,8 @@
 #include "Engine/Renderer/OrthographicCameraController.h"
 #include "Engine/Renderer/OrthographicCamera.h"
 
+// --------------Mesh Objects---------------
+#include "Engine/AssetLoaders/ObjLoader.h"
+
 // ---------------Entry Point---------------
 #include "Engine/Core/EntryPoint.h"

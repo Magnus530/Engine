@@ -19,11 +19,12 @@ public:
 	{
 		m_VertexArray.reset(Engine::VertexArray::Create());
 
+
 		float vertices[3 * 7] =
 		{
-			-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-			 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-			 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
+		//	-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
+		//	 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
+		//	 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> vertexBuffer;
@@ -45,10 +46,11 @@ public:
 
 		float squareVertices[5 * 4] =
 		{
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+		//    x      y	     z?			uv
+			-0.5f, -0.5f,   0.0f,	0.0f, 0.0f,	//	Bottom	- Left 
+			 0.5f, -0.5f,   0.0f,	1.0f, 0.0f, //	Bottom	- Right
+			 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right
+			-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> SquareVB;
@@ -64,6 +66,34 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> SquareIB;
 		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
 		m_SquareVA->SetIndexBuffer(SquareIB);
+
+		//--------------------------ObjLoader Test-----------------------------
+		/* Loading obj */
+		std::vector<glm::vec3> objVertices;
+		std::vector<uint32_t> objIndices;
+		Engine::ObjLoader::Get()->ReadFile("CubeCube", objVertices, objIndices);
+
+		/* Creating vertex buffer */
+		std::shared_ptr<Engine::VertexBuffer> objVB;
+		std::vector<float> data;
+		for (auto& it : objVertices) {
+			data.push_back(*glm::value_ptr(it));
+		}
+		objVB.reset(Engine::VertexBuffer::Create(data.data(), sizeof(objVertices)));
+		objVB->SetLayout(
+			{
+				{ Engine::ShaderDataType::Float3, "a_Position" },
+			});
+
+		/* Creating vertex array & adding vertex buffer*/
+		m_objVA.reset(Engine::VertexArray::Create());
+		m_objVA->AddVertexBuffer(objVB);
+
+		/* Creating index buffer */
+		std::shared_ptr<Engine::IndexBuffer> objIB;
+		objIB.reset(Engine::IndexBuffer::Create(objIndices.data(), sizeof(objIndices) / sizeof(uint32_t)));
+		m_objVA->SetIndexBuffer(objIB);
+		//--------------------END ObjLoader Test -----------------------------------
 
 		std::string vertexSrc = R"(
 			#version 330 core
@@ -176,6 +206,7 @@ public:
 
 		m_Texture->Bind();
 		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Engine::Renderer::Submit(textureShader, m_objVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		m_WolfLogoTexture->Bind();
 		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
@@ -205,10 +236,21 @@ private:
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA;
 
+	std::shared_ptr<Engine::VertexArray> m_objVA;	// For obj loader
+
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
 	Engine::OrthographicCameraController m_CameraController;
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
+};
+
+class Pathfinder : public Engine::Layer
+{
+public:
+	Pathfinder();
+	~Pathfinder();
+
+
 };
 
 class Sandbox : public Engine::Application
@@ -217,6 +259,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
+		
 	}
 
 	~Sandbox()
