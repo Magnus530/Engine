@@ -16,6 +16,9 @@
     <Filter Include="src\Engine\Events">
       <UniqueIdentifier>{B624EAB0-223B-E846-6BB2-7368D707B9CE}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\FMOD">
+      <UniqueIdentifier>{87507679-F3DB-E33D-FCEC-663268F73F3E}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\ImGui">
       <UniqueIdentifier>{BC1B88A8-A814-A7FA-D146-8C7FBD9E8606}</UniqueIdentifier>
     </Filter>
@@ -110,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Events\MouseEvent.h">
       <Filter>src\Engine\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\FMOD\AudioEngine.h">
+      <Filter>src\Engine\FMOD</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
@@ -1434,7 +1440,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\FMOD\AudioEngine.h" />
+    <ClInclude Include="src\Engine\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
@@ -1451,6 +1457,9 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Core\Log.cpp">
       <Filter>src\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp">
+      <Filter>src\Engine\FMOD</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp">
       <Filter>src\Engine\ImGui</Filter>
@@ -1524,6 +1533,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp" />
+    <ClCompile Include="src\Engine\Scene\Scene.cpp" />
   </ItemGroup>
 </Project>
