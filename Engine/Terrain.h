@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-
+/*
 class Terrain
 {
 public:
@@ -15,3 +15,4 @@ private:
 	std::vector <std::vector <float[2]>> uv;
 };
 
+*/

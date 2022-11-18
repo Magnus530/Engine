@@ -1,7 +1,7 @@
 #include "epch.h"
 #include "Readers.h"
 #include "Terrain.h"
-
+/*
 Terrain::Terrain() {
 
 }
@@ -26,3 +26,4 @@ Terrain::~Terrain() {
 
 }
 
+*/

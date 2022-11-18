@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 class Point
 {
 	std::vector <int> Neightbors;
@@ -11,3 +11,4 @@ public:
 
 };
 
+*/

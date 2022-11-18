@@ -6,6 +6,7 @@ std::ostream& operator << (std::ostream& os, const vertex& v) {
 	os << "(" << v.xyz[0] << ", " << v.xyz[1] << ", " << v.xyz[2] << ")";
 	os << "(" << v.normals[0] << ", " << v.normals[1] << ", " << v.normals[2] << ")";
 	os << "(" << v.uv[0] << ", " << v.uv[1] << ")";
+	return os;
 }
 
 std::istream& operator >> (std::istream& is, vertex& v) {
@@ -20,7 +21,7 @@ vertex::vertex() {
 
 }
 
-vertex::vertex(float x, float y, float z, float r = 1, float g = 1, float b = 1, float u = 1, float v = 1) {
+vertex::vertex(float x, float y, float z, float r, float g, float b, float u, float v) {
 	xyz[0] = x;
 	xyz[1] = y;
 	xyz[2] = z;

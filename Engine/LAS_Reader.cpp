@@ -4,7 +4,7 @@
  
 #include "epch.h"
 #include "Readers.h"
-
+/*
 void reduce_points(std::vector <float[3]> &p, std::vector <std::vector<float[3]>> &v, std::vector <std::vector <float[3]>>& c);
 
 void LAS_read(std::string filepath, std::vector <std::vector <float[3]>>& xyz, std::vector <std::vector <float[3]>>& rgb, std::vector <std::vector <float[2]>>& uv) {
@@ -74,4 +74,4 @@ void reduce_points(std::vector <float[3]>& p, std::vector <std::vector<float[3]>
 		}
 		v.push_back(temp);
 	}
-}
+}*/
