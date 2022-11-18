@@ -24,6 +24,12 @@
 
 #include "Engine/Renderer/OrthographicCameraController.h"
 #include "Engine/Renderer/OrthographicCamera.h"
+#include "Engine/Renderer/PerspectiveCameraController.h"
+#include "Engine/Renderer/PerspectiveCamera.h"
+
+
+// --------------Pathfinding---------------
+#include "Engine/Pathfinding/PNode.h"
 
 // --------------Mesh Objects---------------
 #include "Engine/AssetLoaders/ObjLoader.h"

@@ -24,7 +24,7 @@ namespace Engine {
         return m_Instance;
     }
 
-	void ObjLoader::ReadFile(std::string filename, std::vector<glm::vec3>& vertices, std::vector<uint32_t>& indices)
+	void ObjLoader::ReadFile(std::string filename, std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs, std::vector<uint32_t>& indices)
 	{
         /* Assumes a default path */
 		std::string path = "assets/meshes/";
@@ -154,6 +154,7 @@ namespace Engine {
                     
                     // MÅ FORANDRES PÅ
                     vertices.push_back(tempVertices[index]);
+                    uvs.push_back(tempUVs[uv]);
                     indices.push_back(temp_index++);
                     /* Lag vertex */
                     //Vertex tempVert{ tempVertices[index], tempNormals[normal], tempUVs[uv] };

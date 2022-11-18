@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/Renderer/OrthographicCamera.h"
+#include "Engine/Renderer/PerspectiveCamera.h"
 #include "Engine/Core/Timestep.h"
 
 #include "Engine/Events/ApplicationEvent.h"
@@ -8,19 +8,16 @@
 
 namespace Engine
 {
-	class OrthographicCameraController
+	class PerspectiveCameraController
 	{
 	public:
-		OrthographicCameraController(float aspectRatio, bool rotation = false);
+		PerspectiveCameraController(float fov, float aspectRatio, float nearPlane, float farPlane);
 
 		void OnUpdate(Timestep ts);
 		void OnEvent(Event& e);
 
-		OrthographicCamera& GetCamera() { return m_Camera; }
-		const OrthographicCamera& GetCamera() const { return m_Camera; }
-
-		float GetZoomLevel() const { return m_ZoomLevel; }
-		void SetZoomLevel(float level) { m_ZoomLevel = level; }
+		PerspectiveCamera& GetCamera() { return m_Camera; }
+		const PerspectiveCamera& GetCamera() const { return m_Camera; }
 
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& e);
@@ -28,8 +25,7 @@ namespace Engine
 
 	private:
 		float m_AspectRatio;
-		float m_ZoomLevel = 1.0f;
-		OrthographicCamera m_Camera;
+		PerspectiveCamera m_Camera;
 
 		bool m_Rotation;
 		glm::vec3 m_CameraPosition = { 0.0f, 0.0f, 0.0f };
