@@ -58,6 +58,12 @@
     <Filter Include="src\Engine\AssetLoaders">
       <UniqueIdentifier>{efe659d9-b903-46ec-b118-7c08ca43c9cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Terrain">
+      <UniqueIdentifier>{71165f95-e96c-4648-b02c-a3b2d675e22d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\AssetLoaders\TerrainLoaders">
+      <UniqueIdentifier>{e2c3518f-94d2-4d90-8374-9b08dd6c4937}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
@@ -1425,9 +1431,22 @@
     <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
       <Filter>src\Engine\AssetLoaders</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Renderer\Camera.h" />
+	<ClInclude Include="src\Engine\Renderer\Camera.h" />
     <ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h" />
     <ClInclude Include="src\Engine\Renderer\PerspectiveCameraController.h" />
+    <ClInclude Include="Terrain.h">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Readers.h">
+      <Filter>src\Engine\AssetLoaders\TerrainLoaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Point.h">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1511,7 +1530,20 @@
     <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
       <Filter>src\Engine\AssetLoaders</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp" />
+	    <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp" />
     <ClCompile Include="src\Engine\Renderer\PerspectiveCameraController.cpp" />
+    <ClCompile Include="Terrain.cpp">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="LAS_Reader.cpp">
+      <Filter>src\Engine\AssetLoaders\TerrainLoaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Point.cpp">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="vertex.cpp" />
   </ItemGroup>
 </Project>
