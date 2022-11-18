@@ -28,7 +28,7 @@ IncludeDir["FMOD"] = "Engine/vendor/FMOD/include"
 include "Engine/vendor/GLFW"
 include "Engine/vendor/Glad"
 include "Engine/vendor/imgui"
---include "Engine/vendor/FMOD"
+include "Engine/vendor/FMOD"
 
 fmodlibdir = {}
 fmodlibdir["FMOD"] = "Engine/vendor/FMOD/libs"
@@ -83,12 +83,8 @@ project "Engine"
 	{
 		"GLFW",
 		"Glad",
-		"ImGui",
---		"FMOD",
-		"fmod_vc.lib",
-		"fmodstudio_vc.lib",
-		"opengl32.lib"
-		
+		"ImGui",	 
+		"opengl32"
 	}
 
 	filter
@@ -98,7 +94,6 @@ project "Engine"
 		defines
 		{
 			"E_PLATFORM_WINDOWS",
-			"E_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
 		}
 
@@ -106,26 +101,36 @@ project "Engine"
 		defines "E_DEBUG"
 		runtime "Debug"
 		symbols "on"
-		links{
-		"FMOD/libs/fmodL_vc.lib",
-		"FMOD/libs/fmodstudioL_vc.lib"
+		links 
+		{
+		"fmodstudioL_vc.lib"
 		}
+
 
 	filter "configurations:Release"
 		defines "E_RELEASE"
 		runtime "Release"
 		optimize "on"
+		links {
+		"fmodstudio_vc.lib"
+		}
+
 
 	filter "configurations:Dist"
 		defines "E_DIST"
 		runtime "Release"
 		optimize "on"
+		links {
+		"fmodstudio_vc.lib"
+		}
+
 		
 		-- FMOD
 	filter { "system:windows"}
 		postbuildcommands
 		{
-			("{COPYFILE} %{wks.location}%{fmodlibdir} bin/" .. outputdir .. "/Engine/")
+			("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmod.dll $(TargetDir)"),
+			("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudio.dll $(TargetDir)")
 		}
 
 project "Sandbox"
@@ -141,6 +146,7 @@ project "Sandbox"
 	files
 	{
 		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.hpp",
 		"%{prj.name}/src/**.cpp"
 	}
 
@@ -149,12 +155,14 @@ project "Sandbox"
 		"Engine/vendor/spdlog/include",
 		"Engine/src",
 		"Engine/vendor",
+		"%{IncludeDir.FMOD}",
 		"%{IncludeDir.glm}"
 	}
 
 	links
 	{
 		"Engine"
+--		"fmod_vc.lib"
 	}
 
 	filter
