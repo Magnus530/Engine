@@ -9,6 +9,11 @@ workspace "Engine"
 		"Dist"
 	}
 
+	flags
+	{
+		"MultiProcessorCompile"
+	}
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 --Include directories relative to root folder (solution directory)
@@ -18,12 +23,16 @@ IncludeDir["Glad"] = "Engine/vendor/Glad/include"
 IncludeDir["ImGui"] = "Engine/vendor/imgui"
 IncludeDir["glm"] = "Engine/vendor/glm"
 IncludeDir["stb_image"] = "Engine/vendor/stb_image"
-IncludeDir["FMOD"] = "Engine/vendor/FMOD"
+IncludeDir["FMOD"] = "Engine/vendor/FMOD/include"
 
 include "Engine/vendor/GLFW"
 include "Engine/vendor/Glad"
 include "Engine/vendor/imgui"
-include "Engine/vendor/FMOD"
+--include "Engine/vendor/FMOD"
+
+fmodlibdir = {}
+fmodlibdir["FMOD"] = "Engine/vendor/FMOD/libs"
+
 
 project "Engine"
 	location "Engine"
@@ -65,12 +74,19 @@ project "Engine"
 		"%{IncludeDir.stb_image}"
 	}
 
+	libdirs
+	{
+	"%{fmodlibdir.FMOD}"
+	}
+	
 	links
 	{
 		"GLFW",
 		"Glad",
 		"ImGui",
-		"../Engine/vendor/FMOD/libs/**.lib",
+--		"FMOD",
+		"fmod_vc.lib",
+		"fmodstudio_vc.lib",
 		"opengl32.lib"
 		
 	}
@@ -90,6 +106,10 @@ project "Engine"
 		defines "E_DEBUG"
 		runtime "Debug"
 		symbols "on"
+		links{
+		"FMOD/libs/fmodL_vc.lib",
+		"FMOD/libs/fmodstudioL_vc.lib"
+		}
 
 	filter "configurations:Release"
 		defines "E_RELEASE"
@@ -100,6 +120,13 @@ project "Engine"
 		defines "E_DIST"
 		runtime "Release"
 		optimize "on"
+		
+		-- FMOD
+	filter { "system:windows"}
+		postbuildcommands
+		{
+			("{COPYFILE} %{wks.location}%{fmodlibdir} bin/" .. outputdir .. "/Engine/")
+		}
 
 project "Sandbox"
 	location "Sandbox"
