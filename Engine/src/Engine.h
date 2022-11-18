@@ -36,3 +36,6 @@
 
 // ---------------Entry Point---------------
 #include "Engine/Core/EntryPoint.h"
+
+// ---------------Audio Engine---------------
+#include "Engine/FMOD/AudioEngine.h"

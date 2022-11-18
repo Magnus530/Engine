@@ -18,10 +18,12 @@ IncludeDir["Glad"] = "Engine/vendor/Glad/include"
 IncludeDir["ImGui"] = "Engine/vendor/imgui"
 IncludeDir["glm"] = "Engine/vendor/glm"
 IncludeDir["stb_image"] = "Engine/vendor/stb_image"
+IncludeDir["FMOD"] = "Engine/vendor/FMOD"
 
 include "Engine/vendor/GLFW"
 include "Engine/vendor/Glad"
 include "Engine/vendor/imgui"
+include "Engine/vendor/FMOD"
 
 project "Engine"
 	location "Engine"
@@ -59,6 +61,7 @@ project "Engine"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.FMOD}",
 		"%{IncludeDir.stb_image}"
 	}
 
@@ -67,7 +70,9 @@ project "Engine"
 		"GLFW",
 		"Glad",
 		"ImGui",
+		"../Engine/vendor/FMOD/libs/**.lib",
 		"opengl32.lib"
+		
 	}
 
 	filter

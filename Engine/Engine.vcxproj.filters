@@ -7,6 +7,9 @@
     <Filter Include="src\Engine">
       <UniqueIdentifier>{12A1320E-FE58-745B-6760-4DB753370F4C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\AssetLoaders">
+      <UniqueIdentifier>{ABEE0D3F-1726-56D6-2030-BAF98CE67CCF}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Core">
       <UniqueIdentifier>{AA407579-16CC-E23D-1FDD-65328BE73E3E}</UniqueIdentifier>
     </Filter>
@@ -55,13 +58,13 @@
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Engine\AssetLoaders">
-      <UniqueIdentifier>{efe659d9-b903-46ec-b118-7c08ca43c9cf}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
+      <Filter>src\Engine\AssetLoaders</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Application.h">
       <Filter>src\Engine\Core</Filter>
@@ -117,6 +120,9 @@
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Camera.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\GraphicsContext.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
@@ -124,6 +130,12 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\OrthographicCameraController.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\PerspectiveCameraController.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\RenderCommand.h">
@@ -1422,14 +1434,12 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
-      <Filter>src\Engine\AssetLoaders</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Renderer\Camera.h" />
-    <ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h" />
-    <ClInclude Include="src\Engine\Renderer\PerspectiveCameraController.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioEngine.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
+      <Filter>src\Engine\AssetLoaders</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Core\Application.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
@@ -1458,6 +1468,12 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\OrthographicCameraController.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\PerspectiveCameraController.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\RenderCommand.cpp">
@@ -1508,10 +1524,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
-      <Filter>src\Engine\AssetLoaders</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp" />
-    <ClCompile Include="src\Engine\Renderer\PerspectiveCameraController.cpp" />
+    <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp" />
   </ItemGroup>
 </Project>
