@@ -13,6 +13,8 @@ namespace Engine
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 
+		inline static void SetMousePos(const float& x, const float& y) { return s_Instance->SetMousePosImpl(x, y); }
+
 	protected:
 		virtual bool IsKeyPressedImpl(int keycode) = 0;
 
@@ -20,6 +22,8 @@ namespace Engine
 		virtual std::pair<float, float> GetMousePositionImpl() = 0;
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
+
+		virtual void SetMousePosImpl(const float& x, const float& y) = 0;
 
 	private:
 		static Input* s_Instance;

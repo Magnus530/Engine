@@ -14,12 +14,14 @@ namespace Engine
 		auto state = glfwGetKey(window, keycode);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
+
 	bool WindowsInput::IsMouseButtonPressedImpl(int button)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		auto state = glfwGetMouseButton(window, button);
 		return state == GLFW_PRESS;
 	}
+
 	std::pair<float, float> WindowsInput::GetMousePositionImpl()
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
@@ -28,6 +30,7 @@ namespace Engine
 
 		return { (float)xpos, (float)ypos };
 	}
+
 	float WindowsInput::GetMouseXImpl()
 	{
 		auto [x, y] = GetMousePosition();
@@ -38,5 +41,11 @@ namespace Engine
 	{
 		auto [x, y] = GetMousePosition();
 		return y;
+	}
+
+	void WindowsInput::SetMousePosImpl(const float& x, const float& y)
+	{
+		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		glfwSetCursorPos(window, x, y);
 	}
 }
