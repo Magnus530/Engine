@@ -8,18 +8,13 @@ project "FMOD"
 
 	files
 	{
-		"core/inc/**.h",
-		"core/inc/fmod.hpp",
-		"fsbank/inc/**.h",
-		"studio/inc/**.h",
-		"studio/inc/fmod_studio.hpp"
+		"include/**.h",
+		"include/**.hpp"
 	}
 
 	includedirs
 	{
-		"core/inc",
-		"fsbank/inc",
-		"studio/inc",
+		"include",
 		"libs"
 	}
 	

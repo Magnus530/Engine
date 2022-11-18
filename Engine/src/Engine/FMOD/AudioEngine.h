@@ -6,9 +6,9 @@
  * ISBN-13: 978-1-4987-4673-1
  */
 
-#include "core/inc/fmod.hpp"
-#include "studio/inc/fmod_studio.hpp"
-#include "core/inc/fmod_errors.h"
+#include "fmod_studio.hpp"
+#include "fmod.hpp"
+#include "fmod_errors.h"
 #include <glm/glm.hpp>
 #include <string>
 #include <map>
