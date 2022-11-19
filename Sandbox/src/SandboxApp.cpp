@@ -172,11 +172,18 @@ public:
 		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 
 		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
-
 		m_WolfLogoTexture = Engine::Texture2D::Create("assets/textures/wolf.png");
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+
+		m_ActiveScene = std::make_shared<Engine::Scene>();
+
+		// Create entities here
+		auto square = m_ActiveScene->CreateEntity("Square");
+		square.AddComponent<Engine::RendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+
+		m_SquareEntity = square;
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -224,7 +231,15 @@ public:
 	virtual void OnImGuiRender() override
 	{
 		ImGui::Begin("Settings");
-		ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
+		if (m_SquareEntity)
+		{
+			ImGui::Separator();
+			auto& tag = m_SquareEntity.GetComponent<Engine::TagComponent>().Tag;
+			ImGui::Text("%s", tag.c_str());
+			auto& squareColor = m_SquareEntity.GetComponent<Engine::RendererComponent>().Color;
+			ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+			ImGui::Separator();
+		}
 		ImGui::End();
 	}
 
@@ -237,13 +252,13 @@ private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
 	std::shared_ptr<Engine::VertexArray> m_VertexArray;
-
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA;
-
 	std::shared_ptr<Engine::VertexArray> m_objVA;	// For obj loader
-
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
+
+	std::shared_ptr<Engine::Scene> m_ActiveScene; // Entities
+	Engine::Entity m_SquareEntity;
 
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
@@ -256,7 +271,6 @@ public:
 	PathfinderLayer()
 	{
 		Engine::Pathfinder::SpawnGrid();
-		
 	}
 	~PathfinderLayer(){}
 

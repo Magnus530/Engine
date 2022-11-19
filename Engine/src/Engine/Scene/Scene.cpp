@@ -1,7 +1,11 @@
 #include "epch.h"
 #include "Scene.h"
 
+#include "Components.h"
+
 #include <glm/glm.hpp>
+
+#include "Entity.h"
 
 namespace Engine
 {
@@ -14,45 +18,16 @@ namespace Engine
 
 	Scene::Scene()
 	{
-		// How to create a component
-		struct TransformComponent
-		{
-			glm::mat4 Transform;
-
-			TransformComponent() = default;
-			TransformComponent(const TransformComponent&) = default;
-			TransformComponent(const glm::mat4& transform)
-				: Transform(transform) {}
-
-			// Operator overload for DoMath parameter
-			operator glm::mat4& () { return Transform; }
-			operator const glm::mat4&() const { return Transform; }
-		};
-
-		struct MeshComponent
-		{};
-
-		// Example
-		TransformComponent transform;
-		DoMath(transform);
-
+#if ENTT_EXAMPLE_CODE
 		// How to create an entity
 		entt::entity entity = m_Registry.create();
-
 		// How to add a component to an entity
 		m_Registry.emplace<TransformComponent>(entity, glm::mat4(1.0f));
-
 		// Calls function when a specific component is created
 		m_Registry.on_construct<TransformComponent>().connect<&OnTransformConstruct>();
-
 		// How to remove component
 		m_Registry.remove<TransformComponent>(entity);
 		m_Registry.clear();
-
-		//if (m_Registry.has<TransformComponent>(entity))
-		//{
-		//	TransformComponent& transform = m_Registry.get<TransformComponent>(entity);
-		//}
 
 		// When rendering all entities with transform component
 		auto view = m_Registry.view<TransformComponent>();
@@ -65,13 +40,34 @@ namespace Engine
 		auto group = m_Registry.group<TransformComponent>(entt::get<MeshComponent>);
 		for (auto entity : group)
 		{
-			//auto&[transform, mesh] = group.get<TransformComponent, MeshComponent>(entity);
+			auto&[transform, mesh] = group.get<TransformComponent, MeshComponent>(entity);
 			//Renderer::submit(mesh, transform);
 		}
-
+#endif
 	}
 
 	Scene::~Scene()
 	{
 	}
+
+	Entity Scene::CreateEntity(const std::string& name)
+	{
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<TransformComponent>();
+		auto& tag = entity.AddComponent<TagComponent>();
+		tag.Tag = name.empty() ? "Entity" : name;
+		return entity;
+	}
+
+	void Scene::OnUpdate(Timestep ts)
+	{
+		auto group = m_Registry.group<TransformComponent>(entt::get<RendererComponent>);
+		for (auto entity : group)
+		{
+			auto& [transform, rend] = group.get<TransformComponent, RendererComponent>(entity);
+		}
+	}
 }
+
+
+
