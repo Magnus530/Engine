@@ -83,48 +83,37 @@ namespace Engine {
             }
 
             if (oneWord == "v"){
-                //QVector3D tempVertex;
                 glm::vec3 tempVertexLocation;
                 sStream >> oneWord;
                 tempVertexLocation.x = std::stof(oneWord);
-                //tempVertex.set''X(std::stof(oneWord));
                 sStream >> oneWord;
                 tempVertexLocation.y = std::stof(oneWord);
-                //tempVertex.setY(std::stof(oneWord));
                 sStream >> oneWord;
                 tempVertexLocation.z = std::stof(oneWord);
-                //tempVertex.setZ(std::stof(oneWord));
 
                 tempVertices.push_back(tempVertexLocation);
 
                 continue;
             }
             if (oneWord == "vt"){
-                //QVector2D tempUV;
                 glm::vec2 tempUV;
                 sStream >> oneWord;
                 tempUV.x = std::stof(oneWord);
-                //tempUV.setX(std::stof(oneWord));
                 sStream >> oneWord;
                 tempUV.y = std::stof(oneWord);
-                //tempUV.setY(std::stof(oneWord));
 
                 tempUVs.push_back(tempUV);
 
                 continue;
             }
             if (oneWord == "vn"){
-                //QVector3D tempNormal;
                 glm::vec3 tempNormal;
                 sStream >> oneWord;
                 tempNormal.x = std::stof(oneWord);
                 sStream >> oneWord;
                 tempNormal.y = std::stof(oneWord);
-                //tempNormal.setY(std::stof(oneWord));
                 sStream >> oneWord;
                 tempNormal.z = std::stof(oneWord);
-                //tempNormal.setZ(std::stof(oneWord));
-
                 tempNormals.push_back(tempNormal);
 
                 continue;
@@ -152,7 +141,7 @@ namespace Engine {
                     --normal;
 
                     
-                    // MÅ FORANDRES PÅ
+
                     vertices.push_back(tempVertices[index]);
                     uvs.push_back(tempUVs[uv]);
                     indices.push_back(temp_index++);
