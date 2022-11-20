@@ -9,6 +9,9 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Engine/Renderer/VisualObject/VisualObject.h"
+#include "Engine/AssetLoaders/ObjLoader.h"
+
 
 
 class ExampleLayer : public Engine::Layer
@@ -17,86 +20,44 @@ public:
 	ExampleLayer()
 		: Layer("Example"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		m_VertexArray.reset(Engine::VertexArray::Create());
+		//m_VertexArray.reset(Engine::VertexArray::Create());
 
-		float vertices[3 * 7] =
-		{
-		//	-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
-		//	 0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.8f, 1.0f,
-		//	 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
-		};
-
-		std::shared_ptr<Engine::VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(Engine::VertexBuffer::Create(vertices, sizeof(vertices)));
-		Engine::BufferLayout layout =
-		{
-			{ Engine::ShaderDataType::Float3, "a_Position" },
-			{ Engine::ShaderDataType::Float4, "a_Color" }
-		};
-		vertexBuffer->SetLayout(layout);
-		m_VertexArray->AddVertexBuffer(vertexBuffer);
-
-		uint32_t indices[3] = { 0, 1, 2 };
-		std::shared_ptr<Engine::IndexBuffer> indexBuffer;
-		indexBuffer.reset(Engine::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
-		m_VertexArray->SetIndexBuffer(indexBuffer);
-
+		//float squareVertices[5 * 4] =
+		//{
+		////    x      y	     z?			uv
+		//	-0.5f, -0.5f,   0.0f,	0.0f, 0.0f,	//	Bottom	- Left 
+		//	 0.5f, -0.5f,   0.0f,	1.0f, 0.0f, //	Bottom	- Right
+		//	 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right
+		//	-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
+		//};
+		// 
 		m_SquareVA.reset(Engine::VertexArray::Create());
-
-		float squareVertices[5 * 4] =
+		std::vector<float> squareVertices =
 		{
-		//    x      y	     z?			uv
-			-0.5f, -0.5f,   0.0f,	0.0f, 0.0f,	//	Bottom	- Left 
-			 0.5f, -0.5f,   0.0f,	1.0f, 0.0f, //	Bottom	- Right
-			 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right
-			-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
+			//    x      y	     z?			uv
+				-0.5f, -0.5f,   0.0f,	0.0f, 0.0f,	//	Bottom	- Left 
+				 0.5f, -0.5f,   0.0f,	1.0f, 0.0f, //	Bottom	- Right
+				 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right
+				-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
 		};
 
 		std::shared_ptr<Engine::VertexBuffer> SquareVB;
-		SquareVB.reset(Engine::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+		SquareVB.reset(Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size()*sizeof(float)));	// for en vector av floats
 		SquareVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },
 			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
 			});
 		m_SquareVA->AddVertexBuffer(SquareVB);
-
-		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
+		
+		std::vector<uint32_t> squareIndices = { 0, 1, 2, 2, 3, 0 };
+		
 		std::shared_ptr<Engine::IndexBuffer> SquareIB;
-		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size()));
 		m_SquareVA->SetIndexBuffer(SquareIB);
 
-		//--------------------------ObjLoader Test-----------------------------
-		/* Loading obj */
-		std::vector<glm::vec3> objVertices;
-		std::vector<glm::vec2> objUv;
-		std::vector<uint32_t> objIndices;
-		Engine::ObjLoader::Get()->ReadFile("CubeCube", objVertices, objUv, objIndices);
 
-		/* Creating vertex buffer */
-		std::shared_ptr<Engine::VertexBuffer> objVB;
-		std::vector<float> data;
-		for (size_t i{}; i < objVertices.size(); i++)	// Scuffed
-		{
-			data.push_back(*glm::value_ptr(objVertices[i]));
-			data.push_back(*glm::value_ptr(objUv[i]));
-		}
-		objVB.reset(Engine::VertexBuffer::Create(data.data(), sizeof(objVertices)));
-		objVB->SetLayout(
-			{
-				{ Engine::ShaderDataType::Float3, "a_Position" },
-				{ Engine::ShaderDataType::Float2, "a_TexCoord" }
-			});
 
-		/* Creating vertex array & adding vertex buffer*/
-		m_objVA.reset(Engine::VertexArray::Create());
-		m_objVA->AddVertexBuffer(objVB);
-
-		/* Creating index buffer */
-		std::shared_ptr<Engine::IndexBuffer> objIB;
-		objIB.reset(Engine::IndexBuffer::Create(objIndices.data(), sizeof(objIndices) / sizeof(uint32_t)));
-		m_objVA->SetIndexBuffer(objIB);
-		//--------------------END ObjLoader Test -----------------------------------
 
 		std::string vertexSrc = R"(
 			#version 330 core
@@ -105,6 +66,7 @@ public:
 			layout(location = 1) in vec4 a_Color;
 
 			uniform mat4 u_ProjectionView;
+			uniform mat4 u_ViewMatrix;
 			uniform mat4 u_Transform;
 
 			out vec3 v_Position;
@@ -114,7 +76,7 @@ public:
 			{
 				v_Position = a_Position;
 				v_Color = a_Color;
-				gl_Position = u_ProjectionView * u_Transform * vec4(a_Position, 1.0);
+				gl_Position = u_ProjectionView * u_ViewMatrix * u_Transform * vec4(a_Position, 1.0);
 			}
 		)";
 
@@ -141,6 +103,7 @@ public:
 			layout(location = 0) in vec3 a_Position;
 
 			uniform mat4 u_ProjectionView;
+			uniform mat4 u_ViewMatrix;
 			uniform mat4 u_Transform;
 
 			out vec3 v_Position;
@@ -148,7 +111,7 @@ public:
 			void main()
 			{
 				v_Position = a_Position;
-				gl_Position = u_ProjectionView * u_Transform * vec4(a_Position, 1.0);
+				gl_Position = u_ProjectionView * u_ViewMatrix * u_Transform * vec4(a_Position, 1.0);
 			}
 		)";
 
@@ -215,12 +178,11 @@ public:
 		auto textureShader = m_ShaderLibrary.Get("Texture");
 
 		m_Texture->Bind();
-		/* Test posisjonering */
+		/* Test posisjonering */	
 		static float sin{};
 		sin += ts;
-		float zPlane = sinf(sin);
-		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(zPlane)));
-		Engine::Renderer::Submit(textureShader, m_objVA, glm::scale(glm::mat4(1.0f), glm::vec3(zPlane)));	// loaded obj
+		float testmovement = sinf(sin);
+		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		m_WolfLogoTexture->Bind();
 		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
@@ -251,10 +213,11 @@ public:
 private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
-	std::shared_ptr<Engine::VertexArray> m_VertexArray;
+	//std::shared_ptr<Engine::VertexArray> m_VertexArray;
+
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA;
-	std::shared_ptr<Engine::VertexArray> m_objVA;	// For obj loader
+
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
 	std::shared_ptr<Engine::Scene> m_ActiveScene; // Entities
@@ -263,6 +226,105 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
+
+
+};
+
+class New3DLayer : public Engine::Layer
+{
+public:
+	New3DLayer()
+		: Layer("New3DLayer"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
+	{
+		std::string vertexSrc = R"(
+			#version 410 core
+
+			layout(location = 0) in vec4 PositionIn;
+			layout(location = 1) in vec4 colorIn;
+
+			out vec4 color;
+			
+			uniform mat4 pMatrix;
+			uniform mat4 vMatrix;
+			uniform mat4 mMatrix;
+
+			void main()
+			{
+				color = colorIn;
+				gl_Position = pMatrix * vMatrix * mMatrix * PositionIn;
+			}
+		)";
+
+		std::string fragmentSrc = R"(
+			#version 410 core
+
+			in vec4 color;
+			out vec4 fragmentColor;
+
+			void main()
+			{
+				fragmentColor = color;
+			}
+		)";
+
+		m_Shader = Engine::Shader::Create("FlatColor", vertexSrc, fragmentSrc);
+		m_vShader = std::make_shared<Engine::vShader>(vertexSrc, fragmentSrc);
+
+
+		/* Loading obj */
+		std::vector<Engine::Vertex> vertices;
+		std::vector<uint32_t> indices;
+		Engine::ObjLoader::Get()->ReadFile("BeveledCube", vertices, indices);
+
+		m_Obj = std::make_unique<Engine::VisualObject>(vertices, indices);
+		m_Obj->SetShader(m_vShader.get());
+		m_Obj->Init();
+	}
+
+	void OnUpdate(Engine::Timestep ts) override
+	{
+		// Update 
+		m_PCameraController.OnUpdate(ts);
+
+		// Begin Render Scene
+		//Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		Engine::RenderCommand::Clear();
+
+		Engine::Renderer::BeginScene(m_PCameraController.GetCamera());
+
+		// Render Objects
+		glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
+		glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
+
+		
+		//m_Shader->Bind();
+		//std::shared_ptr<Engine::OpenGLShader> shader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader);
+		//shader->UploadUniformMat4("mMatrix", m_Obj->GetMatrix());
+		//shader->UploadUniformMat4("pMatrix", projectionmatrix);
+		//shader->UploadUniformMat4("vMatrix", viewmatrix);
+		
+		//glUseProgram(m_Shader->GetProgram());
+		m_vShader->Use();
+		m_vShader->SetUniformMatrix("mMatrix", m_Obj->GetMatrix());
+		m_vShader->SetUniformMatrix("pMatrix", projectionmatrix);
+		m_vShader->SetUniformMatrix("vMatrix", viewmatrix);
+		m_Obj->Draw();
+
+
+		// End Render Scene
+		Engine::Renderer::EndScene();
+	}
+
+private:
+	Engine::ShaderLibrary m_ShaderLibrary;
+	std::shared_ptr<Engine::Shader> m_Shader;
+	std::shared_ptr<Engine::vShader> m_vShader;
+	
+	std::unique_ptr<Engine::VisualObject> m_Obj;
+
+	Engine::PerspectiveCameraController m_PCameraController;
+	Engine::OrthographicCameraController m_OCameraController;
 };
 
 class PathfinderLayer : public Engine::Layer
@@ -319,7 +381,8 @@ class Sandbox : public Engine::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
+		//PushLayer(new ExampleLayer());
+		PushLayer(new New3DLayer());
 		PushOverlay(new PathfinderLayer());
 	}
 

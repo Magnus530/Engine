@@ -36,7 +36,7 @@ namespace Engine
 		uint32_t Offset;
 		bool Normalized;
 
-		BufferElement() {}
+		BufferElement() = default;
 
 		BufferElement(ShaderDataType type, const std::string name, bool normalized = false)
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
@@ -51,8 +51,10 @@ namespace Engine
 				case ShaderDataType::Float2:	return 2;
 				case ShaderDataType::Float3:	return 3;
 				case ShaderDataType::Float4:	return 4;
-				case ShaderDataType::Mat3:		return 3 * 3;
-				case ShaderDataType::Mat4:		return 4 * 4;
+				//case ShaderDataType::Mat3:		return 3 * 3;
+				case ShaderDataType::Mat3:		return 3; //3* float3
+				//case ShaderDataType::Mat4:		return 4 * 4;
+				case ShaderDataType::Mat4:		return 4; //4* float4
 				case ShaderDataType::Int:		return 1;
 				case ShaderDataType::Int2:		return 2;
 				case ShaderDataType::Int3:		return 3;
@@ -110,10 +112,14 @@ namespace Engine
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		virtual void SetData(const void* data, uint32_t size) = 0;
+
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
-		static VertexBuffer* Create(float* vertices, uint32_t size);
+		//static VertexBuffer* Create(float* vertices, uint32_t size);
+		static VertexBuffer* Create(void* data, uint32_t size);
+		//static Ref<VertexBuffer> Create(void* data, uint32_t size);
 	};
 
 	class IndexBuffer
@@ -127,5 +133,6 @@ namespace Engine
 		virtual uint32_t GetCount() const = 0;
 
 		static IndexBuffer* Create(uint32_t* indices, uint32_t size);
+		//static Ref<IndexBuffer> Create(uint32_t* indices, uint32_t size);
 	};
 }

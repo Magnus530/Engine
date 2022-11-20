@@ -20,6 +20,7 @@ namespace Engine
 	void Renderer::BeginScene(Camera& camera)
 	{
 		m_SceneData->ProjectionViewMatrix = camera.GetProjectionViewMatrix();
+		m_SceneData->ViewMatrix = camera.GetViewMatrix();
 	}
 
 	void Renderer::EndScene()
@@ -30,6 +31,7 @@ namespace Engine
 	{
 		shader->Bind();
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ProjectionView", m_SceneData->ProjectionViewMatrix);
+		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewMatrix", m_SceneData->ViewMatrix);
 		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Transform", transform);
 
 		vertexArray->Bind();
