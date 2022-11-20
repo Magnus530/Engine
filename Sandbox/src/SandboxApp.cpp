@@ -22,7 +22,6 @@ public:
 	{
 		//m_VertexArray.reset(Engine::VertexArray::Create());
 
-		//m_SquareVA.reset(Engine::VertexArray::Create());
 		//float squareVertices[5 * 4] =
 		//{
 		////    x      y	     z?			uv
@@ -32,75 +31,33 @@ public:
 		//	-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
 		//};
 		// 
-		//std::vector<float> squareVertices =
-		//{
-		//	//    x      y	     z?			uv
-		//		-0.5f, -0.5f,   0.0f,	0.0f, 0.0f,	//	Bottom	- Left 
-		//		 0.5f, -0.5f,   0.0f,	1.0f, 0.0f, //	Bottom	- Right
-		//		 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right
-		//		-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
-		//};
-		// 
-		//std::vector<float> squareVertices =
-		//{
-		//	//    x      y	     z?			uv
-		//		-0.5f, -0.5f,   0.0f,	0.0f, 0.0f,	//	Bottom	- Left	- Bot
-		//		 0.5f, -0.5f,   0.0f,	1.0f, 0.0f, //	Bottom	- Right	- Bot
-		//		 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right	- Bot
-		//		-0.5f,  0.5f,   0.0f,	0.0f, 1.0f,	//	Top		- Left	- Bot
-		//
-		//		-0.5f, -0.5f,   1.0f,	0.0f, 0.0f,	//	Bottom	- Left  - Top
-		//		 0.5f, -0.5f,   1.0f,	1.0f, 0.0f, //	Bottom	- Right	- Top
-		//		 0.5f,  0.5f,   1.0f,	1.0f, 1.0f, //	Top		- Right	- Top
-		//		-0.5f,  0.5f,   1.0f,	0.0f, 1.0f	//	Top		- Left	- Top
-		//};
-		//
-		//std::vector<Engine::Vertex> squareVertices;
-		//squareVertices.push_back({ glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec2(0.0f, 0.0f) });
-		//squareVertices.push_back({ glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(1.0f, 0.0f) });
-		//squareVertices.push_back({ glm::vec3(0.5f,  0.5f, 0.0f), glm::vec2(1.0f, 1.0f) });
-		//squareVertices.push_back({ glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(0.0f, 1.0f) });
-		//
-		//std::shared_ptr<Engine::VertexBuffer> SquareVB;
-		//SquareVB = Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size()*sizeof(Engine::Vertex));	// for en vector av floats
-		//SquareVB->SetLayout
-		//({
-		//	{ Engine::ShaderDataType::Float3, "a_Position" },
-		//	{ Engine::ShaderDataType::Float2, "a_TexCoord" }
-		//	});
-		//m_SquareVA->AddVertexBuffer(SquareVB);
-		//
-		//std::vector<uint32_t> squareIndices = { 0, 1, 2, 2, 3, 0 };
-		//
-		//std::shared_ptr<Engine::IndexBuffer> SquareIB;
-		//SquareIB.reset(Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size()));
-		//m_SquareVA->SetIndexBuffer(SquareIB);
+		m_SquareVA.reset(Engine::VertexArray::Create());
+		std::vector<float> squareVertices =
+		{
+			//    x      y	     z?			uv
+				-0.5f, -0.5f,   0.0f,	0.0f, 0.0f,	//	Bottom	- Left 
+				 0.5f, -0.5f,   0.0f,	1.0f, 0.0f, //	Bottom	- Right
+				 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right
+				-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
+		};
 
-		//--------------------------ObjLoader Test-----------------------------
-		/* Loading obj */
-		std::vector<Engine::Vertex> mVertices;
-		std::vector<uint32_t> objIndices;
-		Engine::ObjLoader::Get()->ReadFile("Cube", mVertices, objIndices);
-		
-		m_objVA.reset(Engine::VertexArray::Create());
-		/* Creating vertex buffer */
-		std::shared_ptr<Engine::VertexBuffer> objVB;
-
-		//objVB.reset(Engine::VertexBuffer::Create(&mVertices[0], mVertices.size() * sizeof(Engine::Vertex)));
-		objVB.reset(Engine::VertexBuffer::Create(mVertices.data(), mVertices.size() * sizeof(Engine::Vertex)));
-		objVB->SetLayout(
-			{
-				{ Engine::ShaderDataType::Float3, "a_Position" },
-				{ Engine::ShaderDataType::Float2, "a_TexCoord" }
+		std::shared_ptr<Engine::VertexBuffer> SquareVB;
+		SquareVB.reset(Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size()*sizeof(float)));	// for en vector av floats
+		SquareVB->SetLayout
+		({
+			{ Engine::ShaderDataType::Float3, "a_Position" },
+			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
 			});
-		m_objVA->AddVertexBuffer(objVB);
+		m_SquareVA->AddVertexBuffer(SquareVB);
+		
+		std::vector<uint32_t> squareIndices = { 0, 1, 2, 2, 3, 0 };
+		
+		std::shared_ptr<Engine::IndexBuffer> SquareIB;
+		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size()));
+		m_SquareVA->SetIndexBuffer(SquareIB);
 
-		/* Creating index buffer */
-		std::shared_ptr<Engine::IndexBuffer> objIB;
-		objIB.reset(Engine::IndexBuffer::Create(objIndices.data(), objIndices.size()));
-		//objIB.reset(Engine::IndexBuffer::Create(&objIndices[0], objIndices.size()));
-		m_objVA->SetIndexBuffer(objIB);
-		//--------------------END ObjLoader Test -----------------------------------
+
+
 
 		std::string vertexSrc = R"(
 			#version 330 core
@@ -207,23 +164,21 @@ public:
 			{
 				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-				//Engine::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
+				Engine::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
 			}
 		}
 
 		auto textureShader = m_ShaderLibrary.Get("Texture");
 
 		m_Texture->Bind();
-		/* Test posisjonering */	//
+		/* Test posisjonering */	
 		static float sin{};
 		sin += ts;
 		float testmovement = sinf(sin);
-		//Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
-		/* loaded obj */
-		Engine::Renderer::Submit(textureShader, m_objVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
-		//m_WolfLogoTexture->Bind();
-		//Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		m_WolfLogoTexture->Bind();
+		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		Engine::Renderer::EndScene();
 	}
@@ -243,13 +198,10 @@ public:
 private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
-	//std::shared_ptr<Engine::OpenGLShader> m_Shader;
 	//std::shared_ptr<Engine::VertexArray> m_VertexArray;
 
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA;
-
-	std::shared_ptr<Engine::VertexArray> m_objVA;	// For obj loader
 
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
