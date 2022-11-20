@@ -4,39 +4,46 @@
 #include <iostream>
 #include <fstream>
 
+//test
+//#include "../Glad/include/glad/glad.h"
+#include <glad/glad.h>
+
 namespace Engine {
+
+
     static ObjLoader* m_Instance{ nullptr };
 
-	//ObjLoader::ObjLoader(std::string filename, std::vector<glm::vec3>& vertices, std::vector<unsigned int>& indices)
-	//{
-	//	ReadFile(filename, vertices, indices);
-	//}
-	
+    //ObjLoader::ObjLoader(std::string filename, std::vector<glm::vec3>& vertices, std::vector<unsigned int>& indices)
+    //{
+    //	ReadFile(filename, vertices, indices);
+    //}
+
     ObjLoader::ObjLoader()
     {}
-	ObjLoader::~ObjLoader()
-	{
+    ObjLoader::~ObjLoader()
+    {
 
-	}
+    }
     ObjLoader* ObjLoader::Get()
     {
         if (!m_Instance) { m_Instance = new ObjLoader(); }
         return m_Instance;
     }
 
-	void ObjLoader::ReadFile(std::string filename, std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs, std::vector<uint32_t>& indices)
-	{
+    void ObjLoader::ReadFile(std::string filename, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
+    //void ObjLoader::ReadFile(std::string filename, std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs, std::vector<uint32_t>& indices)
+    {
         /* Assumes a default path */
-		std::string path = "assets/meshes/";
-		std::string objType = ".obj";
-		std::string file = path + filename + objType;
+        std::string path = "assets/meshes/";
+        std::string objType = ".obj";
+        std::string file = path + filename + objType;
 
-		std::ifstream fileIn;
-		fileIn.open(file, std::ifstream::in);
-		if (!fileIn)
-            E_CORE_ERROR("Could not open file: {0} : {1}", filename, file);
+        std::ifstream fileIn;
+        fileIn.open(file, std::ifstream::in);
+        if (!fileIn)
+            E_CORE_ERROR("Could not open file: {0}", file);
         else
-            E_CORE_TRACE("Successfully read file: {0} : {1}", filename, file);
+            E_CORE_TRACE("Successfully read file: {0}", file);
 
 
         std::string oneLine;
@@ -57,32 +64,32 @@ namespace Engine {
             oneWord = "";
             sStream >> oneWord;
 
-            if (oneWord == "#"){
+            if (oneWord == "#") {
                 // Ignore
                 continue;
             }
-            if (oneWord == ""){
+            if (oneWord == "") {
                 // Ignore
                 continue;
             }
-            if (oneWord == "mtllib"){
+            if (oneWord == "mtllib") {
                 // Ignore
                 continue;
             }
-            if (oneWord == "o"){
+            if (oneWord == "o") {
                 // Ignore
                 continue;
             }
-            if (oneWord == "usemtl"){
+            if (oneWord == "usemtl") {
                 // Ignore
                 continue;
             }
-            if (oneWord == "s"){
+            if (oneWord == "s") {
                 // Ignore
                 continue;
             }
 
-            if (oneWord == "v"){
+            if (oneWord == "v") {
                 glm::vec3 tempVertexLocation;
                 sStream >> oneWord;
                 tempVertexLocation.x = std::stof(oneWord);
@@ -95,7 +102,7 @@ namespace Engine {
 
                 continue;
             }
-            if (oneWord == "vt"){
+            if (oneWord == "vt") {
                 glm::vec2 tempUV;
                 sStream >> oneWord;
                 tempUV.x = std::stof(oneWord);
@@ -106,7 +113,7 @@ namespace Engine {
 
                 continue;
             }
-            if (oneWord == "vn"){
+            if (oneWord == "vn") {
                 glm::vec3 tempNormal;
                 sStream >> oneWord;
                 tempNormal.x = std::stof(oneWord);
@@ -140,22 +147,20 @@ namespace Engine {
                     --uv;
                     --normal;
 
-                    
 
-                    vertices.push_back(tempVertices[index]);
-                    uvs.push_back(tempUVs[uv]);
-                    indices.push_back(temp_index++);
+                    //vertices.push_back(tempVertices[index]);
+                    //uvs.push_back(tempUVs[uv]);
                     /* Lag vertex */
-                    //Vertex tempVert{ tempVertices[index], tempNormals[normal], tempUVs[uv] };
-                    //mVertices.push_back(tempVert);
-
+                    Vertex tempVert( tempVertices[index], tempNormals[normal], tempUVs[uv] );
+                    vertices.push_back(tempVert);
+                    indices.push_back(temp_index++);
                     /* Lag indekser */
                     //mIndices.push_back(temp_index++);
+
                 }
                 continue;
             }
         }
-        
         fileIn.close();
-	}
+    }
 }

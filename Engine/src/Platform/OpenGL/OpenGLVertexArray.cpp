@@ -58,12 +58,14 @@ namespace Engine
 		for (const auto& element : layout)
 		{
 			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index,
+			glVertexAttribPointer(
+				index,
 				element.GetComponentCount(),
 				ShaderDataTypeToOpenGLBaseType(element.Type),
 				element.Normalized ? GL_TRUE : GL_FALSE,
 				layout.GetStride(),
-				(const void*)element.Offset);
+				//(const void*)element.Offset);
+				reinterpret_cast<GLvoid*>(0*index));
 			index++;
 		}
 
@@ -73,6 +75,7 @@ namespace Engine
 	void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
 	{
 		glBindVertexArray(m_RendererID);
+		//glGenBuffers(1, &m_RendererID);
 		indexBuffer->Bind();
 
 		m_IndexBuffer = indexBuffer;

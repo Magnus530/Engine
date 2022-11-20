@@ -162,8 +162,6 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Point.h" />
-    <ClInclude Include="Readers.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h" />
     <ClInclude Include="src\Engine\Core\Application.h" />
@@ -185,11 +183,11 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Engine\Pathfinding\PNode.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
-	<ClInclude Include="src\Engine\Renderer\Camera.h" />
+    <ClInclude Include="src\Engine\Renderer\Camera.h" />
     <ClInclude Include="src\Engine\Renderer\GraphicsContext.h" />
     <ClInclude Include="src\Engine\Renderer\OrthographicCamera.h" />
-    <ClInclude Include="src\Engine\Renderer\OrthographicCameraController.h" />    
-	<ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h" />
+    <ClInclude Include="src\Engine\Renderer\OrthographicCameraController.h" />
+    <ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h" />
     <ClInclude Include="src\Engine\Renderer\PerspectiveCameraController.h" />
     <ClInclude Include="src\Engine\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Engine\Renderer\Renderer.h" />
@@ -197,6 +195,9 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\Renderer\Shader.h" />
     <ClInclude Include="src\Engine\Renderer\Texture.h" />
     <ClInclude Include="src\Engine\Renderer\VertexArray.h" />
+    <ClInclude Include="src\Engine\Renderer\VisualObject\vShader.h" />
+    <ClInclude Include="src\Engine\Renderer\VisualObject\VisualObject.h" />
+    <ClInclude Include="src\Engine\Renderer\VisualObject\vertex.h" />
     <ClInclude Include="src\Engine\Scene\Scene.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
@@ -207,8 +208,6 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\epch.h" />
-    <ClInclude Include="Terrain.h" />
-    <ClInclude Include="Triangle.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
     <ClInclude Include="vendor\glm\glm\detail\_features.hpp" />
     <ClInclude Include="vendor\glm\glm\detail\_fixes.hpp" />
@@ -626,11 +625,8 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="vendor\glm\glm\vec4.hpp" />
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp" />
     <ClInclude Include="vendor\stb_image\stb_image.h" />
-    <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LAS_Reader.cpp" />
-    <ClCompile Include="Point.cpp" />
     <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp" />
     <ClCompile Include="src\Engine\Core\Application.cpp" />
     <ClCompile Include="src\Engine\Core\Layer.cpp" />
@@ -646,11 +642,14 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp" />
     <ClCompile Include="src\Engine\Renderer\PerspectiveCameraController.cpp" />
     <ClCompile Include="src\Engine\Renderer\RenderCommand.cpp" />
-	<ClCompile Include="src\Engine\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Engine\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Engine\Renderer\Shader.cpp" />
     <ClCompile Include="src\Engine\Renderer\Texture.cpp" />
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp" />
+    <ClCompile Include="src\Engine\Renderer\VisualObject\vShader.cpp" />
+    <ClCompile Include="src\Engine\Renderer\VisualObject\vertex.cpp" />
+    <ClCompile Include="src\Engine\Renderer\VisualObject\VisualObject.cpp" />
     <ClCompile Include="src\Engine\Scene\Scene.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
@@ -663,10 +662,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\epch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Terrain.cpp" />
-    <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
-    <ClCompile Include="vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="vendor\GLFW\GLFW.vcxproj">

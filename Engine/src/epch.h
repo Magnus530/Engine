@@ -13,8 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
 
 #include "Engine/Core/Log.h"
 

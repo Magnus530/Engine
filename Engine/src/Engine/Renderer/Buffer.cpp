@@ -7,12 +7,23 @@
 namespace Engine
 {
 	//Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
-	VertexBuffer* VertexBuffer::Create(float* vertices, uint32_t size)
+	//VertexBuffer* VertexBuffer::Create(float* vertices, uint32_t size)
+	//{
+	//	switch (Renderer::GetAPI())
+	//	{
+	//		case RendererAPI::API::None:     E_CORE_ASSERT(false, "RendererAPI::None has yet to be supported."); return nullptr;
+	//		case RendererAPI::API::OpenGL:   return new OpenGLVertexBuffer(vertices, size);
+	//	}
+	//	E_CORE_ASSERT(false, "Unknown RendererAPI.");
+	//	return nullptr;
+	//}
+	//std::shared_ptr<VertexBuffer> VertexBuffer::Create(void* data, uint32_t size)
+	VertexBuffer* VertexBuffer::Create(void* data, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::None:     E_CORE_ASSERT(false, "RendererAPI::None has yet to be supported."); return nullptr;
-			case RendererAPI::API::OpenGL:   return new OpenGLVertexBuffer(vertices, size);
+		case RendererAPI::API::None:     E_CORE_ASSERT(false, "RendererAPI::None has yet to be supported."); return nullptr;
+		case RendererAPI::API::OpenGL:   return new OpenGLVertexBuffer(data, size);
 		}
 		E_CORE_ASSERT(false, "Unknown RendererAPI.");
 		return nullptr;
