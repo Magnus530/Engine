@@ -21,6 +21,8 @@ namespace Engine
 		virtual const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const = 0;
 		//virtual const Ref<IndexBuffer>& GetIndexBuffer() const = 0;
 		
-		static VertexArray* Create();
+		//static VertexArray* Create();
+		//static std::shared_ptr<VertexArray> Create();
+		static Ref<VertexArray> Create();
 	};
 }

@@ -171,6 +171,9 @@
     <ClInclude Include="src\Engine\Renderer\VisualObject\VisualObject.h">
       <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\VisualObject\vShader.h">
+      <Filter>src\Engine\Renderer\VisualObject</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\VisualObject\vertex.h">
       <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClInclude>
@@ -1455,7 +1458,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Renderer\VisualObject\vShader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
@@ -1518,6 +1520,12 @@
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\VisualObject\VisualObject.cpp">
+      <Filter>src\Engine\Renderer\VisualObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\VisualObject\vShader.cpp">
+      <Filter>src\Engine\Renderer\VisualObject</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\VisualObject\vertex.cpp">
       <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClCompile>
@@ -1554,7 +1562,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Renderer\VisualObject\VisualObject.cpp" />
-    <ClCompile Include="src\Engine\Renderer\VisualObject\vShader.cpp" />
   </ItemGroup>
 </Project>
