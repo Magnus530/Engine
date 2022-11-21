@@ -3,8 +3,7 @@
 #include "vertex.h"
 #include <vector>
 #include "vShader.h"
-#include "../Buffer.h"
-#include "../VertexArray.h"
+//#include "../Shader.h"
 
 
 namespace Engine {
@@ -15,19 +14,14 @@ namespace Engine {
 		VisualObject();
 		VisualObject(std::vector<Vertex> vertices, std::vector<uint32_t> indices);
 		~VisualObject();
-		void Init(std::shared_ptr<VertexArray>& vertexarray);
+	
+		glm::mat4 GetMatrix() const { return m_Matrix; }
+
 		void Init();
 		void Draw();
 		void Draw(glm::mat4& projectionMatrix, glm::mat4& viewMatrix);
-	
-		// Set functions
+
 		void SetShader(vShader* shader) { m_Shader = shader; }
-
-		// Get functions
-		glm::mat4 GetMatrix() const { return m_Matrix; }
-		//VertexArray* GetVertexArray() const { return m_VA; }
-		std::shared_ptr<VertexArray> GetVertexArray() const { return m_VA; }
-
 	private:
 		glm::mat4 m_Matrix{ 1 };
 
@@ -38,12 +32,6 @@ namespace Engine {
 		std::vector<Vertex> m_Vertices;
 		std::vector<uint32_t> m_Indices;
 
-		//VertexArray* m_VA;
-		//VertexBuffer* m_VB;
-		//IndexBuffer* m_EAB;
-		std::shared_ptr<VertexArray> m_VA;
-		std::shared_ptr<VertexBuffer> m_VB;
-		std::shared_ptr<IndexBuffer> m_IB;
 		uint32_t m_VAO{};
 		uint32_t m_VBO{};
 		uint32_t m_EAB{};
