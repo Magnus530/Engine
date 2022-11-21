@@ -325,7 +325,7 @@ public:
 		* The renderer, which will then hold all vertex arrays and buffer, will check which arrays and buffers belong to that object
 		* If the buffers do not exist, create them and do a single render call.
 		*	else if the buffers exists, do instance rendering */
-		//Engine::Renderer::Submit(m_Shader, m_Obj); 
+		//Engine::Renderer::Submit(m_Shader, m_Obj); // Something like this
 
 		// End Render Scene
 		Engine::Renderer::EndScene();
