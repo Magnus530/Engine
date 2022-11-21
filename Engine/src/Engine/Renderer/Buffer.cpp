@@ -18,15 +18,28 @@ namespace Engine
 		E_CORE_ASSERT(false, "Unknown RendererAPI.");
 		return nullptr;
 	}
+	VertexBuffer* VertexBuffer::Create(std::vector<Vertex>& vertices)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:     E_CORE_ASSERT(false, "RendererAPI::None has yet to be supported."); return nullptr;
+		case RendererAPI::API::OpenGL:   return new OpenGLVertexBuffer(vertices);
+		}
+		E_CORE_ASSERT(false, "Unknown RendererAPI.");
+		return nullptr;
+	}
 
 	//std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t size)
-	IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t size)
+	//IndexBuffer* IndexBuffer::Create(uint32_t* indices, uint32_t size)
+	//IndexBuffer* IndexBuffer::Create(uint32_t* indices, size_t size)
+	IndexBuffer* IndexBuffer::Create(std::vector<uint32_t>& indices)
 	{
 		switch (Renderer::GetAPI())
 		{
 			case RendererAPI::API::None:     E_CORE_ASSERT(false, "RendererAPI::None has yet to be supported."); return nullptr;
 			//case RendererAPI::API::OpenGL:   return std::make_shared<OpenGLIndexBuffer>(indices, size);
-			case RendererAPI::API::OpenGL:   return new OpenGLIndexBuffer(indices, size);
+			//case RendererAPI::API::OpenGL:   return new OpenGLIndexBuffer(indices, size);
+			case RendererAPI::API::OpenGL:   return new OpenGLIndexBuffer(indices);
 		}
 
 		E_CORE_ASSERT(false, "Unknown RendererAPI.");

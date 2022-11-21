@@ -30,7 +30,8 @@ namespace Engine {
         vertexarray->Bind();
     
         /* Vertex buffer */
-        m_VB.reset(VertexBuffer::Create(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex)));
+        //m_VB.reset(VertexBuffer::Create(m_Vertices.data(), (uint32_t)m_Vertices.size() * sizeof(Vertex)));
+        m_VB.reset(VertexBuffer::Create(m_Vertices));
         m_VB->SetLayout
         ({
             { ShaderDataType::Float3, "PositionIn" },
@@ -40,7 +41,8 @@ namespace Engine {
         vertexarray->AddVertexBuffer(m_VB);
     
         /* Index buffer */
-        m_IB.reset(IndexBuffer::Create(m_Indices.data(), m_Indices.size()));
+        //m_IB.reset(IndexBuffer::Create(m_Indices.data(), m_Indices.size()));
+        m_IB.reset(IndexBuffer::Create(m_Indices));
         vertexarray->SetIndexBuffer(m_IB);
     }
     void VisualObject::Init()

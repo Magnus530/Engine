@@ -1,5 +1,7 @@
 #pragma once
 
+#include "VisualObject/vertex.h"
+
 namespace Engine
 {
 	enum class ShaderDataType
@@ -119,6 +121,7 @@ namespace Engine
 
 		//static std::shared_ptr<VertexBuffer> Create(void* data, uint32_t size);
 		static VertexBuffer* Create(void* data, uint32_t size);
+		static VertexBuffer* Create(std::vector<Vertex>& vertices);
 	};
 
 	class IndexBuffer
@@ -132,6 +135,9 @@ namespace Engine
 		virtual uint32_t GetCount() const = 0;
 
 		//static std::shared_ptr<IndexBuffer> Create(uint32_t* indices, uint32_t size);
-		static IndexBuffer* Create(uint32_t* indices, uint32_t size);
+		//static IndexBuffer* Create(uint32_t* indices, uint32_t size);
+		//static IndexBuffer* Create(uint32_t* indices, size_t size);
+		//static IndexBuffer* Create(uint32_t* indices, std::vector<uint32_t> indices);
+		static IndexBuffer* Create(std::vector<uint32_t>& indices);
 	};
 }

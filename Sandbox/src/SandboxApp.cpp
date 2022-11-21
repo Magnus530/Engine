@@ -55,7 +55,8 @@ public:
 		std::vector<uint32_t> squareIndices = { 0, 1, 2, 2, 3, 0 };
 		
 		std::shared_ptr<Engine::IndexBuffer> SquareIB;
-		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size())); // OpenGLIndexBuffer*
+		//SquareIB.reset(Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size())); // OpenGLIndexBuffer*
+		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices)); // OpenGLIndexBuffer*
 		// SquareIB = Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size());	// Ref<OpenGLIndexBuffer>
 		m_SquareVA->SetIndexBuffer(SquareIB);
 
@@ -285,8 +286,8 @@ public:
 
 
 		m_Obj = std::make_unique<Engine::VisualObject>(vertices, indices);
-		m_Obj->Init(m_VA);
 		m_Obj->Init();
+		m_Obj->Init(m_VA);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -388,8 +389,8 @@ class Sandbox : public Engine::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
-		//PushLayer(new New3DLayer());
+		//PushLayer(new ExampleLayer());
+		PushLayer(new New3DLayer());
 		PushOverlay(new PathfinderLayer());
 	}
 
