@@ -103,27 +103,28 @@ namespace Engine {
 	}
 	void vShader::SetUniformMatrix(const std::string& uniform, glm::mat4& matrix)
 	{
-		//GLint location;
-		//if (m_Uniforms.find(uniform) == m_Uniforms.end())
-		//{
-		//	location = glGetUniformLocation(GetProgram(), uniform.c_str());
-		//	m_Uniforms[uniform] = location;
-		//}
-		//else
-		//{
-		//	location = m_Uniforms[uniform];
-		//}
-		GLint location = GetUniformMatrix(uniform);
+		GLint location;
+		if (m_Uniforms.find(uniform) == m_Uniforms.end())
+		{
+			location = glGetUniformLocation(GetProgram(), uniform.c_str());
+			m_Uniforms[uniform] = location;
+		}
+		else
+		{
+			location = m_Uniforms[uniform];
+		}
 		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 	uint32_t vShader::GetUniformMatrix(const std::string& uniform)
 	{
 		GLint location;
-		if (m_Uniforms.find(uniform) == m_Uniforms.end()){
+		if (m_Uniforms.find(uniform) == m_Uniforms.end())
+		{
 			location = glGetUniformLocation(GetProgram(), uniform.c_str());
 			m_Uniforms[uniform] = location;
 		}
-		else{
+		else
+		{
 			location = m_Uniforms[uniform];
 		}
 		return location;
