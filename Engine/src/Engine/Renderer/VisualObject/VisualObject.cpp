@@ -24,11 +24,10 @@ namespace Engine {
     void VisualObject::Init(std::shared_ptr<VertexArray>& vertexarray)
     {
 
-        // Create Vertex array
+        /* Create Vertex array */
         vertexarray = VertexArray::Create();
-        vertexarray->Bind();
 
-        // Vertex buffer
+        /* Vertex buffer */
         m_VB = VertexBuffer::Create(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex));
         m_VB->SetLayout
         ({
@@ -36,10 +35,9 @@ namespace Engine {
             { ShaderDataType::Float4, "colorIn" },
             { ShaderDataType::Float2, "uvIn" }
             });
-        /* Layout */
         vertexarray->AddVertexBuffer(m_VB);
 
-        //// Index buffer
+        /* Index buffer */
         m_IB = IndexBuffer::Create(m_Indices.data(), m_Indices.size());
         vertexarray->SetIndexBuffer(m_IB);
     }

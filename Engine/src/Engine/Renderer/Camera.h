@@ -36,7 +36,7 @@ namespace Engine
 				glm::rotate(glm::mat4(1.0f), glm::radians(m_Rotation.z), glm::vec3(0, 0, 1));
 
 				m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Dir, { 0,1,0 });
-			//m_ViewMatrix = glm::inverse(transform);
+			//m_ViewMatrix = glm::inverse(m_ViewMatrix);
 			m_ProjectionViewMatrix = m_ProjectionMatrix * m_ViewMatrix;
 		}
 
