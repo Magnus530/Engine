@@ -4,6 +4,8 @@
 #include <vector>
 #include "vShader.h"
 //#include "../Shader.h"
+#include "../VertexArray.h"
+#include "../Buffer.h"
 
 
 namespace Engine {
@@ -16,6 +18,7 @@ namespace Engine {
 		~VisualObject();
 	
 		glm::mat4 GetMatrix() const { return m_Matrix; }
+		void Init(std::shared_ptr<VertexArray>& vertexarray);
 
 		void Init();
 		void Draw();
@@ -32,6 +35,9 @@ namespace Engine {
 		std::vector<Vertex> m_Vertices;
 		std::vector<uint32_t> m_Indices;
 
+		std::shared_ptr<VertexArray> m_VA;
+		std::shared_ptr<VertexBuffer> m_VB;
+		std::shared_ptr<IndexBuffer> m_IB;
 		uint32_t m_VAO{};
 		uint32_t m_VBO{};
 		uint32_t m_EAB{};
