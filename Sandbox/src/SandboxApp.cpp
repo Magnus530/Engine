@@ -12,8 +12,6 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 #include "Engine/Renderer/VisualObject/VisualObject.h"
 #include "Engine/AssetLoaders/ObjLoader.h"
 
-
-
 class ExampleLayer : public Engine::Layer
 {
 public:
@@ -55,9 +53,6 @@ public:
 		std::shared_ptr<Engine::IndexBuffer> SquareIB;
 		SquareIB = Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size());
 		m_SquareVA->SetIndexBuffer(SquareIB);
-
-
-
 
 		std::string vertexSrc = R"(
 			#version 330 core
@@ -130,9 +125,10 @@ public:
 			}
 		)";
 
-		m_FlatColorShader = Engine::Shader::Create("FlatColor", flatColorShaderVertexSrc, flatColorShaderFragmentSrc);
-
+		auto flatShader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
 		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+
+		m_FlatColorShader = Engine::Shader::Create("FlatColor", flatColorShaderVertexSrc, flatColorShaderFragmentSrc);
 
 		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
 		m_WolfLogoTexture = Engine::Texture2D::Create("assets/textures/wolf.png");
@@ -227,7 +223,6 @@ private:
 	Engine::OrthographicCameraController m_OCameraController;
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 
-
 };
 
 class New3DLayer : public Engine::Layer
@@ -269,7 +264,6 @@ public:
 
 		m_Shader = Engine::Shader::Create("FlatColor", vertexSrc, fragmentSrc);
 		m_vShader = std::make_shared<Engine::vShader>(vertexSrc, fragmentSrc);
-
 
 		/* Loading obj */
 		std::vector<Engine::Vertex> vertices;
@@ -384,8 +378,8 @@ class Sandbox : public Engine::Application
 public:
 	Sandbox()
 	{
-		//PushLayer(new ExampleLayer());
-		PushLayer(new New3DLayer());
+		PushLayer(new ExampleLayer());
+		//PushLayer(new New3DLayer());
 		PushOverlay(new PathfinderLayer());
 	}
 
