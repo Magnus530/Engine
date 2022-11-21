@@ -31,7 +31,8 @@ public:
 		//	-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
 		//};
 		// 
-		m_SquareVA = Engine::VertexArray::Create();
+		// m_SquareVA = Engine::VertexArray::Create();	// Ref<OpenGLVertexArray>
+		m_SquareVA.reset(Engine::VertexArray::Create()); // OpenGLVertexArray*
 		std::vector<float> squareVertices =
 		{
 			//    x      y	     z?			uv
@@ -40,9 +41,10 @@ public:
 				 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right
 				-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
 		};
-
+		
 		std::shared_ptr<Engine::VertexBuffer> SquareVB;
-		SquareVB = Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size()*sizeof(float));	// for en vector av floats
+		SquareVB.reset(Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size()*sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
+		// SquareVB = Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size()*sizeof(float)); //Ref<OpenGLVertexBuffer>	// for en vector av floats
 		SquareVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },
@@ -53,7 +55,8 @@ public:
 		std::vector<uint32_t> squareIndices = { 0, 1, 2, 2, 3, 0 };
 		
 		std::shared_ptr<Engine::IndexBuffer> SquareIB;
-		SquareIB = Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size());
+		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size())); OpenGLIndexBuffer*
+		// SquareIB = Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size());	// Ref<OpenGLIndexBuffer>
 		m_SquareVA->SetIndexBuffer(SquareIB);
 
 
@@ -182,7 +185,8 @@ public:
 		static float sin{};
 		sin += ts;
 		float testmovement = sinf(sin);
-		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement,0)));
+		//Engine::Renderer::Submit(textureShader, m_VA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		m_WolfLogoTexture->Bind();
 		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
@@ -218,6 +222,10 @@ private:
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA;
 
+
+	std::shared_ptr<Engine::VertexArray> m_VA;
+	std::shared_ptr<Engine::VisualObject> m_Obj;
+
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
 	std::shared_ptr<Engine::Scene> m_ActiveScene; // Entities
@@ -241,17 +249,18 @@ public:
 
 			layout(location = 0) in vec3 PositionIn;
 			layout(location = 1) in vec4 colorIn;
+			layout(location = 2) in vec2 uvIn;
 
 			out vec4 color;
 			
-			uniform mat4 u_ProjectionMatrix;
+			uniform mat4 u_ProjectionView;
 			uniform mat4 u_ViewMatrix;
-			uniform mat4 u_TransformMatrix;
+			uniform mat4 u_Transform;
 
 			void main()
 			{
 				color = colorIn;
-				gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_TransformMatrix * vec4(PositionIn, 1);
+				gl_Position = u_ProjectionView * u_ViewMatrix * u_Transform * vec4(PositionIn, 1);
 			}
 		)";
 
@@ -276,8 +285,8 @@ public:
 		std::vector<uint32_t> indices;
 		Engine::ObjLoader::Get()->ReadFile("BeveledCube", vertices, indices);
 
+
 		m_Obj = std::make_unique<Engine::VisualObject>(vertices, indices);
-		//m_Obj->SetShader(m_vShader.get());
 		m_Obj->Init(m_VA);
 		m_Obj->Init();
 	}
@@ -288,7 +297,6 @@ public:
 		m_PCameraController.OnUpdate(ts);
 
 		// Begin Render Scene
-		//Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
@@ -298,18 +306,15 @@ public:
 		glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
 		glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
-		
+		/* New method of rendering object */
 		Engine::Renderer::Submit(m_Shader, m_VA, m_Obj->GetMatrix());
+		//Engine::Renderer::Submit(m_Shader, m_Obj); 
 
-		//std::shared_ptr<Engine::OpenGLShader> shader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader);
-		//shader->UploadUniformMat4("mMatrix", m_Obj->GetMatrix());
-		//shader->UploadUniformMat4("pMatrix", projectionmatrix);
-		//shader->UploadUniformMat4("vMatrix", viewmatrix);
-		
+		/* Old method, similar to 3Dprog */
 		glm::mat4 pos = glm::translate(m_Obj->GetMatrix(), glm::vec3(5, 0, 0));
 		m_vShader->Use();
-		m_vShader->SetUniformMatrix("u_TransformMatrix", pos);
-		m_vShader->SetUniformMatrix("u_ProjectionMatrix", projectionmatrix);
+		m_vShader->SetUniformMatrix("u_Transform", pos);
+		m_vShader->SetUniformMatrix("u_ProjectionView", projectionmatrix);
 		m_vShader->SetUniformMatrix("u_ViewMatrix", viewmatrix);
 		m_Obj->Draw();
 
@@ -323,6 +328,7 @@ private:
 	std::shared_ptr<Engine::Shader> m_Shader;
 	std::shared_ptr<Engine::vShader> m_vShader;
 	
+
 	std::shared_ptr<Engine::VertexArray> m_VA;
 	std::unique_ptr<Engine::VisualObject> m_Obj;
 

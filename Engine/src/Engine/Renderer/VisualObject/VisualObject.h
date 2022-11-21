@@ -22,9 +22,15 @@ namespace Engine {
 
 		void Init();
 		void Draw();
-		void Draw(glm::mat4& projectionMatrix, glm::mat4& viewMatrix);
+		//void Draw(glm::mat4& projectionMatrix, glm::mat4& viewMatrix);
+	
+		// Set functions
+		//void SetShader(vShader* shader) { m_Shader = shader; }
 
-		void SetShader(vShader* shader) { m_Shader = shader; }
+		// Get functions
+		glm::mat4 GetMatrix() const { return m_Matrix; }
+		std::shared_ptr<VertexArray> GetVertexArray() const { return m_VA; }
+
 	private:
 		glm::mat4 m_Matrix{ 1 };
 
@@ -38,10 +44,11 @@ namespace Engine {
 		std::shared_ptr<VertexArray> m_VA;
 		std::shared_ptr<VertexBuffer> m_VB;
 		std::shared_ptr<IndexBuffer> m_IB;
+
 		uint32_t m_VAO{};
 		uint32_t m_VBO{};
 		uint32_t m_EAB{};
+		//vShader* m_Shader{ nullptr };
 
-		vShader* m_Shader{ nullptr };
 	};
 }
