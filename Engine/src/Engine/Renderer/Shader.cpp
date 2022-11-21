@@ -3,13 +3,6 @@
 
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
-#include "Shader.h"
-#include "Shader.h"
-#include "Shader.h"
-#include "Shader.h"
-#include "Shader.h"
-#include "Shader.h"
-#include "Shader.h"
 
 
 namespace Engine

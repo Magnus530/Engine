@@ -37,5 +37,7 @@ namespace Engine
 	private:
 		uint32_t m_RendererID;
 		std::string m_Name;
+
+		std::unordered_map<std::string, uint32_t> m_Uniforms;
 	};
 }

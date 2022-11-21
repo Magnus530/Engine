@@ -7,7 +7,6 @@ namespace Engine
 	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
-		//OpenGLVertexBuffer(float* vertices, uint32_t size);
 		OpenGLVertexBuffer(void* data, uint32_t size);
 		virtual ~OpenGLVertexBuffer();
 

@@ -19,7 +19,7 @@ namespace Engine
 
 	void Renderer::BeginScene(Camera& camera)
 	{
-		m_SceneData->ProjectionViewMatrix = camera.GetProjectionViewMatrix();
+		m_SceneData->ProjectionViewMatrix = camera.GetProjectionMatrix();
 		m_SceneData->ViewMatrix = camera.GetViewMatrix();
 	}
 
@@ -36,5 +36,6 @@ namespace Engine
 
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
+		vertexArray->Unbind();
 	}
 }
