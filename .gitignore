@@ -11,7 +11,8 @@ bin-int/
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+# Legger til stjerne
 Sandbox/imgui.ini
-Sandbox/Sandbox.vcxproj
-Engine/Engine.vcxproj.filters
-Engine/Engine.vcxproj
+Sandbox/**.vcxproj
+Engine/**.vcxproj.filters
+Engine/**.vcxproj
