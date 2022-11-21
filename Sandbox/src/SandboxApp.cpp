@@ -247,7 +247,7 @@ public:
 			#version 410 core
 
 			layout(location = 0) in vec3 PositionIn;
-			layout(location = 1) in vec4 colorIn;
+			layout(location = 1) in vec3 colorIn;
 			layout(location = 2) in vec2 uvIn;
 
 			out vec4 color;
@@ -255,10 +255,11 @@ public:
 			uniform mat4 u_ProjectionView;
 			uniform mat4 u_ViewMatrix;
 			uniform mat4 u_Transform;
+			uniform vec4 u_Color;
 
 			void main()
 			{
-				color = colorIn;
+				color = vec4(colorIn, 1) * u_Color;
 				gl_Position = u_ProjectionView * u_ViewMatrix * u_Transform * vec4(PositionIn, 1);
 			}
 		)";
@@ -276,17 +277,14 @@ public:
 		)";
 
 		m_Shader = Engine::Shader::Create("FlatColor", vertexSrc, fragmentSrc);
-		m_vShader = std::make_shared<Engine::vShader>(vertexSrc, fragmentSrc);
 
 
 		/* Loading obj */
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
-		Engine::ObjLoader::Get()->ReadFile("BeveledCube", vertices, indices);
+		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 
-
-		m_Obj = std::make_unique<Engine::VisualObject>(vertices, indices);
-		m_Obj->Init();
+		m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
 		m_Obj->Init(m_VA);
 	}
 
@@ -296,27 +294,38 @@ public:
 		m_PCameraController.OnUpdate(ts);
 
 		// Begin Render Scene
+		Engine::Renderer::BeginScene(m_PCameraController.GetCamera());
+		
+		// Set background color 
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
-		Engine::Renderer::BeginScene(m_PCameraController.GetCamera());
 
 		// Render Objects
 		glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
 		glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
-		/* New method of rendering object */
-		Engine::Renderer::Submit(m_Shader, m_VA, m_Obj->GetMatrix());
-		//Engine::Renderer::Submit(m_Shader, m_Obj); 
 
-		/* Old method, similar to 3Dprog */
 		glm::mat4 pos = glm::translate(m_Obj->GetMatrix(), glm::vec3(5, 0, 0));
-		m_vShader->Use();
-		m_vShader->SetUniformMatrix("u_Transform", pos);
-		m_vShader->SetUniformMatrix("u_ProjectionView", projectionmatrix);
-		m_vShader->SetUniformMatrix("u_ViewMatrix", viewmatrix);
-		m_Obj->Draw();
 
+		// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
+		static float sin{};
+		sin += ts;
+		float fleeting = (sinf(sin) + 1) / 2;
+		glm::vec4 color(fleeting, 1, 1, 1);
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", color);
+
+		// SandboxApp.cpp
+		// Draw call for Vertex array m_VA with m_Obj's position
+		Engine::Renderer::Submit(m_Shader, m_VA, m_Obj->GetMatrix());	
+
+		// TODO: Note regarding rendering 
+		/* Want it to be something like this. 
+		* The scene tells the renderer which object to render.
+		* The renderer, which will then hold all vertex arrays and buffer, will check which arrays and buffers belong to that object
+		* If the buffers do not exist, create them and do a single render call.
+		*	else if the buffers exists, do instance rendering */
+		//Engine::Renderer::Submit(m_Shader, m_Obj); 
 
 		// End Render Scene
 		Engine::Renderer::EndScene();
@@ -325,11 +334,9 @@ public:
 private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
-	std::shared_ptr<Engine::vShader> m_vShader;
-	
 
 	std::shared_ptr<Engine::VertexArray> m_VA;
-	std::unique_ptr<Engine::VisualObject> m_Obj;
+	std::shared_ptr<Engine::VisualObject> m_Obj;
 
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;

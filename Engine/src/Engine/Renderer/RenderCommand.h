@@ -2,6 +2,7 @@
 
 #include "RendererAPI.h"
 
+
 namespace Engine
 {
 	class RenderCommand
@@ -32,8 +33,6 @@ namespace Engine
 		{
 			s_RendererAPI->DrawIndexed(vertexArray);
 		}
-
-
 
 	private:
 		static RendererAPI* s_RendererAPI;

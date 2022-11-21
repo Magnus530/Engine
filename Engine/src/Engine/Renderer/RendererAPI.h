@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "VertexArray.h"
+#include "VisualObject/VisualObject.h"
 
 namespace Engine
 {

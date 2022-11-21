@@ -29,7 +29,6 @@ namespace Engine
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
 		glGenVertexArrays(1, &m_VAO);
-		//glCreateVertexArrays(1, &m_VAO);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
@@ -66,7 +65,6 @@ namespace Engine
 				element.Normalized ? GL_TRUE : GL_FALSE,
 				layout.GetStride(),
 				(const void*)element.Offset);
-				//reinterpret_cast<GLvoid*>(0*index));
 			index++;
 		}
 
@@ -89,7 +87,6 @@ namespace Engine
 	void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
 	{
 		glBindVertexArray(m_VAO);
-		//glGenBuffers(1, &m_RendererID);
 		indexBuffer->Bind();
 
 		m_IndexBuffer = indexBuffer;

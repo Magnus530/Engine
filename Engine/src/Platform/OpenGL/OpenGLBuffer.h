@@ -7,7 +7,6 @@ namespace Engine
 	class OpenGLVertexBuffer : public VertexBuffer
 	{
 	public:
-		//OpenGLVertexBuffer(float* vertices, uint32_t size);
 		OpenGLVertexBuffer(void* data, uint32_t size);
 		OpenGLVertexBuffer(std::vector<Vertex>& vertices);
 		virtual ~OpenGLVertexBuffer();
@@ -28,8 +27,7 @@ namespace Engine
 	class OpenGLIndexBuffer : public IndexBuffer
 	{
 	public:
-		//OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
-		//OpenGLIndexBuffer(uint32_t* indices, size_t size);
+		OpenGLIndexBuffer(uint32_t* indicesdata, uint32_t count);
 		OpenGLIndexBuffer(std::vector<uint32_t>& indices);
 		virtual ~OpenGLIndexBuffer();
 
