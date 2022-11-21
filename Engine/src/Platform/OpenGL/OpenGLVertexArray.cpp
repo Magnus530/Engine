@@ -28,7 +28,7 @@ namespace Engine
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
-		glGenVertexArrays(1, &m_VAO);
+		glGenVertexArrays(1, &m_RendererID);
 		//glCreateVertexArrays(1, &m_VAO);
 	}
 
@@ -75,7 +75,7 @@ namespace Engine
 
 	void OpenGLVertexArray::AddVertexBuffer(const uint32_t& vertexBuffer, uint64_t& data)
 	{
-		glBindVertexArray(m_VAO);
+		glBindVertexArray(m_RendererID);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, data, reinterpret_cast<void*>(0));// array buffer offset

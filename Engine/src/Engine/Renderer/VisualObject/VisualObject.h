@@ -16,8 +16,6 @@ namespace Engine {
 		VisualObject();
 		VisualObject(std::vector<Vertex> vertices, std::vector<uint32_t> indices);
 		~VisualObject();
-	
-		glm::mat4 GetMatrix() const { return m_Matrix; }
 		void Init(std::shared_ptr<VertexArray>& vertexarray);
 
 		void Init();

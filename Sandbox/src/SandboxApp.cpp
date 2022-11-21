@@ -55,11 +55,9 @@ public:
 		std::vector<uint32_t> squareIndices = { 0, 1, 2, 2, 3, 0 };
 		
 		std::shared_ptr<Engine::IndexBuffer> SquareIB;
-		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size())); OpenGLIndexBuffer*
+		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size())); // OpenGLIndexBuffer*
 		// SquareIB = Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size());	// Ref<OpenGLIndexBuffer>
 		m_SquareVA->SetIndexBuffer(SquareIB);
-
-
 
 
 		std::string vertexSrc = R"(
@@ -390,8 +388,8 @@ class Sandbox : public Engine::Application
 public:
 	Sandbox()
 	{
-		//PushLayer(new ExampleLayer());
-		PushLayer(new New3DLayer());
+		PushLayer(new ExampleLayer());
+		//PushLayer(new New3DLayer());
 		PushOverlay(new PathfinderLayer());
 	}
 
