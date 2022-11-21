@@ -22,7 +22,7 @@ namespace Engine
 	private:
 		struct SceneData
 		{
-			glm::mat4 ProjectionViewMatrix;
+			glm::mat4 ProjectionMatrix;
 			glm::mat4 ViewMatrix;
 		};
 

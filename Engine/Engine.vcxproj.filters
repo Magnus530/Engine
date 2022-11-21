@@ -28,6 +28,9 @@
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Renderer\VisualObject">
+      <UniqueIdentifier>{F268419A-DEB9-2CDC-071E-1B9EF3CDBF45}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Scene">
       <UniqueIdentifier>{AF1338A9-9B0C-57FB-C43E-3C80B0963607}</UniqueIdentifier>
     </Filter>
@@ -164,6 +167,15 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
       <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\VisualObject\VisualObject.h">
+      <Filter>src\Engine\Renderer\VisualObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\VisualObject\vShader.h">
+      <Filter>src\Engine\Renderer\VisualObject</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\VisualObject\vertex.h">
+      <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Components.h">
       <Filter>src\Engine\Scene</Filter>
@@ -1513,6 +1525,15 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
       <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\VisualObject\VisualObject.cpp">
+      <Filter>src\Engine\Renderer\VisualObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\VisualObject\vShader.cpp">
+      <Filter>src\Engine\Renderer\VisualObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\VisualObject\vertex.cpp">
+      <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Entity.cpp">
       <Filter>src\Engine\Scene</Filter>

@@ -7,15 +7,11 @@ namespace Engine {
 
     VisualObject::VisualObject()
     {
-
     }
-
     VisualObject::VisualObject(std::vector<Vertex> vertices, std::vector<uint32_t> indices)
         : m_Vertices{ vertices }, m_Indices{ indices }
     {
-        //Init(m_VA);
     }
-
     VisualObject::~VisualObject()
     {
         glDeleteVertexArrays(1, &m_VAO);
@@ -23,7 +19,6 @@ namespace Engine {
     }
     void VisualObject::Init(std::shared_ptr<VertexArray>& vertexarray)
     {
-
         /* Create Vertex array */
         vertexarray = VertexArray::Create();
 
