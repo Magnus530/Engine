@@ -6,8 +6,8 @@
 
 //#include <glad/glad.h>
 
-namespace Engine {
-
+namespace Engine 
+{
     void ObjLoader::ReadFile(std::string filename, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
     {
         /* Assumes a default path */
