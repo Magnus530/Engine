@@ -57,87 +57,17 @@ public:
 		// SquareIB = Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size());	// Ref<OpenGLIndexBuffer>
 		m_SquareVA->SetIndexBuffer(SquareIB);
 
-		std::string vertexSrc = R"(
-			#version 330 core
-
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec4 a_Color;
-
-			uniform mat4 u_ProjectionView;
-			uniform mat4 u_ViewMatrix;
-			uniform mat4 u_Transform;
-
-			out vec3 v_Position;
-			out vec4 v_Color;
-
-			void main()
-			{
-				v_Position = a_Position;
-				v_Color = a_Color;
-				gl_Position = u_ProjectionView * u_ViewMatrix * u_Transform * vec4(a_Position, 1.0);
-			}
-		)";
-
-		std::string fragmentSrc = R"(
-			#version 330 core
-
-			layout(location = 0) out vec4 color;
-
-			in vec3 v_Position;
-			in vec4 v_Color;
-
-			void main()
-			{
-				color = vec4(v_Position * 0.5 + 0.5, 1.0);
-				color = v_Color;
-			}
-		)";
-
-		m_Shader = Engine::Shader::Create("VertexPosColor", vertexSrc, fragmentSrc);
-
-		std::string flatColorShaderVertexSrc = R"(
-			#version 330 core
-
-			layout(location = 0) in vec3 a_Position;
-
-			uniform mat4 u_ProjectionView;
-			uniform mat4 u_ViewMatrix;
-			uniform mat4 u_Transform;
-
-			out vec3 v_Position;
-
-			void main()
-			{
-				v_Position = a_Position;
-				gl_Position = u_ProjectionView * u_ViewMatrix * u_Transform * vec4(a_Position, 1.0);
-			}
-		)";
-
-		std::string flatColorShaderFragmentSrc = R"(
-			#version 330 core
-
-			layout(location = 0) out vec4 color;
-
-			in vec3 v_Position;
-			uniform vec3 u_Color;
-
-
-			void main()
-			{
-				color = vec4(u_Color, 1.0);
-			}
-		)";
-
 		auto flatShader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
 		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
-
-		m_FlatColorShader = Engine::Shader::Create("FlatColor", flatColorShaderVertexSrc, flatColorShaderFragmentSrc);
 
 		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
 		m_WolfLogoTexture = Engine::Texture2D::Create("assets/textures/wolf.png");
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader)->Bind();
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader)->UploadUniformInt("u_Color", 0);
 
 		m_ActiveScene = std::make_shared<Engine::Scene>();
 
@@ -161,20 +91,12 @@ public:
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_FlatColorShader)->Bind();
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat3("u_Color", m_SquareColor);
-
-		for (int y = 0; y < 20; y++)
-		{
-			for (int x = 0; x < 20; x++)
-			{
-				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
-				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-				Engine::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
-			}
-		}
-
 		auto textureShader = m_ShaderLibrary.Get("Texture");
+		auto flatShader = m_ShaderLibrary.Get("Flat");
+
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader)->UploadUniformFloat3("u_Color", m_SquareColor);
+
+		Engine::Renderer::Submit(flatShader, m_SquareVA, glm::mat4(1.0f));
 
 		m_Texture->Bind();
 		/* Test posisjonering */	
@@ -239,6 +161,14 @@ public:
 	New3DLayer()
 		: Layer("New3DLayer"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
+
+		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+
+		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
+
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+
 		std::string vertexSrc = R"(
 			#version 410 core
 
@@ -279,9 +209,8 @@ public:
 		std::vector<uint32_t> indices;
 		Engine::ObjLoader::Get()->ReadFile("BeveledCube", vertices, indices);
 
-
 		m_Obj = std::make_unique<Engine::VisualObject>(vertices, indices);
-		m_Obj->Init(m_VA);
+		m_Obj->(m_VA);
 		m_Obj->Init();
 	}
 
@@ -296,12 +225,21 @@ public:
 
 		Engine::Renderer::BeginScene(m_PCameraController.GetCamera());
 
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+		auto textureShader = m_ShaderLibrary.Get("Texture");
+
+		m_Texture->Bind();
+
+		m_SquareVA.reset(Engine::VertexArray::Create()); // OpenGLVertexArray*
+
+
 		// Render Objects
 		glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
 		glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
 		/* New method of rendering object */
-		Engine::Renderer::Submit(m_Shader, m_VA, m_Obj->GetMatrix());
+		Engine::Renderer::Submit(textureShader, m_VA, m_Obj->GetMatrix());
 		//Engine::Renderer::Submit(m_Shader, m_Obj); 
 
 		/* Old method, similar to 3Dprog */
@@ -312,7 +250,6 @@ public:
 		m_vShader->SetUniformMatrix("u_ViewMatrix", viewmatrix);
 		m_Obj->Draw();
 
-
 		// End Render Scene
 		Engine::Renderer::EndScene();
 	}
@@ -322,9 +259,10 @@ private:
 	std::shared_ptr<Engine::Shader> m_Shader;
 	std::shared_ptr<Engine::vShader> m_vShader;
 	
-
 	std::shared_ptr<Engine::VertexArray> m_VA;
 	std::unique_ptr<Engine::VisualObject> m_Obj;
+	std::shared_ptr<Engine::VertexArray> m_SquareVA;
+	std::shared_ptr<Engine::Texture2D> m_Texture;
 
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
@@ -384,8 +322,8 @@ class Sandbox : public Engine::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
-		//PushLayer(new New3DLayer());
+		//PushLayer(new ExampleLayer());
+		PushLayer(new New3DLayer());
 		PushOverlay(new PathfinderLayer());
 	}
 
