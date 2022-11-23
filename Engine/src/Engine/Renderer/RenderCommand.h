@@ -33,6 +33,10 @@ namespace Engine
 		{
 			s_RendererAPI->DrawIndexed(vertexArray);
 		}
+		inline static void DrawPoint(const std::shared_ptr<VertexArray>& vertexArray)
+		{
+			s_RendererAPI->DrawPoint(vertexArray);
+		}
 
 	private:
 		static RendererAPI* s_RendererAPI;

@@ -168,13 +168,13 @@
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Renderer\VisualObject\VisualObject.h">
+    <ClInclude Include="src\Engine\Objects\VisualObject.h">
       <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Renderer\VisualObject\vShader.h">
+    <ClInclude Include="src\Engine\Objects\vShader.h">
       <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Renderer\VisualObject\vertex.h">
+    <ClInclude Include="src\Engine\Objects\vertex.h">
       <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Components.h">
@@ -1464,6 +1464,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Objects\TransformObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
@@ -1526,13 +1527,13 @@
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Renderer\VisualObject\VisualObject.cpp">
+    <ClCompile Include="src\Engine\Objects\VisualObject.cpp">
       <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Renderer\VisualObject\vShader.cpp">
+    <ClCompile Include="src\Engine\Objects\vShader.cpp">
       <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Renderer\VisualObject\vertex.cpp">
+    <ClCompile Include="src\Engine\Objects\vertex.cpp">
       <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Entity.cpp">
@@ -1571,5 +1572,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Objects\TransformObject.cpp" />
   </ItemGroup>
 </Project>

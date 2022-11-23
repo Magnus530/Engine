@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VisualObject/vertex.h"
+#include "../Objects/vertex.h"
 
 namespace Engine
 {

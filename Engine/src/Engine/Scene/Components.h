@@ -37,4 +37,10 @@ namespace Engine
 			: Color(color) {}
 	};
 
+	struct PathfindingComponent
+	{
+		PathfindingComponent() = default;
+		PathfindingComponent(const PathfindingComponent&) = default;
+	};
+
 }

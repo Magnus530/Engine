@@ -9,7 +9,7 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Engine/Renderer/VisualObject/VisualObject.h"
+#include "Engine/Objects/VisualObject.h"
 #include "Engine/AssetLoaders/ObjLoader.h"
 
 
@@ -44,7 +44,6 @@ public:
 		
 		std::shared_ptr<Engine::VertexBuffer> SquareVB;
 		SquareVB.reset(Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size()*sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
-		// SquareVB = Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size()*sizeof(float)); //Ref<OpenGLVertexBuffer>	// for en vector av floats
 		SquareVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },
@@ -55,9 +54,7 @@ public:
 		std::vector<uint32_t> squareIndices = { 0, 1, 2, 2, 3, 0 };
 		
 		std::shared_ptr<Engine::IndexBuffer> SquareIB;
-		//SquareIB.reset(Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size())); // OpenGLIndexBuffer*
 		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices)); // OpenGLIndexBuffer*
-		// SquareIB = Engine::IndexBuffer::Create(squareIndices.data(), squareIndices.size());	// Ref<OpenGLIndexBuffer>
 		m_SquareVA->SetIndexBuffer(SquareIB);
 
 
@@ -221,10 +218,6 @@ private:
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA;
 
-
-	std::shared_ptr<Engine::VertexArray> m_VA;
-	std::shared_ptr<Engine::VisualObject> m_Obj;
-
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
 	std::shared_ptr<Engine::Scene> m_ActiveScene; // Entities
@@ -234,11 +227,30 @@ private:
 	Engine::OrthographicCameraController m_OCameraController;
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 
-
+	
 };
 
 class New3DLayer : public Engine::Layer
 {
+private:
+	Engine::ShaderLibrary m_ShaderLibrary;
+	std::shared_ptr<Engine::Shader> m_Shader, m_Textureshader;
+	std::shared_ptr<Engine::Texture2D> m_Texture;
+
+	Engine::PerspectiveCameraController m_PCameraController;
+	Engine::OrthographicCameraController m_OCameraController;
+
+	/* Test VisualObject with Pathfinding */
+	std::shared_ptr<Engine::VisualObject> m_Obj;
+	std::vector<glm::vec3> m_Path;
+	std::vector<glm::vec3> m_SplinePath;
+	float m_Splinetime{};
+	bool bObjPathfindActive{};
+	bool bOverrideShaderColor{};
+
+	/* Visual Point */
+	//std::shared_ptr<Engine::VertexArray> m_PointVA;
+	//std::vector<Engine::Vertex> m_PointVertices;
 public:
 	New3DLayer()
 		: Layer("New3DLayer"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
@@ -246,21 +258,26 @@ public:
 		std::string vertexSrc = R"(
 			#version 410 core
 
-			layout(location = 0) in vec3 PositionIn;
-			layout(location = 1) in vec3 colorIn;
-			layout(location = 2) in vec2 uvIn;
+			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec3 a_Normal;
+			layout(location = 2) in vec2 a_TexCoord;
 
 			out vec4 color;
 			
 			uniform mat4 u_ProjectionView;
 			uniform mat4 u_ViewMatrix;
 			uniform mat4 u_Transform;
+
 			uniform vec4 u_Color;
+			uniform int u_Override;
 
 			void main()
 			{
-				color = vec4(colorIn, 1) * u_Color;
-				gl_Position = u_ProjectionView * u_ViewMatrix * u_Transform * vec4(PositionIn, 1);
+				color = vec4(a_Normal, 1);
+				if (u_Override == 1){
+					color = u_Color;
+				}
+				gl_Position = u_ProjectionView * u_ViewMatrix * u_Transform * vec4(a_Position, 1);
 			}
 		)";
 
@@ -277,15 +294,39 @@ public:
 		)";
 
 		m_Shader = Engine::Shader::Create("FlatColor", vertexSrc, fragmentSrc);
+		m_Textureshader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
 
+		m_Textureshader->Bind();
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Textureshader)->UploadUniformInt("u_Texture", 0);
 
 		/* Loading obj */
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
-		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 
+		Engine::ObjLoader::ReadFile("Plane", vertices, indices);
 		m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
-		m_Obj->Init(m_VA);
+
+		/* Pathfinding */
+		Engine::Pathfinder::SpawnGrid();
+
+		// Drawing a debug point
+		//m_PointVA.reset(Engine::VertexArray::Create());
+		//std::shared_ptr<Engine::VertexBuffer> vb;
+		//for (auto& it : m_Path)
+		//{
+		//	m_PointVertices.emplace_back(it, glm::vec3(1,1,1 ));
+		//}
+		//vb.reset(Engine::VertexBuffer::Create(m_PointVertices.data(), m_PointVertices.size() * sizeof(Engine::Vertex)));
+		//vb->SetLayout({
+			//{ Engine::ShaderDataType::Float3, "PositionIn" },
+			//{ Engine::ShaderDataType::Float3, "colorIn" },
+			//{ Engine::ShaderDataType::Float2, "uvIn" }
+			//});
+		//m_PointVA->AddVertexBuffer(vb);
+		//std::shared_ptr<Engine::IndexBuffer> ib;
+		//ib.reset(Engine::IndexBuffer::Create(indices.data(), indices.size()));
+		//m_PointVA->SetIndexBuffer(ib);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -306,18 +347,48 @@ public:
 		glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
 
-		glm::mat4 pos = glm::translate(m_Obj->GetMatrix(), glm::vec3(5, 0, 0));
+		if (m_Splinetime < 0.99f) m_Splinetime += (ts * 1.f)/* / (float)Engine::Pathfinder::m_NodeLocations.size()*/;
+		else { m_Splinetime = 0.99f; bObjPathfindActive = false; }
+		if (m_Splinetime > 0.99f) m_Splinetime = 0.99f;
 
+		if (bObjPathfindActive) {
+			glm::vec3 pos = Engine::Pathfinder::GetPositionAlongSpline(m_Path, m_Splinetime);
+			//E_TRACE("SplineTime: {0}, {1}, {2}", pos.x, pos.y, pos.z);
+			m_Obj->SetWorldPosition(pos);
+		}
 		// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
 		static float sin{};
 		sin += ts;
+		float tmp = sinf(sin);
 		float fleeting = (sinf(sin) + 1) / 2;
-		glm::vec4 color(fleeting, 1, 1, 1);
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", color);
+		glm::vec4 color(1, 1, 1, 1);
 
+
+		/* --------------------- RENDERING ------------------------ */
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_Override", 0);
+		m_Texture->Bind();
 		// SandboxApp.cpp
 		// Draw call for Vertex array m_VA with m_Obj's position
-		Engine::Renderer::Submit(m_Shader, m_VA, m_Obj->GetMatrix());	
+		Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix());		// Render m_Obj
+
+		/* Render Nodegrid */
+		float scale = 0.1f;
+		for (auto& it : Engine::Pathfinder::m_NodeLocations)
+		{
+			Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it/scale)));	
+		}
+
+		/* Render Spline Path */
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", color);
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_Override", bOverrideShaderColor);
+		scale = 0.05f;
+		for (auto& it : m_Path)
+		{
+			Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0,0.1f,0)));
+		}
+		/* Render points */
+		//Engine::Renderer::Submit(m_Shader, m_PointVA, glm::mat4(1.f));
+
 
 		// TODO: Note regarding rendering 
 		/* Want it to be something like this. 
@@ -331,37 +402,24 @@ public:
 		Engine::Renderer::EndScene();
 	}
 
-private:
-	Engine::ShaderLibrary m_ShaderLibrary;
-	std::shared_ptr<Engine::Shader> m_Shader;
-
-	std::shared_ptr<Engine::VertexArray> m_VA;
-	std::shared_ptr<Engine::VisualObject> m_Obj;
-
-	Engine::PerspectiveCameraController m_PCameraController;
-	Engine::OrthographicCameraController m_OCameraController;
-};
-
-class PathfinderLayer : public Engine::Layer
-{
-public:
-	PathfinderLayer()
-	{
-		Engine::Pathfinder::SpawnGrid();
-	}
-	~PathfinderLayer(){}
-
 	virtual void OnImGuiRender() override
 	{
 		ImGui::Begin("Pathfinder");
+
+		/* Override Shader Color */
+		ImGui::Checkbox("OverrideShaderColor", &bOverrideShaderColor);
+		//ImGui::Colo
+
+		/* Pathfinding GUI */
 		using namespace Engine;	// Tmp, for readability
 
 		static std::string currentStart{ NULL };
 		static std::string currentEnd{ NULL };
 		static std::shared_ptr<PNode> start;
 		static std::shared_ptr<PNode> end;
+		static std::vector<PNode*> nodepath;
 		if (ImGui::BeginCombo("StartNode", currentStart.c_str())) {
-			for (const auto& it : Pathfinder::mNodes) 
+			for (const auto& it : Pathfinder::m_Nodes)
 			{
 				if (ImGui::Selectable(it->m_name.c_str())) {
 					currentStart = it->m_name;
@@ -371,7 +429,7 @@ public:
 			ImGui::EndCombo();
 		}
 		if (ImGui::BeginCombo("EndNode", currentEnd.c_str())) {
-			for (const auto& it : Pathfinder::mNodes)
+			for (const auto& it : Pathfinder::m_Nodes)
 			{
 				if (ImGui::Selectable(it->m_name.c_str())) {
 					currentEnd = it->m_name;
@@ -384,11 +442,22 @@ public:
 		if (ImGui::Button("Find path")) {
 			if (start.get() && end.get()) {
 				E_TRACE("Finding path between from {0} to {1}", start->m_name, end->m_name);
-				Pathfinder::FindPath(start.get(), end.get());
+				nodepath.clear();
+				m_Path.clear();
+				nodepath = Pathfinder::FindPath(start, end.get());
+				m_Path.push_back(start->m_Position);
+				for (auto it = nodepath.end(); it != nodepath.begin();) {
+					m_Path.push_back((*--it)->m_Position);
+				}
+				//m_Path.push_back(start->m_Position);
+				Pathfinder::MakeKnotVector(m_Path);
+				m_Splinetime = 0.f;
+				bObjPathfindActive = true;
 			}
 		}
 		ImGui::End();
 	}
+
 };
 
 class Sandbox : public Engine::Application
@@ -398,7 +467,7 @@ public:
 	{
 		//PushLayer(new ExampleLayer());
 		PushLayer(new New3DLayer());
-		PushOverlay(new PathfinderLayer());
+		//PushOverlay(new PathfinderLayer());
 	}
 
 	~Sandbox()

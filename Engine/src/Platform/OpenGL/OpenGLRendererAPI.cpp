@@ -33,4 +33,9 @@ namespace Engine
 	{
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
+	void OpenGLRendererAPI::DrawPoint(const std::shared_ptr<VertexArray>& vertexArray)
+	{
+		glDrawArrays(GL_POINT, 0, 1);
+		glPointSize(1.f);
+	}
 }
