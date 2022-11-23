@@ -16,3 +16,9 @@ Sandbox/imgui.ini
 Sandbox/**.vcxproj
 Engine/**.vcxproj.filters
 Engine/**.vcxproj
+Engine/Engine.vcxproj
+Engine/Engine.vcxproj.filters
+Sandbox/Sandbox.vcxproj
+Engine/Engine.vcxproj
+Engine/Engine.vcxproj.filters
+Sandbox/Sandbox.vcxproj

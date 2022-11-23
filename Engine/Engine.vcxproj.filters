@@ -22,14 +22,14 @@
     <Filter Include="src\Engine\ImGui">
       <UniqueIdentifier>{BC1B88A8-A814-A7FA-D146-8C7FBD9E8606}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Objects">
+      <UniqueIdentifier>{CB31A3A1-B715-64F7-2076-5E4A0C794E79}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Pathfinding">
       <UniqueIdentifier>{0D4C45E0-F945-6E32-E2B2-0443CE4BD49E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Engine\Renderer\VisualObject">
-      <UniqueIdentifier>{F268419A-DEB9-2CDC-071E-1B9EF3CDBF45}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Scene">
       <UniqueIdentifier>{AF1338A9-9B0C-57FB-C43E-3C80B0963607}</UniqueIdentifier>
@@ -126,6 +126,18 @@
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Objects\TransformObject.h">
+      <Filter>src\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Objects\VisualObject.h">
+      <Filter>src\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Objects\vShader.h">
+      <Filter>src\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Objects\vertex.h">
+      <Filter>src\Engine\Objects</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Pathfinding\PNode.h">
       <Filter>src\Engine\Pathfinding</Filter>
     </ClInclude>
@@ -167,15 +179,6 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
       <Filter>src\Engine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Objects\VisualObject.h">
-      <Filter>src\Engine\Renderer\VisualObject</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Objects\vShader.h">
-      <Filter>src\Engine\Renderer\VisualObject</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Objects\vertex.h">
-      <Filter>src\Engine\Renderer\VisualObject</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Components.h">
       <Filter>src\Engine\Scene</Filter>
@@ -1464,7 +1467,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Objects\TransformObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
@@ -1490,6 +1492,18 @@
     </ClCompile>
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp">
       <Filter>src\Engine\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Objects\TransformObject.cpp">
+      <Filter>src\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Objects\VisualObject.cpp">
+      <Filter>src\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Objects\vShader.cpp">
+      <Filter>src\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Objects\vertex.cpp">
+      <Filter>src\Engine\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
       <Filter>src\Engine\Pathfinding</Filter>
@@ -1527,15 +1541,6 @@
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Objects\VisualObject.cpp">
-      <Filter>src\Engine\Renderer\VisualObject</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Objects\vShader.cpp">
-      <Filter>src\Engine\Renderer\VisualObject</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Objects\vertex.cpp">
-      <Filter>src\Engine\Renderer\VisualObject</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\Scene\Entity.cpp">
       <Filter>src\Engine\Scene</Filter>
     </ClCompile>
@@ -1572,6 +1577,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Objects\TransformObject.cpp" />
   </ItemGroup>
 </Project>
