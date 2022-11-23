@@ -27,6 +27,16 @@ namespace Engine {
         F = G + H;
     }
 
+    void PNode::SetBlock(bool b)
+    {
+        if (b) {
+            NodeType = ENodeType::NT_Block;
+        }
+        else {
+            NodeType = ENodeType::NT_None;
+        }
+    }
+
     namespace Pathfinder {
 
         glm::vec3 GetPositionAlongSpline(std::vector<glm::vec3> splinepoints, float t)

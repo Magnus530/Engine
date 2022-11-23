@@ -42,7 +42,7 @@ namespace Engine {
 		void SetH(PNode* target) { H = GetDistanceToNode(target); }
 
 		bool IsBlock() const { return NodeType == ENodeType::NT_Block; }
-
+		void SetBlock(bool b);
 	};
 
 	namespace Pathfinder {
@@ -66,7 +66,7 @@ namespace Engine {
 		inline std::string GenerateNodeName()
 		{
 			std::string name = "PNode ";
-			name += std::to_string(m_Nodes.size());
+			name += std::to_string(m_Nodes.size()+1);
 			return name;
 		}
 		inline void SpawnGrid()
