@@ -173,14 +173,6 @@ public:
 	New3DLayer()
 		: Layer("New3DLayer"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-
-		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
-
-		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
-
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
-
 		std::string vertexSrc = R"(
 			#version 410 core
 
@@ -262,24 +254,16 @@ public:
 
 		// Begin Render Scene
 		Engine::Renderer::BeginScene(m_PCameraController.GetCamera());
-		
+
 		// Set background color 
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
 
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-
-		auto textureShader = m_ShaderLibrary.Get("Texture");
-
-		m_Texture->Bind();
-
-		m_SquareVA.reset(Engine::VertexArray::Create()); // OpenGLVertexArray*
-
-
 		// Render Objects
 		glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
 		glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
+
 
 		if (m_Splinetime < 0.99f) m_Splinetime += (ts * 1.f)/* / (float)Engine::Pathfinder::m_NodeLocations.size()*/;
 		else { m_Splinetime = 0.99f; bObjPathfindActive = false; }
@@ -309,7 +293,7 @@ public:
 		float scale = 0.1f;
 		for (auto& it : Engine::Pathfinder::m_NodeLocations)
 		{
-			Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it/scale)));	
+			Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale)));
 		}
 
 		/* Render Spline Path */
@@ -318,14 +302,14 @@ public:
 		scale = 0.05f;
 		for (auto& it : m_Path)
 		{
-			Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0,0.1f,0)));
+			Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 0.1f, 0)));
 		}
 		/* Render points */
 		//Engine::Renderer::Submit(m_Shader, m_PointVA, glm::mat4(1.f));
 
 
 		// TODO: Note regarding rendering 
-		/* Want it to be something like this. 
+		/* Want it to be something like this.
 		* The scene tells the renderer which object to render.
 		* The renderer, which will then hold all vertex arrays and buffer, will check which arrays and buffers belong to that object
 		* If the buffers do not exist, create them and do a single render call.
@@ -335,27 +319,6 @@ public:
 		// End Render Scene
 		Engine::Renderer::EndScene();
 	}
-
-private:
-	Engine::ShaderLibrary m_ShaderLibrary;
-	std::shared_ptr<Engine::Shader> m_Shader;
-	std::shared_ptr<Engine::vShader> m_vShader;
-	
-	std::unique_ptr<Engine::VisualObject> m_Obj;
-	std::shared_ptr<Engine::Texture2D> m_Texture;
-
-	Engine::PerspectiveCameraController m_PCameraController;
-	Engine::OrthographicCameraController m_OCameraController;
-};
-
-class PathfinderLayer : public Engine::Layer
-{
-public:
-	PathfinderLayer()
-	{
-		Engine::Pathfinder::SpawnGrid();
-	}
-	~PathfinderLayer(){}
 
 	virtual void OnImGuiRender() override
 	{
@@ -412,7 +375,6 @@ public:
 		}
 		ImGui::End();
 	}
-
 };
 
 class Sandbox : public Engine::Application
