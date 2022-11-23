@@ -181,6 +181,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\Events\MouseEvent.h" />
     <ClInclude Include="src\Engine\FMOD\AudioEngine.h" />
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Engine\Objects\TransformObject.h" />
     <ClInclude Include="src\Engine\Pathfinding\PNode.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
     <ClInclude Include="src\Engine\Renderer\Camera.h" />
@@ -195,9 +196,9 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\Renderer\Shader.h" />
     <ClInclude Include="src\Engine\Renderer\Texture.h" />
     <ClInclude Include="src\Engine\Renderer\VertexArray.h" />
-    <ClInclude Include="src\Engine\Renderer\VisualObject\VisualObject.h" />
-    <ClInclude Include="src\Engine\Renderer\VisualObject\vShader.h" />
-    <ClInclude Include="src\Engine\Renderer\VisualObject\vertex.h" />
+    <ClInclude Include="src\Engine\Objects\VisualObject.h" />
+    <ClInclude Include="src\Engine\Objects\vShader.h" />
+    <ClInclude Include="src\Engine\Objects\vertex.h" />
     <ClInclude Include="src\Engine\Scene\Components.h" />
     <ClInclude Include="src\Engine\Scene\Entity.h" />
     <ClInclude Include="src\Engine\Scene\Scene.h" />
@@ -637,6 +638,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="src\Engine\Objects\TransformObject.cpp" />
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Engine\Renderer\OrthographicCamera.cpp" />
@@ -649,9 +651,9 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\Engine\Renderer\Shader.cpp" />
     <ClCompile Include="src\Engine\Renderer\Texture.cpp" />
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp" />
-    <ClCompile Include="src\Engine\Renderer\VisualObject\VisualObject.cpp" />
-    <ClCompile Include="src\Engine\Renderer\VisualObject\vShader.cpp" />
-    <ClCompile Include="src\Engine\Renderer\VisualObject\vertex.cpp" />
+    <ClCompile Include="src\Engine\Objects\VisualObject.cpp" />
+    <ClCompile Include="src\Engine\Objects\vShader.cpp" />
+    <ClCompile Include="src\Engine\Objects\vertex.cpp" />
     <ClCompile Include="src\Engine\Scene\Entity.cpp" />
     <ClCompile Include="src\Engine\Scene\Scene.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />

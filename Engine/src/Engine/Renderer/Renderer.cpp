@@ -36,6 +36,10 @@ namespace Engine
 
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
-		//vertexArray->Unbind();
+	}
+	void Renderer::SubmitPoint(const std::shared_ptr<VertexArray>& vertexArray)
+	{
+		vertexArray->Bind();
+		RenderCommand::DrawPoint(vertexArray);
 	}
 }
