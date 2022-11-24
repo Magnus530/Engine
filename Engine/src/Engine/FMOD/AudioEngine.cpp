@@ -4,6 +4,9 @@
 namespace Engine 
 {
 	//*********************** IMPLEMENTATION CODE*********************//
+	//--------------------------------------------------------------
+	// Initialize the FMOD system
+	//--------------------------------------------------------------
 	Implementation::Implementation()
 	{
 		// Create a System studio object and initialize.
@@ -15,29 +18,50 @@ namespace Engine
 		// Create a System object.
 		mpSystem = nullptr;
 		AudioEngine::errorCheck(mpStudioSystem->getCoreSystem(&mpSystem));
+		mpReverb = nullptr;
+		mnNextChannelId = 0;
 	}
 
+	//--------------------------------------------------------------
+	// Release FMOD resources
+	//--------------------------------------------------------------
 	Implementation::~Implementation()
 	{
 		// unloading and releasing all sound maps to save memory leak
 		AudioEngine::errorCheck(mpStudioSystem->unloadAll());
 		AudioEngine::errorCheck(mpStudioSystem->release());
 	}
+
+	//--------------------------------------------------------------
+	// Update the FMOD system
+	//--------------------------------------------------------------
 	void Implementation::update(float fTimeDeltaSeconds)
 	{
-		// if(mChannels.size() != 0) {return;}    // debug test
+		// if(mChannels.size() != 0) {return;}				// debug test
 		// iterate through channels.
 		std::vector<ChannelMap::iterator> pStoppedChannels;
 
-		for (auto it = mChannels.begin(), itEnd = mChannels.end(); it != itEnd; ++it)
+		for (auto it = mChannels.begin(), itEnd = mChannels.end(); it != itEnd; it++)
 		{
 			bool bIsPlaying = false;
-			it->second->isPlaying(&bIsPlaying);     // if we call and errorcheck here, it will return an error
-			if (!bIsPlaying) // "take note" is a channel is stopped
+			it->second->isPlaying(&bIsPlaying);				// if we call and errorcheck here, it will return an error
+			if (!bIsPlaying)								// "take note" is a channel is stopped
 				pStoppedChannels.push_back(it);
 		}
 		for (auto& it : pStoppedChannels)
-			mChannels.erase(it); // erase the stopped channel
+			mChannels.erase(it);						// erase the stopped channel
+
+		std::vector<SoundChannelMap::iterator> pStoppedSoundChannels;
+		for (auto it = mSoundChannels.begin(), itEnd = mSoundChannels.end(); it != itEnd; it++)
+		{
+			bool bIsPlaying = false;
+			it->second->isPlaying(&bIsPlaying);				// if we call and errorcheck here, it will return an error
+			if (!bIsPlaying)								// "take note" is a channel is stopped
+				pStoppedSoundChannels.push_back(it);
+		}
+		for (auto& it : pStoppedSoundChannels)
+			mSoundChannels.erase(it);					// erase the stopped channel
+
 		AudioEngine::errorCheck(mpStudioSystem->update());
 	}
 
@@ -48,11 +72,18 @@ namespace Engine
 	
 	Implementation* sgpImplementation = nullptr;
 
+
+	//----------------------
+	// Initialize the engine
+	//----------------------
 	void AudioEngine::init()
 	{
 		sgpImplementation = new Implementation;
 	}
 
+	//------------------------------
+	// Update the engine properties
+	//------------------------------
 	void AudioEngine::update(float fTimeDeltaSeconds)
 	{
 		sgpImplementation->update(fTimeDeltaSeconds);
@@ -75,6 +106,9 @@ namespace Engine
 		}
 	}
 
+	//-----------------
+	// Load bank files
+	//-----------------
 	void AudioEngine::loadBank(const std::string& strBankName, FMOD_STUDIO_LOAD_BANK_FLAGS flags)
 	{
 		auto tFoundIt = sgpImplementation->mBanks.find(strBankName);
@@ -86,6 +120,9 @@ namespace Engine
 			sgpImplementation->mBanks[strBankName] = pBank; // assign bank to bankmap
 	}
 	
+	//-------------------------
+	// Load FMOD studio events
+	//-------------------------
 	void AudioEngine::loadEvent(const std::string& strEventName)
 	{
 		auto tFoundIt = sgpImplementation->mEvents.find(strEventName);
@@ -100,7 +137,10 @@ namespace Engine
 				sgpImplementation->mEvents[strEventName] = pEventInstance;
 		}
 	}
-	
+
+	//--------------------------------------------------------
+	// Load a sound track and store in the queue for playback
+	//--------------------------------------------------------
 	void AudioEngine::loadSound(const std::string& strSoundName, bool bIs3d, bool bIsLooping, bool bIsStreaming)
 	{
 		FMOD_CREATESOUNDEXINFO exinfo;
@@ -120,20 +160,28 @@ namespace Engine
 		eMode |= bIs3d ? (FMOD_3D | FMOD_3D_INVERSETAPEREDROLLOFF) : FMOD_2D;
 		eMode |= bIsLooping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
 		eMode |= bIsStreaming ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
+		eMode |= FMOD_INIT_CHANNEL_LOWPASS;												// enable low pass filtering
 		FMOD::Sound* pSound = nullptr;
 		AudioEngine::errorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
-		if (pSound) // ass sound to the cache
+		// If sound loaded correctly
+		// add it to the queue of all sounds (cache)
+		if (pSound)
 			sgpImplementation->mSounds[strSoundName] = pSound;
 	}
 	
+	//----------------------------
+	// Unload sounds in the cache
+	//----------------------------
 	void AudioEngine::unLoadSound(const std::string& strSoundName)
 	{
 		// check cache for sound
-		auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);
+		auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);			// Find sound  from the list of loaded files (cache)
 		if (tFoundIt != sgpImplementation->mSounds.end())
 			return;
-		AudioEngine::errorCheck(tFoundIt->second->release()); // check for errors and unload sound
-		sgpImplementation->mSounds.erase(tFoundIt); // erase from the cache
+
+		// Clear sound after use
+		AudioEngine::errorCheck(tFoundIt->second->release());					// check for errors and unload sound
+		sgpImplementation->mSounds.erase(tFoundIt);								// erase from the cache
 	}
 	
 	void AudioEngine::unLoadEvent(const std::string& strEventName)
@@ -156,9 +204,14 @@ namespace Engine
 		sgpImplementation->mBanks.erase(tFoundIt); // erase from the cache
 	}
 	
-	// playback
-
-	int AudioEngine::playSound(const std::string& strSoundName, const glm::vec3& vPos, float fVolumedB)
+	// PLAYBACK
+	// ----------------------------------------------------------------
+	// Play sounds that have been loaded correctly
+	// create channels for the sound to play
+	// sound is initially paused to avoid the sound popping in abruptly
+	// returns the channel ID of playing sound
+	// ----------------------------------------------------------------
+	int AudioEngine::playSound(const std::string& strSoundName, const glm::vec3& vPos, float fVolumedB,float fFadeInTime)
 	{
 		int nChannelId = sgpImplementation->mnNextChannelId++;  // report next unused / free channelID
 		// assign it to current channel and increase the counter
@@ -184,13 +237,17 @@ namespace Engine
 				FMOD_VECTOR position = vectorToFmod(vPos);
 				AudioEngine::errorCheck(pChannel->set3DAttributes(&position, nullptr));
 			}
+
+			sgpImplementation->mChannels[nChannelId] = pChannel;
 			AudioEngine::errorCheck(pChannel->setVolume(dBToVolume(fVolumedB)));
 			AudioEngine::errorCheck(pChannel->setPaused(false));
-			sgpImplementation->mChannels[nChannelId] = pChannel;
 		}
 		return nChannelId;
 	}
-	
+
+	//------------
+	// Play Events
+	//------------
 	void AudioEngine::playEvent(const std::string& strEventName)
 	{
 		auto tFoundIt = sgpImplementation->mEvents.find(strEventName);
@@ -205,14 +262,28 @@ namespace Engine
 	
 	// stop playback
 
-	void AudioEngine::stopChannel(int nChannelId)
+	//----------------------------
+	// Stops the specified channel
+	//----------------------------
+	void AudioEngine::stopChannel(int nChannelId, float fFadeOutTime)
 	{
+		bool playing;
 		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
 		if (tFoundIt == sgpImplementation->mChannels.end())
 			return;
-		AudioEngine::errorCheck(tFoundIt->second->stop());
+		tFoundIt->second->isPlaying(&playing);
+		if (playing)
+		{
+			if (fFadeOutTime <= 0.0f)
+				AudioEngine::errorCheck(tFoundIt->second->stop());
+			else
+				this->fadeOutChannel(tFoundIt->first, fFadeOutTime, 0);
+		}
 	}
 	
+	//------------
+	// Stop Events
+	//------------
 	void AudioEngine::stopEvent(const std::string& strEventName, bool bImmediate)
 	{
 		auto tFoundIt = sgpImplementation->mEvents.find(strEventName);
@@ -222,13 +293,19 @@ namespace Engine
 		eMode = bImmediate ? FMOD_STUDIO_STOP_IMMEDIATE : FMOD_STUDIO_STOP_ALLOWFADEOUT;
 		AudioEngine::errorCheck(tFoundIt->second->stop(eMode));
 	}
-	
+
+	//-------------------------------------
+	// Stops all currently playing channels
+	//-------------------------------------
 	void AudioEngine::stopAllChannels()
 	{
 		for (auto [name, channel] : sgpImplementation->mChannels)
 			AudioEngine::errorCheck(channel->stop());
 	}
 	
+	//------------------------------------------------
+	// Return true if the channel is currently playing
+	//------------------------------------------------
 	bool AudioEngine::isPlaying(int nChannelId) const
 	{
 		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
@@ -248,6 +325,9 @@ namespace Engine
 		return bIsPlaying;
 	}
 
+	//------------------------------
+	// Check if the event is playing
+	//------------------------------
 	bool AudioEngine::isEventPlaying(const std::string& strEventName) const
 	{
 		auto tFoundIt = sgpImplementation->mEvents.find(strEventName);
@@ -261,14 +341,16 @@ namespace Engine
 		return false;
 	}
 
-	// put the position of the camera and hear sound based on where it is positioned.
-
+	//-------------------------------------------------------------------------------
+	// Set the position of the camera and hear sound based on where it is positioned.
+	//-------------------------------------------------------------------------------
 	void AudioEngine::set3dListenerAndOrientation(const glm::vec3& vPosition, const glm::vec3& vLook, const glm::vec3& vUp)
 	{
 		FMOD_VECTOR position = vectorToFmod(vPosition);
-		FMOD_VECTOR look = vectorToFmod(vLook);
+		FMOD_VECTOR forward = vectorToFmod(vLook);
 		FMOD_VECTOR up = vectorToFmod(vUp);
-		AudioEngine::errorCheck(sgpImplementation->mpSystem->set3DListenerAttributes(0, &position, nullptr, &look, &up));
+		FMOD_VECTOR velocity = velocityToFmod(0,0,0);
+		AudioEngine::errorCheck(sgpImplementation->mpSystem->set3DListenerAttributes(0, &position, &velocity, &forward, &up));
 	}
 	
 	// parameters 
@@ -282,6 +364,9 @@ namespace Engine
 		AudioEngine::errorCheck(tFoundIt->second->set3DAttributes(&position, nullptr));
 	}
 	
+	//------------------------------------
+	// Set the volume of the sound channel
+	//------------------------------------
 	void AudioEngine::setChannelVolume(int nChannelId, float fVolumedB)
 	{
 		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
@@ -290,6 +375,9 @@ namespace Engine
 		AudioEngine::errorCheck(tFoundIt->second->setVolume(dBToVolume(fVolumedB)));
 	}
 	
+	//------------
+	// Play Events
+	//------------
 	void AudioEngine::getEventParameter(const std::string& strEventName, const std::string& strParameterName, float* outParValue)
 	{
 		auto tFoundIt = sgpImplementation->mEvents.find(strEventName);
@@ -306,7 +394,10 @@ namespace Engine
 		// get local event parameter value
 		AudioEngine::errorCheck(tFoundIt->second->getParameterByName(strParameterName.c_str(), outParValue));
 	}
-	
+
+	//---------------------------------
+	// Set the parameters of the events
+	//---------------------------------
 	void AudioEngine::setEventParameter(const std::string& strEventName, const std::string& strParameterName, float fValue)
 	{
 		auto tFoundIt = sgpImplementation->mEvents.find(strParameterName);
@@ -321,16 +412,210 @@ namespace Engine
 		AudioEngine::errorCheck(tFoundIt->second->setParameterByName(strParameterName.c_str(), fValue));
 	}
 
+	//----------------------------------------
+	// Move audio source position in 3D space
+	//----------------------------------------
+	void AudioEngine::moveChannel3dPosition(int nChannelId, const glm::vec3& vVelocity)
+	{
+		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+		if (tFoundIt == sgpImplementation->mChannels.end())
+			return;
+		FMOD_VECTOR currentPosition;
+		tFoundIt->second->get3DAttributes(&currentPosition, nullptr);
+		currentPosition.x += vectorToFmod(vVelocity).x;
+		currentPosition.y += vectorToFmod(vVelocity).y;
+		currentPosition.z += vectorToFmod(vVelocity).z;
+		AudioEngine::errorCheck(tFoundIt->second->set3DAttributes(&currentPosition, nullptr));
+	}
+
+	//--------------------------------------------------------------------
+	// Fade out a given channel to a given volume
+	// Stops the channel when fadeouttime is zero
+	// FadeOutTime is used to set the time over which the sound will fade
+	//--------------------------------------------------------------------
+	void AudioEngine::fadeOutChannel(int nChannelId, float fadeOutTime, float fadeOutVolume)
+	{
+		bool bPlaying;
+		float fCurrentVolume;
+		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+		if (tFoundIt == sgpImplementation->mChannels.end())
+			return;
+		AudioEngine::errorCheck(tFoundIt->second->isPlaying(&bPlaying));
+		AudioEngine::errorCheck(tFoundIt->second->getVolume(&fCurrentVolume));
+		if (bPlaying)
+		{
+			unsigned long long dspClock;
+			int rate;
+			FMOD::System* sys;
+
+			if (fadeOutTime <= 0.0f)
+				AudioEngine::errorCheck(tFoundIt->second->stop());
+			else
+			{
+				AudioEngine::errorCheck(tFoundIt->second->getSystemObject(&sys));
+				AudioEngine::errorCheck(sys->getSoftwareFormat(&rate, 0, 0));
+				AudioEngine::errorCheck(tFoundIt->second->getDSPClock(0, &dspClock));
+				AudioEngine::errorCheck(tFoundIt->second->addFadePoint(dspClock, fCurrentVolume));
+				AudioEngine::errorCheck(tFoundIt->second->addFadePoint(dspClock + (rate * fadeOutTime), fadeOutVolume));
+				AudioEngine::errorCheck(tFoundIt->second->setDelay(0, dspClock + (rate * fadeOutTime), true));
+			}
+		}
+		tFoundIt->second->isPlaying(&bPlaying);
+		if (!bPlaying)
+			sgpImplementation->mnNextChannelId--;
+	}
+
+	//------------------------------------------------------------------
+	// Fade in a given channel to a given volume from zero volume
+	// FadeInTime is used to set the time over which the sound will fade
+	//-------------------------------------------------------------------
+	void AudioEngine::fadeInChannel(int nChannelId, float fadeInTime, float fadeInVolume)
+	{
+		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+		if (tFoundIt == sgpImplementation->mChannels.end())
+			return;
+		unsigned long long dspClock;
+		int rate;
+		FMOD::System* sys;
+		AudioEngine::errorCheck(tFoundIt->second->getSystemObject(&sys));
+		AudioEngine::errorCheck(sys->getSoftwareFormat(&rate, 0, 0));
+		AudioEngine::errorCheck(tFoundIt->second->getDSPClock(0, &dspClock));
+		AudioEngine::errorCheck(tFoundIt->second->addFadePoint(dspClock, 0));
+		AudioEngine::errorCheck(tFoundIt->second->addFadePoint(dspClock + (rate * fadeInTime), fadeInVolume));
+	}
+
+	//----------------------------------------------------------------------
+	// Set the pitch of a channel
+	// Pitch value, 0.5 = half pitch, 2.0 = double pitch, etc default = 1.0.
+	//----------------------------------------------------------------------
+	void AudioEngine::setPitch(int nChannelId, float fPitch)
+	{
+		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+		if (tFoundIt == sgpImplementation->mChannels.end())
+			return;
+		AudioEngine::errorCheck(tFoundIt->second->setPitch(fPitch));
+	}
+
+	//--------------------------------------
+	// Return the pitch of the given channel
+	//--------------------------------------
+	float AudioEngine::getPitch(int nChannelId)
+	{
+		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+		if (tFoundIt == sgpImplementation->mChannels.end())
+			return 0;
+		float fPitch = 0;
+		AudioEngine::errorCheck(tFoundIt->second->getPitch(&fPitch));
+		return fPitch;
+	}
+
+	//-------------------------------
+	// Set the frequency of a channel
+	//-------------------------------
+	void AudioEngine::setFrequency(int nChannelId, float fFrequency)
+	{
+		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+		if (tFoundIt == sgpImplementation->mChannels.end())
+			return;
+		AudioEngine::errorCheck(tFoundIt->second->setFrequency(fFrequency));
+	}
+
+	//-------------------------------------------------------
+	// Return the frequency of the given channel
+	// Frequency value in Hertz
+	// If frequency is negative the sound will play backwards
+	//-------------------------------------------------------
+	float AudioEngine::getFrequency(int nChannelId)
+	{
+		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+		if (tFoundIt == sgpImplementation->mChannels.end())
+			return 0;
+		float fFrequency = 0;
+		AudioEngine::errorCheck(tFoundIt->second->getFrequency(&fFrequency));
+		return fFrequency;
+	}
+
+	//-----------------------------------
+	// Set the low pass gain of a channel
+	//-----------------------------------
+	void AudioEngine::setLowPassGain(int nChannelId, float gain)
+	{
+		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+		if (tFoundIt == sgpImplementation->mChannels.end())
+			return;
+		AudioEngine::errorCheck(tFoundIt->second->setLowPassGain(gain));
+	}
+
+	//------------------------------------------------------------------------------------------------------
+	// Return the low pass gain of the given channel
+	// Linear gain level, from 0 (silent, full filtering) to 1.0 (full volume, no filtering), default = 1.0.
+	//------------------------------------------------------------------------------------------------------
+	float AudioEngine::getLowPassGain(int nChannelId)
+	{
+		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
+		if (tFoundIt == sgpImplementation->mChannels.end())
+			return 0;
+		float fGain = 0;
+		AudioEngine::errorCheck(tFoundIt->second->getLowPassGain(&fGain));
+		return fGain;
+	}
+
+
+	//----------------------------
+	// Activate environment reverb
+	//----------------------------
+	void AudioEngine::activateReverb(bool active)
+	{
+		AudioEngine::errorCheck(sgpImplementation->mpReverb->setActive(&active));
+	}
+
+	//----------------------------------
+	// Return if reverb is active or not
+	//----------------------------------
+	bool AudioEngine::getReverbState() const
+	{
+		bool active;
+		AudioEngine::errorCheck(sgpImplementation->mpReverb->getActive(&active));
+		return active;
+	}
+
+	//----------------------
+	// Set reverb properties
+	//----------------------
+	FMOD_REVERB_PROPERTIES AudioEngine::setReverbProperties(const ReverbProperties& reverbProp) const
+	{
+
+		FMOD_REVERB_PROPERTIES myReverbProp = { reverbProp.DecayTime, reverbProp.EarlyDelay, reverbProp.LateDelay, reverbProp.HFReference,
+												reverbProp.HFDecayRatio, reverbProp.Diffusion, reverbProp.Density, reverbProp.LowShelfFrequency,
+												reverbProp.LowShelfGain, reverbProp.HighCut, reverbProp.EarlyLateMix, reverbProp.WetLevel };
+		return myReverbProp;
+	}
+
+	//---------------------------------------------------------------------------------------
+	// Set a 3D reverb zone having the given reverb properties
+	// The zone will be a sphere centered at the gievn position
+	// The reverb effect will be heard from min distance from the center to the max distance
+	//---------------------------------------------------------------------------------------
+	void AudioEngine::setEnvironmentReverb(const FMOD_REVERB_PROPERTIES reverbProperties, const glm::vec3 vPosition, float fMinDistance, float fMaxDistance)
+	{
+		AudioEngine::errorCheck(sgpImplementation->mpSystem->createReverb3D(&sgpImplementation->mpReverb));
+		sgpImplementation->mpReverb->setProperties(&reverbProperties);
+		FMOD_VECTOR pos = vectorToFmod(vPosition);
+		float mindist = fMinDistance;
+		float maxdist = fMaxDistance;
+		AudioEngine::errorCheck(sgpImplementation->mpReverb->set3DAttributes(&pos, mindist, maxdist));
+	}
+
 	///TODO: WIP of changing states. Will make things easier
 	/*
-	void Implementation::Channel::update(float fTimeDeltaSeconds)
+	void Channel::update(float fTimeDeltaSeconds)
 	{
 		switch(meState)
 		{
-		case Implementation::Channel::State::INITIALIZE:
+		case Channel::State::INITIALIZE:
 			[[fallthrough]];
-		case Implementation::Channel::State::DEVIRTUALIZE:
-		case Implementation::Channel::State::TOPLAY:
+		case Channel::State::DEVIRTUALIZE:
+		case Channel::State::TOPLAY:
 		{
 			if(mbStopRequested){
 				meState = State::STOPPING;
@@ -366,11 +651,11 @@ namespace Engine
 				meState = State::STOPPING;
 		}
 		break;
-		case Implementation::Channel::State::LOADING:
+		case Channel::State::LOADING:
 			if(mImplementation.soundIsLoaded(mSoundId))
 				meState = State::TOPLAY;
 			break;
-		case Implementation::Channel::State::PLAYING:
+		case Channel::State::PLAYING:
 			mVirtualizeFader.Update(fTimeDeltaSeconds);
 			updateChannelParameters();
 			if(!isPlaying() || mbStopRequested)
@@ -384,7 +669,7 @@ namespace Engine
 				meState = State::VIRTUALIZING;
 			}
 			break;
-		case Implementation::Channel::State::STOPPING:
+		case Channel::State::STOPPING:
 			mStopFader.Update(fTimeDeltaSeconds);
 			updateChannelParameters();
 			if(mStopFader.IsFinished()){
@@ -396,8 +681,8 @@ namespace Engine
 				return;
 			}
 			break;
-		case Implementation::Channel::State::STOPPED: break;
-		case Implementation::Channel::State::VIRTUALIZING:
+		case Channel::State::STOPPED: break;
+		case Channel::State::VIRTUALIZING:
 			mVirtualizeFader.update(fTimeDeltaSeconds);
 			updateChannelParameters();
 			if(!shouldBeVirtual(false))
@@ -412,7 +697,7 @@ namespace Engine
 				meState = State::VIRUTAL;
 			}
 			break;
-		case Implementation::Channel::State::VIRUTAL:
+		case Channel::State::VIRUTAL:
 			if(mbStopRequested)
 				meState = State::STOPPING;
 			else if(!shouldBeVirtual(false))
