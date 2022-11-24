@@ -132,9 +132,6 @@
     <ClInclude Include="src\Engine\Objects\VisualObject.h">
       <Filter>src\Engine\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Objects\vShader.h">
-      <Filter>src\Engine\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Objects\vertex.h">
       <Filter>src\Engine\Objects</Filter>
     </ClInclude>
@@ -1497,9 +1494,6 @@
       <Filter>src\Engine\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Objects\VisualObject.cpp">
-      <Filter>src\Engine\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Objects\vShader.cpp">
       <Filter>src\Engine\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Objects\vertex.cpp">

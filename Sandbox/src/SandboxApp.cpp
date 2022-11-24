@@ -19,16 +19,11 @@ public:
 	ExampleLayer()
 		: Layer("Example"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		/* Loading obj */
+		/* ----- OBJ test start ----- */
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
 
-		/* ----- OBJ test start ----- */
-		//auto obj = m_ActiveScene->CreateEntity("Obj");
-		//obj.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
-		//m_ObjEntity = obj;
-
-		Engine::ObjLoader::ReadFile("Cube", vertices, indices);
+		Engine::ObjLoader::ReadFile("Pillar", vertices, indices);
 		m_ObjVA.reset(Engine::VertexArray::Create());
 		std::shared_ptr<Engine::VertexBuffer> ObjVB;
 		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
@@ -43,9 +38,6 @@ public:
 		ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
 		m_ObjVA->SetIndexBuffer(ObjIB);
 		/* ----- OBJ test end ----- */
-
-
-		//m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
 
 		m_SquareVA.reset(Engine::VertexArray::Create()); // OpenGLVertexArray*
 		std::vector<float> squareVertices =
@@ -87,8 +79,8 @@ public:
 		m_ActiveScene = std::make_shared<Engine::Scene>();
 
 		// Create entities here
-		auto square = m_ActiveScene->CreateEntity("Square");
-		square.AddComponent<Engine::RendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+		auto square = m_ActiveScene->CreateEntity("Pillar");
+		square.AddComponent<Engine::RendererComponent>(glm::vec4{1.0f, 1.0f, 0.0f, 1.0f});
 		m_SquareEntity = square;
 
 		auto obj = m_ActiveScene->CreateEntity("Obj");
@@ -126,16 +118,15 @@ public:
 		m_WolfLogoTexture->Bind();
 		//Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
-		//Engine::Renderer::Submit(flatShader, m_Obj->GetVertexArray(), m_Obj->GetMatrix());		// Render m_Obj
-
 		/* ----- OBJ TEST START ----- */
-		glm::vec3 currentPosition(m_Position[3]);
-		glm::vec3 tempPos = m_ObjEntity.GetComponent<Engine::TransformComponent>().Transform[3];
+		auto objTComp = m_ObjEntity.GetComponent<Engine::TransformComponent>();
+		glm::vec3 currentPosition(objTComp.m_Position[3]);
+		glm::vec3 tempPos = objTComp.m_Transform[3];
 		glm::vec3 travel = tempPos - currentPosition;
-		m_Position = glm::translate(m_Position, travel);
-		m_Matrix = m_Scale * m_Rotation * m_Position;
+		glm::mat4 tempP = glm::translate(tempP, travel);
+		glm::mat4 tempM = objTComp.m_Scale * objTComp.m_Rotation * objTComp.m_Position;
 
-		Engine::Renderer::Submit(flatShader, m_ObjVA, m_Matrix);
+		Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
 		/* ----- OBJ TEST END ----- */
 
 		Engine::Renderer::EndScene();
@@ -179,11 +170,6 @@ private:
 	Engine::OrthographicCameraController m_OCameraController;
 
 	std::shared_ptr<Engine::VisualObject> m_Obj;
-
-	glm::mat4 m_Matrix{ 1 };
-	glm::mat4 m_Position{ 1 };
-	glm::mat4 m_Rotation{ 1 };
-	glm::mat4 m_Scale{ 1 };
 };
 
 class Sandbox : public Engine::Application
