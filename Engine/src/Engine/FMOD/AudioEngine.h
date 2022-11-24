@@ -217,10 +217,11 @@ namespace Engine {
             fVel.x = _x;
             fVel.y = _y;
             fVel.z = _z;
+
+            return fVel;
         }
 
-        ///TODO will need to fix the src to make these function properly
-
+        // TODO: Need to fix code to function properly
         struct SoundDefinition
         {
             std::string mSoundName;
