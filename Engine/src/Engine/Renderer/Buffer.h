@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Objects/vertex.h"
+//#include "../Objects/vertex.h"
 
 namespace Engine
 {
@@ -120,7 +120,7 @@ namespace Engine
 		virtual void SetLayout(const BufferLayout& layout) = 0;
 
 		static VertexBuffer* Create(void* data, uint32_t size);
-		static VertexBuffer* Create(std::vector<Vertex>& vertices);
+		//static VertexBuffer* Create(std::vector<Vertex>& vertices);
 	};
 
 	class IndexBuffer

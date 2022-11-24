@@ -17,7 +17,6 @@ namespace Engine
 		static void EndScene();
 
 		static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4 transform = glm::mat4(1.0f));
-		static void SubmitPoint(const std::shared_ptr<VertexArray>& vertexArray);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
@@ -30,6 +29,4 @@ namespace Engine
 
 		static SceneData* m_SceneData;
 	};
-
-
 }

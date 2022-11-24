@@ -5,8 +5,8 @@
 #include "../Objects/VisualObject.h"
 
 
-namespace Engine {
-
+namespace Engine
+{
 	class ObjLoader
 	{
 	public:

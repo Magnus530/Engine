@@ -8,7 +8,7 @@ namespace Engine
 	{
 	public:
 		OpenGLVertexBuffer(void* data, uint32_t size);
-		OpenGLVertexBuffer(std::vector<Vertex>& vertices);
+		//OpenGLVertexBuffer(std::vector<Vertex>& vertices);
 		virtual ~OpenGLVertexBuffer();
 
 		virtual void Bind() const override;
