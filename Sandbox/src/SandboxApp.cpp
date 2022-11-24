@@ -66,10 +66,6 @@ public:
 		auto flatShader = m_ShaderLibrary.Get("Flat");
 		auto textureShader = m_ShaderLibrary.Get("Texture");
 
-		auto flat = std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader);
-		flat->UploadUniformInt("u_ShowCustomColor", 1);
-		flat->UploadUniformFloat3("u_Color", glm::vec3(m_SquareEntity.GetComponent<Engine::RendererComponent>().Color));
-
 		//Engine::Renderer::Submit(flatShader, m_SquareVA, glm::mat4(1.0f));
 
 		/* Test posisjonering */	
@@ -81,6 +77,11 @@ public:
 
 		//m_WolfLogoTexture->Bind();
 		//Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
+		auto flat = std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader);
+		flat->Bind();
+		flat->UploadUniformInt("u_ShowCustomColor", bShowCustomColor);
+		flat->UploadUniformFloat3("u_Color", glm::vec3(m_ObjEntity.GetComponent<Engine::RendererComponent>().Color));
 
 		/* ----- OBJ START ----- */
 		auto objTComp = m_ObjEntity.GetComponent<Engine::TransformComponent>();
@@ -106,7 +107,10 @@ public:
 			auto& tag = m_ObjEntity.GetComponent<Engine::TagComponent>().Tag;
 			ImGui::Text("%s", tag.c_str());
 			auto& squareColor = m_ObjEntity.GetComponent<Engine::RendererComponent>().Color;
-			ImGui::ColorEdit4("Obj Color", glm::value_ptr(squareColor));
+			//ImGui::ColorEdit4("Obj Color", glm::value_ptr(squareColor));
+			ImGui::ColorEdit4("Obj Color", glm::value_ptr(m_ObjEntity.GetComponent<Engine::RendererComponent>().Color));
+			ImGui::Separator();
+			ImGui::Checkbox("Show Custom Color", &bShowCustomColor);
 			ImGui::Separator();
 		}
 		ImGui::End();
@@ -136,6 +140,8 @@ private:
 
 	std::shared_ptr<Engine::VisualObject> m_Obj;
 	//std::shared_ptr<Engine::EntityInitializer> m_EInit;
+private:
+	bool bShowCustomColor{};
 };
 
 class Sandbox : public Engine::Application
@@ -143,9 +149,9 @@ class Sandbox : public Engine::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
+		//PushLayer(new ExampleLayer());
 		//PushLayer(new PathfindingLayer());
-		//PushLayer(new TransformExampleLayer());
+		PushLayer(new TransformExampleLayer());
 	}
 
 	~Sandbox()

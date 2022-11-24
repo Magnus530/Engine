@@ -36,6 +36,6 @@ private: // Transform testing
 	bool bSetScale{};
 	float m_SetScale{ 1.f };
 
-	glm::vec3 m_ObjColor;
+	glm::vec3 m_ObjColor{ 0.5f, 0.5f, 0.5f };
 	bool bShowCustomColor{};
 };

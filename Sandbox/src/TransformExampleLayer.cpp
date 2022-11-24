@@ -88,10 +88,11 @@ void TransformExampleLayer::OnImGuiRender()
 		m_Obj->Reset();
 		m_Position *= 0.f;
 	}
+	ImGui::Separator();
 
 	ImGui::Text("Position");
 	ImGui::PushItemWidth(75.f);
-	const char* format = "%2.f";
+	const char* format = "%.1f";
 	//ImGui::Checkbox("Set World Position", &bSetWorldPosition);
 	ImGui::SliderFloat("X", &m_Position.x, -10.f, 10.f, format);
 	ImGui::SameLine();
@@ -99,6 +100,7 @@ void TransformExampleLayer::OnImGuiRender()
 	ImGui::SameLine();
 	ImGui::SliderFloat("Z", &m_Position.z, -10.f, 10.f, format);
 
+	ImGui::Separator();
 
 	ImGui::PushItemWidth(100.f);
 	//ImGui::Checkbox("Add World Position", &bAddWorldPosition);
@@ -109,16 +111,20 @@ void TransformExampleLayer::OnImGuiRender()
 	ImGui::Checkbox("Add World Rotation", &bAddWorldRotation);
 	ImGui::Checkbox("Add Local Rotation", &bAddLocalRotation);
 	ImGui::SliderFloat("Rotation Strength", &m_RotationStrength, -1.f, 1.f);
+	ImGui::Separator();
 
 	ImGui::Text("Scale");
 	ImGui::Checkbox("Add Scale", &bAddScale);
 	ImGui::SliderFloat("Scale Strength", &m_ScaleStrength, -1.f, 1.f);
 	//ImGui::Checkbox("Set Scale", &bSetScale);
 	//ImGui::SliderFloat("Set Scale", &m_SetScale, 0.f, 3.f);
+	ImGui::Separator();
 
+	ImGui::Separator();
 	ImGui::PushItemWidth(200.f);
 	ImGui::ColorEdit3("Object color", glm::value_ptr(m_ObjColor));
 	ImGui::Checkbox("Set custom color", &bShowCustomColor);
+	ImGui::Separator();
 
 	ImGui::End();
 }
