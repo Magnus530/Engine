@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Engine/Renderer/Buffer.h"
+#include "Engine/Renderer/VertexArray.h"
+
 #include <glm/glm.hpp>
 
 namespace Engine
@@ -30,6 +33,10 @@ namespace Engine
 	struct RendererComponent
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+
+		std::shared_ptr<VertexArray> m_VA;
+		std::shared_ptr<VertexBuffer> m_VB;
+		std::shared_ptr<IndexBuffer> m_IB;
 
 		RendererComponent() = default;
 		RendererComponent(const RendererComponent&) = default;

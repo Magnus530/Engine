@@ -11,6 +11,7 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 #include <glm/gtc/type_ptr.hpp>
 #include "Engine/Objects/VisualObject.h"
 #include "Engine/AssetLoaders/ObjLoader.h"
+#include "Platform/OpenGL/OpenGLVertexArray.h"
 
 class ExampleLayer : public Engine::Layer
 {
@@ -23,17 +24,25 @@ public:
 		std::vector<uint32_t> indices;
 
 		Engine::ObjLoader::ReadFile("Cube", vertices, indices);
-		m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
+		auto obj = m_ActiveScene->CreateEntity("Obj");
+		obj.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+
+		m_ObjVA.reset(Engine::VertexArray::Create());
+		std::shared_ptr<Engine::VertexBuffer> ObjVB;
+		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
+
+
+		//m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
 
 		m_SquareVA.reset(Engine::VertexArray::Create()); // OpenGLVertexArray*
-	std::vector<float> squareVertices =
-	{
-		//    x      y	     z?			uv
+		std::vector<float> squareVertices =
+		{
+		//    x      y	     z			uv
 			-0.5f, -0.5f,   0.0f,	0.0f, 0.0f,	//	Bottom	- Left 
 			 0.5f, -0.5f,   0.0f,	1.0f, 0.0f, //	Bottom	- Right
 			 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right
 			-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
-	};;
+		};;
 		
 		std::shared_ptr<Engine::VertexBuffer> SquareVB;
 		SquareVB.reset(Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size()*sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
@@ -67,8 +76,8 @@ public:
 		// Create entities here
 		auto square = m_ActiveScene->CreateEntity("Square");
 		square.AddComponent<Engine::RendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
-
 		m_SquareEntity = square;
+
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -101,6 +110,7 @@ public:
 
 		m_WolfLogoTexture->Bind();
 		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
+
 		Engine::Renderer::Submit(flatShader, m_Obj->GetVertexArray(), m_Obj->GetMatrix());		// Render m_Obj
 
 		Engine::Renderer::EndScene();
@@ -132,12 +142,13 @@ private:
 	//std::shared_ptr<Engine::VertexArray> m_VertexArray;
 
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
-	std::shared_ptr<Engine::VertexArray> m_SquareVA;
+	std::shared_ptr<Engine::VertexArray> m_SquareVA, m_ObjVA;
 
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
 	std::shared_ptr<Engine::Scene> m_ActiveScene; // Entities
 	Engine::Entity m_SquareEntity;
+	Engine::Entity m_ObjEntity;
 
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
