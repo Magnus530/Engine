@@ -183,6 +183,9 @@
     <ClInclude Include="src\Engine\Scene\Entity.h">
       <Filter>src\Engine\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Scene\EntityInitializer.h">
+      <Filter>src\Engine\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Scene\Scene.h">
       <Filter>src\Engine\Scene</Filter>
     </ClInclude>
@@ -1536,6 +1539,9 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Entity.cpp">
+      <Filter>src\Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\EntityInitializer.cpp">
       <Filter>src\Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Scene.cpp">
