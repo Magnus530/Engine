@@ -35,71 +35,29 @@ private: // Visual Aid & ImGui related elements
 	bool bOverrideShaderColor{ true };
 	std::shared_ptr<Engine::PNode> m_StartNode;
 	std::shared_ptr<Engine::PNode> m_TargetNode;
-	void NodePicker(const char* title, int (&selected)[100], int& selectlocation, std::shared_ptr<Engine::PNode>& node);
-	void SelectableColor(ImVec2 selectable, ImU32 color);
-
 	std::vector<std::shared_ptr<Engine::PNode>> m_BlockedNodes;
 
-private: // Transform testing
-	//bool bSetWorldPosition{};
-	glm::vec3 m_Position{};
-	bool bAddWorldPosition{};
-	bool bAddLocalPosition{};
-	float m_PositionStrength{ 0.f };
-
-	bool bAddWorldRotation{};
-	bool bAddLocalRotation{};
-	float m_RotationStrength{ 0.f };
-
-	bool bAddScale{};
-	float m_ScaleStrength{ 0.f };
-	bool bSetScale{};
-	float m_SetScale{ 1.f };
+//private: // Transform testing
+//	//bool bSetWorldPosition{};
+//	glm::vec3 m_Position{};
+//	bool bAddWorldPosition{};
+//	bool bAddLocalPosition{};
+//	float m_PositionStrength{ 0.f };
+//
+//	bool bAddWorldRotation{};
+//	bool bAddLocalRotation{};
+//	float m_RotationStrength{ 0.f };
+//
+//	bool bAddScale{};
+//	float m_ScaleStrength{ 0.f };
+//	bool bSetScale{};
+//	float m_SetScale{ 1.f };
 
 public:
 	PathfindingLayer()
-		: Layer("New3DLayer"), /*m_OCameraController(1280.0f / 720.0f, true),*/ m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
+		: Layer("New3DLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		std::string vertexSrc = R"(
-			#version 410 core
-
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec3 a_Normal;
-			layout(location = 2) in vec2 a_TexCoord;
-
-			out vec4 color;
-			
-			uniform mat4 u_ProjectionView;
-			uniform mat4 u_ViewMatrix;
-			uniform mat4 u_Transform;
-
-			uniform vec4 u_Color;
-			uniform int u_Override;
-
-			void main()
-			{
-				//color = vec4(a_Normal, 1);
-				//if (u_Override == 1){
-				//	color = u_Color;
-				//}
-				color = u_Color;
-				gl_Position = u_ProjectionView * u_ViewMatrix * u_Transform * vec4(a_Position, 1);
-			}
-		)";
-
-		std::string fragmentSrc = R"(
-			#version 410 core
-
-			in vec4 color;
-			out vec4 fragmentColor;
-
-			void main()
-			{
-				fragmentColor = color;
-			}
-		)";
-
-		m_Shader = Engine::Shader::Create("FlatColor", vertexSrc, fragmentSrc);
+		m_Shader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
 		m_Textureshader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
 
@@ -150,28 +108,6 @@ public:
 		float tmp = sinf(sin);
 		float fleeting = (sinf(sin) + 1) / 2;
 
-		// ---- TRANSFORMATION TESTING ---------------------
-			// Position
-		//if (bSetWorldPosition)
-		m_Obj->SetWorldPosition(m_Position);
-		//if (bAddWorldPosition)
-			//m_Obj->AddWorldPosition(glm::vec3(0, ts * m_PositionStrength, 0));
-		//if (bAddLocalPosition)
-			//m_Obj->AddLocalPosition(glm::vec3(0, ts * m_PositionStrength, 0));
-
-			// Rotation
-		if (bAddWorldRotation)
-			m_Obj->AddWorldRotation(ts * m_RotationStrength, glm::vec3(0, 1.f, 0));
-		if (bAddLocalRotation)
-			m_Obj->AddLocalRotation(ts * m_RotationStrength, glm::vec3(1.f, 0, 0));
-			// Scale
-		if (bAddScale)
-			m_Obj->AddLocalScale(ts * m_ScaleStrength, glm::vec3(0, 1.f, 0));
-		if (bSetScale)
-			m_Obj->SetScale(glm::vec3(m_SetScale));
-
-		m_Obj->UpdateMatrix();
-
 
 		glm::vec4 nodeColor(0.1, 0.5, 0.1, 1);
 		glm::vec4 startColor(1, 0, 0, 1);
@@ -218,17 +154,8 @@ public:
 		scale = 0.1f;
 		for (auto& it : m_Path)
 		{
-			Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 0.1f, 0)));
+			Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 1.f, 0)));
 		}
-
-
-		// TODO: Note regarding rendering 
-		/* Want it to be something like this.
-		* The scene tells the renderer which object to render.
-		* The renderer, which will then hold all vertex arrays and buffer, will check which arrays and buffers belong to that object
-		* If the buffers do not exist, create them and do a single render call.
-		*	else if the buffers exists, do instance rendering */
-		//Engine::Renderer::Submit(m_Shader, m_Obj); // Something like this
 
 		// End Render Scene
 		Engine::Renderer::EndScene();
@@ -238,41 +165,41 @@ public:
 	{
 		ImGui::ShowDemoWindow();
 
-		// Transformation Demo
-		ImGui::Begin("TransformTesting");
-		if (ImGui::Button("Reset Transformations")) {
-			m_Obj->Reset();
-			m_Position *= 0.f;
-		}
+		//// Transformation Demo
+		//ImGui::Begin("TransformTesting");
+		//if (ImGui::Button("Reset Transformations")) {
+		//	m_Obj->Reset();
+		//	m_Position *= 0.f;
+		//}
 
-		ImGui::Text("Position");
-		ImGui::PushItemWidth(75.f);
-		const char* format = "%0.5f";
-		//ImGui::Checkbox("Set World Position", &bSetWorldPosition);
-		ImGui::SliderFloat("X", &m_Position.x, -10.f, 10.f, format);
-		ImGui::SameLine();
-		ImGui::SliderFloat("Y", &m_Position.y, -10.f, 10.f, format);
-		ImGui::SameLine();
-		ImGui::SliderFloat("Z", &m_Position.z, -10.f, 10.f, format);
+		//ImGui::Text("Position");
+		//ImGui::PushItemWidth(75.f);
+		//const char* format = "%0.5f";
+		////ImGui::Checkbox("Set World Position", &bSetWorldPosition);
+		//ImGui::SliderFloat("X", &m_Position.x, -10.f, 10.f, format);
+		//ImGui::SameLine();
+		//ImGui::SliderFloat("Y", &m_Position.y, -10.f, 10.f, format);
+		//ImGui::SameLine();
+		//ImGui::SliderFloat("Z", &m_Position.z, -10.f, 10.f, format);
 
 
-		ImGui::PushItemWidth(100.f);
-		//ImGui::Checkbox("Add World Position", &bAddWorldPosition);
-		//ImGui::Checkbox("Add Local Position", &bAddLocalPosition);
-		//ImGui::SliderFloat("Position Strength", &m_PositionStrength, -1.f, 1.f);
+		//ImGui::PushItemWidth(100.f);
+		////ImGui::Checkbox("Add World Position", &bAddWorldPosition);
+		////ImGui::Checkbox("Add Local Position", &bAddLocalPosition);
+		////ImGui::SliderFloat("Position Strength", &m_PositionStrength, -1.f, 1.f);
 
-		ImGui::Text("Rotation");
-		ImGui::Checkbox("Add World Rotation", &bAddWorldRotation);
-		ImGui::Checkbox("Add Local Rotation", &bAddLocalRotation);
-		ImGui::SliderFloat("Rotation Strength", &m_RotationStrength, -1.f, 1.f);
-		
-		ImGui::Text("Scale");
-		ImGui::Checkbox("Add Scale", &bAddScale);
-		ImGui::SliderFloat("Scale Strength", &m_ScaleStrength, -1.f, 1.f);
-		ImGui::Checkbox("Set Scale", &bSetScale);
-		ImGui::SliderFloat("Set Scale", &m_SetScale, 0.f, 3.f);
+		//ImGui::Text("Rotation");
+		//ImGui::Checkbox("Add World Rotation", &bAddWorldRotation);
+		//ImGui::Checkbox("Add Local Rotation", &bAddLocalRotation);
+		//ImGui::SliderFloat("Rotation Strength", &m_RotationStrength, -1.f, 1.f);
+		//
+		//ImGui::Text("Scale");
+		//ImGui::Checkbox("Add Scale", &bAddScale);
+		//ImGui::SliderFloat("Scale Strength", &m_ScaleStrength, -1.f, 1.f);
+		//ImGui::Checkbox("Set Scale", &bSetScale);
+		//ImGui::SliderFloat("Set Scale", &m_SetScale, 0.f, 3.f);
 
-		ImGui::End();
+		//ImGui::End();
 
 		ImGui::Begin("Pathfinder");
 

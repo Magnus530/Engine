@@ -17,6 +17,7 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 
 // Layers
 #include "PathfindingLayer.h"
+#include "TransformExampleLayer.h"
 
 
 class ExampleLayer : public Engine::Layer
@@ -80,8 +81,8 @@ public:
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 		
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader)->Bind();
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader)->UploadUniformInt("u_Color", 0);
+		//std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader)->Bind();
+		//std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader)->UploadUniformInt("u_Color", 0);
 
 		m_ActiveScene = std::make_shared<Engine::Scene>();
 
@@ -89,6 +90,7 @@ public:
 		auto square = m_ActiveScene->CreateEntity("Pillar");
 		square.AddComponent<Engine::RendererComponent>(glm::vec4{1.0f, 1.0f, 0.0f, 1.0f});
 		m_SquareEntity = square;
+
 
 		auto obj = m_ActiveScene->CreateEntity("Obj");
 		m_ObjEntity = obj;
@@ -110,8 +112,9 @@ public:
 		auto textureShader = m_ShaderLibrary.Get("Texture");
 		auto flatShader = m_ShaderLibrary.Get("Flat");
 
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader)->UploadUniformFloat3("u_Color", 
-			m_SquareEntity.GetComponent<Engine::RendererComponent>().Color);
+		auto flat = std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader);
+		flat->UploadUniformInt("u_ShowCustomColor", 1);
+		flat->UploadUniformFloat3("u_Color", glm::vec3(m_SquareEntity.GetComponent<Engine::RendererComponent>().Color));
 
 		//Engine::Renderer::Submit(flatShader, m_SquareVA, glm::mat4(1.0f));
 
@@ -121,17 +124,19 @@ public:
 		sin += ts;
 		float testmovement = sinf(sin);
 		//Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement,0)));
+		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement,0)));
 
 		m_WolfLogoTexture->Bind();
 		//Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
 		/* ----- OBJ TEST START ----- */
 		auto objTComp = m_ObjEntity.GetComponent<Engine::TransformComponent>();
-		glm::vec3 currentPosition(objTComp.m_Position[3]);
-		glm::vec3 tempPos = objTComp.m_Transform[3];
-		glm::vec3 travel = tempPos - currentPosition;
-		glm::mat4 tempP = glm::translate(tempP, travel);
-		glm::mat4 tempM = objTComp.m_Scale * objTComp.m_Rotation * objTComp.m_Position;
+		Engine::TransformSystem::SetWorldPosition(objTComp, glm::vec3(0, testmovement, 0));
+		//glm::vec3 currentPosition(objTComp.m_Position[3]);
+		//glm::vec3 tempPos = objTComp.m_Transform[3];
+		//glm::vec3 travel = tempPos - currentPosition;
+		//glm::mat4 tempP = glm::translate(tempP, travel);
+		//glm::mat4 tempM = objTComp.m_Scale * objTComp.m_Rotation * objTComp.m_Position;
 
 		Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
 		/* ----- OBJ TEST END ----- */
@@ -186,6 +191,8 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
+		//PushLayer(new PathfindingLayer());
+		//PushLayer(new TransformExampleLayer());
 	}
 
 	~Sandbox()

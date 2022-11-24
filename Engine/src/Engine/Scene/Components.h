@@ -53,4 +53,12 @@ namespace Engine
 		PathfindingComponent(const PathfindingComponent&) = default;
 	};
 
+	class TestComponent
+	{
+	public:
+		TestComponent();
+		~TestComponent();
+
+		int data{};
+	};
 }
