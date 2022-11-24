@@ -40,6 +40,21 @@ private: // Visual Aid & ImGui related elements
 
 	std::vector<std::shared_ptr<Engine::PNode>> m_BlockedNodes;
 
+private: // Transform testing
+	//bool bSetWorldPosition{};
+	glm::vec3 m_Position{};
+	bool bAddWorldPosition{};
+	bool bAddLocalPosition{};
+	float m_PositionStrength{ 0.f };
+
+	bool bAddWorldRotation{};
+	bool bAddLocalRotation{};
+	float m_RotationStrength{ 0.f };
+
+	bool bAddScale{};
+	float m_ScaleStrength{ 0.f };
+	bool bSetScale{};
+	float m_SetScale{ 1.f };
 
 public:
 	PathfindingLayer()
@@ -95,7 +110,7 @@ public:
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
 
-		Engine::ObjLoader::ReadFile("Plane", vertices, indices);
+		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 		m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
 
 		/* Pathfinding */
@@ -134,6 +149,30 @@ public:
 		sin += ts;
 		float tmp = sinf(sin);
 		float fleeting = (sinf(sin) + 1) / 2;
+
+		// ---- TRANSFORMATION TESTING ---------------------
+			// Position
+		//if (bSetWorldPosition)
+		m_Obj->SetWorldPosition(m_Position);
+		//if (bAddWorldPosition)
+			//m_Obj->AddWorldPosition(glm::vec3(0, ts * m_PositionStrength, 0));
+		//if (bAddLocalPosition)
+			//m_Obj->AddLocalPosition(glm::vec3(0, ts * m_PositionStrength, 0));
+
+			// Rotation
+		if (bAddWorldRotation)
+			m_Obj->AddWorldRotation(ts * m_RotationStrength, glm::vec3(0, 1.f, 0));
+		if (bAddLocalRotation)
+			m_Obj->AddLocalRotation(ts * m_RotationStrength, glm::vec3(1.f, 0, 0));
+			// Scale
+		if (bAddScale)
+			m_Obj->AddLocalScale(ts * m_ScaleStrength, glm::vec3(0, 1.f, 0));
+		if (bSetScale)
+			m_Obj->SetScale(glm::vec3(m_SetScale));
+
+		m_Obj->UpdateMatrix();
+
+
 		glm::vec4 nodeColor(0.1, 0.5, 0.1, 1);
 		glm::vec4 startColor(1, 0, 0, 1);
 		glm::vec4 targetColor(0, 0, 1, 1);
@@ -197,14 +236,56 @@ public:
 
 	virtual void OnImGuiRender() override
 	{
-		//ImGui::ShowDemoWindow();
+		ImGui::ShowDemoWindow();
+
+		// Transformation Demo
+		ImGui::Begin("TransformTesting");
+		if (ImGui::Button("Reset Transformations")) {
+			m_Obj->Reset();
+			m_Position *= 0.f;
+		}
+
+		ImGui::Text("Position");
+		ImGui::PushItemWidth(75.f);
+		const char* format = "%0.5f";
+		//ImGui::Checkbox("Set World Position", &bSetWorldPosition);
+		ImGui::SliderFloat("X", &m_Position.x, -10.f, 10.f, format);
+		ImGui::SameLine();
+		ImGui::SliderFloat("Y", &m_Position.y, -10.f, 10.f, format);
+		ImGui::SameLine();
+		ImGui::SliderFloat("Z", &m_Position.z, -10.f, 10.f, format);
+
+
+		ImGui::PushItemWidth(100.f);
+		//ImGui::Checkbox("Add World Position", &bAddWorldPosition);
+		//ImGui::Checkbox("Add Local Position", &bAddLocalPosition);
+		//ImGui::SliderFloat("Position Strength", &m_PositionStrength, -1.f, 1.f);
+
+		ImGui::Text("Rotation");
+		ImGui::Checkbox("Add World Rotation", &bAddWorldRotation);
+		ImGui::Checkbox("Add Local Rotation", &bAddLocalRotation);
+		ImGui::SliderFloat("Rotation Strength", &m_RotationStrength, -1.f, 1.f);
+		
+		ImGui::Text("Scale");
+		ImGui::Checkbox("Add Scale", &bAddScale);
+		ImGui::SliderFloat("Scale Strength", &m_ScaleStrength, -1.f, 1.f);
+		ImGui::Checkbox("Set Scale", &bSetScale);
+		ImGui::SliderFloat("Set Scale", &m_SetScale, 0.f, 3.f);
+
+		ImGui::End();
 
 		ImGui::Begin("Pathfinder");
 
-		//ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.f, 0.2f, 0.2f, 1.f));
-		//ImGui::Button("testbutton");
-		//ImGui::PopStyleColor();
-
+		ImGui::TextDisabled("(?)");
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+		{
+			ImGui::BeginTooltip();
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted("RED: click to select start node\nBLUE: hold SHIFT to select target node\nGREY: hold ALT to set nodes to block");
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+		
 		// ----------------------------------------- NODE MENU BEGIN ------------------------------------------------------------------------
 		/* Start and Target node selection */
 		static int startSelected[100];
