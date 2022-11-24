@@ -10,6 +10,7 @@ public:
 	~Point() {};
 
 	void addneightbor(Point n);
+	void removeneighbor(Point n);
 
 	float returndistance(Point n);
 

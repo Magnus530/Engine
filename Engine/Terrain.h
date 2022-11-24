@@ -10,6 +10,7 @@ class Terrain
 public:
 	Terrain() {};
 	Terrain(std::vector <Triangle*> &T) { Triangles = T; };
+	Terrain(std::string filepath) { /*Triangles =*/ }
 	~Terrain() {};
 
 private:
