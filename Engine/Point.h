@@ -1,14 +1,22 @@
 #pragma once
-/*
+#include <math.h>
+#include "vertex.h"
+
 class Point
 {
-	std::vector <int> Neightbors;
-
 public:
-	void addneightbor(Point n) { Neightbors.push_back(n.id); }
-	int id;
+	Point() {};
+	Point(int id, vertex v) { _id = id; info = v; };
+	~Point() {};
 
+	void addneightbor(Point n);
 
+	float returndistance(Point n);
+
+	int _id;
+
+private:
+	std::vector <int> Neightbors;
+	std::vector <float[2]> distances;
+	vertex info;
 };
-
-*/

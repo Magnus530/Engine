@@ -2,17 +2,16 @@
 
 #include <vector>
 #include <string>
-/*
+
+#include "Triangle.h"
+
 class Terrain
 {
 public:
-	Terrain();
-	Terrain(std::string s);
-	~Terrain();
-private:
-	std::vector <std::vector <float[3]>> vertices;
-	std::vector <std::vector <float[3]>> colors;
-	std::vector <std::vector <float[2]>> uv;
-};
+	Terrain() {};
+	Terrain(std::vector <Triangle*> &T) { Triangles = T; };
+	~Terrain() {};
 
-*/
+private:
+	std::vector <Triangle*> Triangles;
+};
