@@ -200,6 +200,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\Renderer\VertexArray.h" />
     <ClInclude Include="src\Engine\Scene\Components.h" />
     <ClInclude Include="src\Engine\Scene\Entity.h" />
+    <ClInclude Include="src\Engine\Scene\EntityInitializer.h" />
     <ClInclude Include="src\Engine\Scene\Scene.h" />
     <ClInclude Include="src\Engine\Scene\Systems\TransformSystem.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
@@ -654,6 +655,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\Engine\Renderer\Texture.cpp" />
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Engine\Scene\Entity.cpp" />
+    <ClCompile Include="src\Engine\Scene\EntityInitializer.cpp" />
     <ClCompile Include="src\Engine\Scene\Scene.cpp" />
     <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
