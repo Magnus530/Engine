@@ -22,7 +22,6 @@ namespace Engine
         else
             E_CORE_TRACE("Successfully read file: {0}", file);
 
-
         std::string oneLine;
         std::string oneWord;
 
