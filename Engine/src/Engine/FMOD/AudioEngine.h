@@ -56,6 +56,8 @@ namespace Engine {
         }
     };
 
+    // https://www.fmod.com/docs/2.02/api/core-api-system.html#fmod_preset_generic
+
     static const ReverbProperties ENVIRONMENT_UNDERWATER = { 1500,    7,  11, 5000,  10, 100, 100, 250, 0,   500,  92,   7.0f };
     static const ReverbProperties ENVIRONMENT_GENERIC = { 1500,    7,  11, 5000,  83, 100, 100, 250, 0, 14500,  96,  -8.0f };
     static const ReverbProperties ENVIRONMENT_PADDEDCELL = { 170,    1,   2, 5000,  10, 100, 100, 250, 0,   160,  84,  -7.8f };
