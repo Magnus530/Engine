@@ -72,7 +72,6 @@ public:
 		sin += ts;
 		float testmovement = sinf(sin);
 		m_Texture->Bind();
-		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement,0)));
 
 		//m_WolfLogoTexture->Bind();
 		//Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
@@ -81,11 +80,12 @@ public:
 		flat->Bind();
 		flat->UploadUniformInt("u_ShowCustomColor", bShowCustomColor);
 		flat->UploadUniformFloat3("u_Color", glm::vec3(m_ObjEntity.GetComponent<Engine::RendererComponent>().Color));
+		Engine::Renderer::Submit(flatShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement,0)));
 
 		auto objTComp = m_ObjEntity.GetComponent<Engine::TransformComponent>();
 		Engine::TransformSystem::SetWorldPosition(objTComp, glm::vec3(0, testmovement, 0));
 
-		Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
+		//Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
 		
 		Engine::Renderer::EndScene();
 	}
@@ -129,7 +129,7 @@ private:
 	Engine::OrthographicCameraController m_OCameraController;
 
 	bool bShowCustomColor{};
-	int PrimitiveType = 2;
+	int PrimitiveType = 3;
 };
 
 class Sandbox : public Engine::Application
