@@ -29,6 +29,25 @@ float Triangle::circle_rad() {
 
 	float A = Areal();
 
+	float m_a, m_b, m_c;
+	float vec_a[2], vec_b[2], vec_c[2], p_a[2], p_b[2], p_c[2];
+	
+	p_a[0] = points[0]->getx();
+	p_a[1] = points[0]->getz();
+	p_b[0] = points[1]->getx();
+	p_b[1] = points[1]->getz();
+	p_c[0] = points[2]->getx();
+	p_c[1] = points[2]->getz();
+
+	vec_a[0] = p_a[0] - p_b[0];
+	vec_a[1] = p_a[1] - p_b[1];
+
+	vec_b[0] = p_b[0] - p_c[0];
+	vec_b[1] = p_b[1] - p_c[1];
+
+	vec_c[0] = p_c[0] - p_a[0];
+	vec_c[1] = p_c[1] - p_a[1];
+
 	return (v_a * v_b * v_c) / (4 * A);
 }
 

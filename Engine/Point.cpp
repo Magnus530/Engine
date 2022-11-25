@@ -2,6 +2,11 @@
 #include "Point.h"
 
 void Point::addneightbor(Point n) { 
+	for (int i = 0; i < Neightbors.size(); i++) {
+		if (Neightbors[i] == n._id) {
+			return;
+		}
+	}
 	Neightbors.push_back(n._id); 
 	float cal, cal2, val1, val2; 
 	val1 = info.getX() - n.info.getX();
@@ -15,7 +20,6 @@ void Point::addneightbor(Point n) {
 
 
 void Point::removeneighbor(Point n) {
-	//Neightbors.remove(Neightbors.begin(), Neightbors.end(), n._id);
 	bool found{ false };
 	int loc{ 0 };
 	while (!found) {
@@ -26,8 +30,20 @@ void Point::removeneighbor(Point n) {
 		loc++;
 	}
 	if (found) {
-		//Neighbors.erase(loc);
-		//distances.erase(loc);
+		int last = Neightbors.size() - 1;
+		int temp;
+		float temp_k, temp_h;
+		temp = Neightbors[loc];
+		temp_k = distances[loc][0];
+		temp_h = distances[loc][1];
+		Neightbors[loc] = Neightbors[last];
+		distances[loc][0] = distances[last][0];
+		distances[loc][1] = distances[last][1];
+		Neightbors[last] = temp;
+		distances[last][0] = temp_k;
+		distances[last][1] = temp_h;
+		Neightbors.pop_back();
+		distances.pop_back();
 	}
 }
 
