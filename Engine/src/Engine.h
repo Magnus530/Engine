@@ -2,6 +2,7 @@
 
 // For use by applications.
 
+
 #include "Engine/Core/Application.h"
 #include "Engine/Core/Layer.h"
 #include "Engine/Core/Log.h"
@@ -11,7 +12,13 @@
 #include "Engine/Core/MouseButtonCodes.h"
 
 
+
 #include "Engine/ImGui/ImGuiLayer.h"
+
+#include "Engine/Scene/Scene.h"
+#include "Engine/Scene/Entity.h"
+#include "Engine/Scene/Components.h"
+#include "Engine/Scene/Systems/TransformSystem.h"
 
 // ---------------Renderer---------------
 #include "Engine/Renderer/Renderer.h"
@@ -35,4 +42,7 @@
 #include "Engine/AssetLoaders/ObjLoader.h"
 
 // ---------------Entry Point---------------
-#include "Engine/Core/EntryPoint.h"
+//#include "Engine/Core/EntryPoint.h"
+
+// ---------------Audio Engine---------------
+#include "Engine/FMOD/AudioEngine.h"

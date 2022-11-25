@@ -7,20 +7,35 @@
     <Filter Include="src\Engine">
       <UniqueIdentifier>{12A1320E-FE58-745B-6760-4DB753370F4C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\AssetLoaders">
+      <UniqueIdentifier>{ABEE0D3F-1726-56D6-2030-BAF98CE67CCF}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Core">
       <UniqueIdentifier>{AA407579-16CC-E23D-1FDD-65328BE73E3E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Events">
       <UniqueIdentifier>{B624EAB0-223B-E846-6BB2-7368D707B9CE}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\FMOD">
+      <UniqueIdentifier>{87507679-F3DB-E33D-FCEC-663268F73F3E}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\ImGui">
       <UniqueIdentifier>{BC1B88A8-A814-A7FA-D146-8C7FBD9E8606}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\Objects">
+      <UniqueIdentifier>{CB31A3A1-B715-64F7-2076-5E4A0C794E79}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Pathfinding">
       <UniqueIdentifier>{0D4C45E0-F945-6E32-E2B2-0443CE4BD49E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\Scene">
+      <UniqueIdentifier>{AF1338A9-9B0C-57FB-C43E-3C80B0963607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\Scene\Systems">
+      <UniqueIdentifier>{B6A886B6-A2CD-D536-CB18-BBC6B79CD454}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Platform">
       <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
@@ -55,19 +70,13 @@
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Engine\AssetLoaders">
-      <UniqueIdentifier>{efe659d9-b903-46ec-b118-7c08ca43c9cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Engine\Terrain">
-      <UniqueIdentifier>{71165f95-e96c-4648-b02c-a3b2d675e22d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Engine\AssetLoaders\TerrainLoaders">
-      <UniqueIdentifier>{e2c3518f-94d2-4d90-8374-9b08dd6c4937}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
+      <Filter>src\Engine\AssetLoaders</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Application.h">
       <Filter>src\Engine\Core</Filter>
@@ -114,13 +123,28 @@
     <ClInclude Include="src\Engine\Events\MouseEvent.h">
       <Filter>src\Engine\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\FMOD\AudioEngine.h">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Objects\TransformObject.h">
+      <Filter>src\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Objects\VisualObject.h">
+      <Filter>src\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Objects\vertex.h">
+      <Filter>src\Engine\Objects</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Pathfinding\PNode.h">
       <Filter>src\Engine\Pathfinding</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\Camera.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\GraphicsContext.h">
@@ -130,6 +154,12 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\OrthographicCameraController.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\PerspectiveCameraController.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\RenderCommand.h">
@@ -149,6 +179,21 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
       <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Components.h">
+      <Filter>src\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Entity.h">
+      <Filter>src\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\EntityInitializer.h">
+      <Filter>src\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Scene.h">
+      <Filter>src\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Systems\TransformSystem.h">
+      <Filter>src\Engine\Scene\Systems</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
@@ -1428,27 +1473,11 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
-      <Filter>src\Engine\AssetLoaders</Filter>
-    </ClInclude>
-	<ClInclude Include="src\Engine\Renderer\Camera.h" />
-    <ClInclude Include="src\Engine\Renderer\PerspectiveCamera.h" />
-    <ClInclude Include="src\Engine\Renderer\PerspectiveCameraController.h" />
-    <ClInclude Include="Terrain.h">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="Readers.h">
-      <Filter>src\Engine\AssetLoaders\TerrainLoaders</Filter>
-    </ClInclude>
-    <ClInclude Include="Point.h">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="Triangle.h">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
+      <Filter>src\Engine\AssetLoaders</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Core\Application.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
@@ -1461,11 +1490,23 @@
     <ClCompile Include="src\Engine\Core\Log.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp">
       <Filter>src\Engine\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp">
       <Filter>src\Engine\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Objects\TransformObject.cpp">
+      <Filter>src\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Objects\VisualObject.cpp">
+      <Filter>src\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Objects\vertex.cpp">
+      <Filter>src\Engine\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
       <Filter>src\Engine\Pathfinding</Filter>
@@ -1477,6 +1518,12 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\OrthographicCameraController.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\PerspectiveCameraController.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\RenderCommand.cpp">
@@ -1496,6 +1543,18 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
       <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Entity.cpp">
+      <Filter>src\Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\EntityInitializer.cpp">
+      <Filter>src\Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Scene.cpp">
+      <Filter>src\Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp">
+      <Filter>src\Engine\Scene\Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
@@ -1527,23 +1586,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
-      <Filter>src\Engine\AssetLoaders</Filter>
-    </ClCompile>
-	    <ClCompile Include="src\Engine\Renderer\PerspectiveCamera.cpp" />
-    <ClCompile Include="src\Engine\Renderer\PerspectiveCameraController.cpp" />
-    <ClCompile Include="Terrain.cpp">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="LAS_Reader.cpp">
-      <Filter>src\Engine\AssetLoaders\TerrainLoaders</Filter>
-    </ClCompile>
-    <ClCompile Include="Point.cpp">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="Triangle.cpp">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="vertex.cpp" />
   </ItemGroup>
 </Project>

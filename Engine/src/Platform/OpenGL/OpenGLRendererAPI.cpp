@@ -7,6 +7,8 @@ namespace Engine
 {
 	void OpenGLRendererAPI::Init()
 	{
+		glEnable(GL_DEPTH_TEST);
+		//glEnable(GL_CULL_FACE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
@@ -30,5 +32,10 @@ namespace Engine
 	void OpenGLRendererAPI::DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray)
 	{
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+	}
+	void OpenGLRendererAPI::DrawPoint(const std::shared_ptr<VertexArray>& vertexArray)
+	{
+		glDrawArrays(GL_POINT, 0, 1);
+		glPointSize(1.f);
 	}
 }

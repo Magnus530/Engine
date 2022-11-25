@@ -4,40 +4,23 @@
 #include <iostream>
 #include <fstream>
 
-namespace Engine {
-    static ObjLoader* m_Instance{ nullptr };
+//#include <glad/glad.h>
 
-	//ObjLoader::ObjLoader(std::string filename, std::vector<glm::vec3>& vertices, std::vector<unsigned int>& indices)
-	//{
-	//	ReadFile(filename, vertices, indices);
-	//}
-	
-    ObjLoader::ObjLoader()
-    {}
-	ObjLoader::~ObjLoader()
-	{
-
-	}
-    ObjLoader* ObjLoader::Get()
+namespace Engine 
+{
+    void ObjLoader::ReadFile(std::string filename, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
     {
-        if (!m_Instance) { m_Instance = new ObjLoader(); }
-        return m_Instance;
-    }
-
-	void ObjLoader::ReadFile(std::string filename, std::vector<glm::vec3>& vertices, std::vector<glm::vec2>& uvs, std::vector<uint32_t>& indices)
-	{
         /* Assumes a default path */
-		std::string path = "assets/meshes/";
-		std::string objType = ".obj";
-		std::string file = path + filename + objType;
+        std::string path = "assets/meshes/";
+        std::string objType = ".obj";
+        std::string file = path + filename + objType;
 
-		std::ifstream fileIn;
-		fileIn.open(file, std::ifstream::in);
-		if (!fileIn)
-            E_CORE_ERROR("Could not open file: {0} : {1}", filename, file);
+        std::ifstream fileIn;
+        fileIn.open(file, std::ifstream::in);
+        if (!fileIn)
+            E_CORE_ERROR("Could not open file: {0}", file);
         else
-            E_CORE_TRACE("Successfully read file: {0} : {1}", filename, file);
-
+            E_CORE_TRACE("Successfully read file: {0}", file);
 
         std::string oneLine;
         std::string oneWord;
@@ -46,8 +29,7 @@ namespace Engine {
         std::vector<glm::vec3> tempNormals;
         std::vector<glm::vec2> tempUVs;
 
-        //GLuint temp_index = 0;
-        unsigned int temp_index = 0;
+        uint32_t temp_index = 0;
 
         while (std::getline(fileIn, oneLine))
         {
@@ -57,74 +39,63 @@ namespace Engine {
             oneWord = "";
             sStream >> oneWord;
 
-            if (oneWord == "#"){
+            if (oneWord == "#") {
                 // Ignore
                 continue;
             }
-            if (oneWord == ""){
+            if (oneWord == "") {
                 // Ignore
                 continue;
             }
-            if (oneWord == "mtllib"){
+            if (oneWord == "mtllib") {
                 // Ignore
                 continue;
             }
-            if (oneWord == "o"){
+            if (oneWord == "o") {
                 // Ignore
                 continue;
             }
-            if (oneWord == "usemtl"){
+            if (oneWord == "usemtl") {
                 // Ignore
                 continue;
             }
-            if (oneWord == "s"){
+            if (oneWord == "s") {
                 // Ignore
                 continue;
             }
 
-            if (oneWord == "v"){
-                //QVector3D tempVertex;
+            if (oneWord == "v") {
                 glm::vec3 tempVertexLocation;
                 sStream >> oneWord;
                 tempVertexLocation.x = std::stof(oneWord);
-                //tempVertex.set''X(std::stof(oneWord));
                 sStream >> oneWord;
                 tempVertexLocation.y = std::stof(oneWord);
-                //tempVertex.setY(std::stof(oneWord));
                 sStream >> oneWord;
                 tempVertexLocation.z = std::stof(oneWord);
-                //tempVertex.setZ(std::stof(oneWord));
 
                 tempVertices.push_back(tempVertexLocation);
 
                 continue;
             }
-            if (oneWord == "vt"){
-                //QVector2D tempUV;
+            if (oneWord == "vt") {
                 glm::vec2 tempUV;
                 sStream >> oneWord;
                 tempUV.x = std::stof(oneWord);
-                //tempUV.setX(std::stof(oneWord));
                 sStream >> oneWord;
                 tempUV.y = std::stof(oneWord);
-                //tempUV.setY(std::stof(oneWord));
 
                 tempUVs.push_back(tempUV);
 
                 continue;
             }
-            if (oneWord == "vn"){
-                //QVector3D tempNormal;
+            if (oneWord == "vn") {
                 glm::vec3 tempNormal;
                 sStream >> oneWord;
                 tempNormal.x = std::stof(oneWord);
                 sStream >> oneWord;
                 tempNormal.y = std::stof(oneWord);
-                //tempNormal.setY(std::stof(oneWord));
                 sStream >> oneWord;
                 tempNormal.z = std::stof(oneWord);
-                //tempNormal.setZ(std::stof(oneWord));
-
                 tempNormals.push_back(tempNormal);
 
                 continue;
@@ -138,8 +109,7 @@ namespace Engine {
                     std::stringstream tempWord(oneWord);
                     std::string segment;
                     std::vector<std::string> segmentArray;
-                    while (std::getline(tempWord, segment, '/'))
-                    {
+                    while (std::getline(tempWord, segment, '/')){
                         segmentArray.push_back(segment);
                     }
                     index = std::stoi(segmentArray[0]);
@@ -151,22 +121,13 @@ namespace Engine {
                     --uv;
                     --normal;
 
-                    
-                    // MÅ FORANDRES PÅ
-                    vertices.push_back(tempVertices[index]);
-                    uvs.push_back(tempUVs[uv]);
+                    Vertex tempVert( tempVertices[index], tempNormals[normal], tempUVs[uv] );
+                    vertices.push_back(tempVert);
                     indices.push_back(temp_index++);
-                    /* Lag vertex */
-                    //Vertex tempVert{ tempVertices[index], tempNormals[normal], tempUVs[uv] };
-                    //mVertices.push_back(tempVert);
-
-                    /* Lag indekser */
-                    //mIndices.push_back(temp_index++);
                 }
                 continue;
             }
         }
-        
         fileIn.close();
-	}
+    }
 }

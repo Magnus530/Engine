@@ -3,6 +3,7 @@
 #include "RenderCommand.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "../Objects/VisualObject.h"
 
 namespace Engine
 {
@@ -22,11 +23,10 @@ namespace Engine
 	private:
 		struct SceneData
 		{
-			glm::mat4 ProjectionViewMatrix;
+			glm::mat4 ProjectionMatrix;
+			glm::mat4 ViewMatrix;
 		};
 
 		static SceneData* m_SceneData;
 	};
-
-
 }
