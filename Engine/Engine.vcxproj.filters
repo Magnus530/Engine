@@ -75,7 +75,7 @@
     <ClInclude Include="src\Engine.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
+    <ClInclude Include="src\Engine\AssetInit\ObjLoader.h">
       <Filter>src\Engine\AssetLoaders</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Application.h">
@@ -130,9 +130,6 @@
       <Filter>src\Engine\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Objects\TransformObject.h">
-      <Filter>src\Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Objects\VisualObject.h">
       <Filter>src\Engine\Objects</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Objects\vertex.h">
@@ -1473,9 +1470,11 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\AssetInit\PrimitiveShape.h" />
+    <ClInclude Include="src\Engine\AssetInit\PrimitiveShapeFactory.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
+    <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
       <Filter>src\Engine\AssetLoaders</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1500,9 +1499,6 @@
       <Filter>src\Engine\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Objects\TransformObject.cpp">
-      <Filter>src\Engine\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Objects\VisualObject.cpp">
       <Filter>src\Engine\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Objects\vertex.cpp">

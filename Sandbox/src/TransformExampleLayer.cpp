@@ -7,9 +7,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Engine/Objects/VisualObject.h"
-#include "Engine/AssetLoaders/ObjLoader.h"
-
+#include "Engine/AssetInit/ObjLoader.h"
+#include "Engine/Renderer/VertexArray.h"
 
 
 TransformExampleLayer::TransformExampleLayer()
@@ -22,7 +21,6 @@ TransformExampleLayer::TransformExampleLayer()
 	std::vector<Engine::Vertex> vertices;
 	std::vector<uint32_t> indices;
 	Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
-	m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
@@ -50,31 +48,31 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	// ---- TRANSFORMATION TESTING ---------------------
 		// Position
 	//if (bSetWorldPosition)
-	m_Obj->SetWorldPosition(m_Position);
+	//m_Obj->SetWorldPosition(m_Position);
 	//if (bAddWorldPosition)
 		//m_Obj->AddWorldPosition(glm::vec3(0, ts * m_PositionStrength, 0));
 	//if (bAddLocalPosition)
 		//m_Obj->AddLocalPosition(glm::vec3(0, ts * m_PositionStrength, 0));
 
 		// Rotation
-	if (bAddWorldRotation)
-		m_Obj->AddWorldRotation(ts * m_RotationStrength, glm::vec3(0, 1.f, 0));
-	if (bAddLocalRotation)
-		m_Obj->AddLocalRotation(ts * m_RotationStrength, glm::vec3(1.f, 0, 0));
+	//if (bAddWorldRotation)
+	//	m_Obj->AddWorldRotation(ts * m_RotationStrength, glm::vec3(0, 1.f, 0));
+	//if (bAddLocalRotation)
+	//	m_Obj->AddLocalRotation(ts * m_RotationStrength, glm::vec3(1.f, 0, 0));
 
 		// Scale
-	if (bAddScale)
-		m_Obj->AddLocalScale(ts * m_ScaleStrength, glm::vec3(0, 1.f, 0));
+	//if (bAddScale)
+	//	m_Obj->AddLocalScale(ts * m_ScaleStrength, glm::vec3(0, 1.f, 0));
 	//if (bSetScale)
 		//m_Obj->SetScale(glm::vec3(m_SetScale));
 
-	m_Obj->UpdateMatrix();
+	//m_Obj->UpdateMatrix();
 
 	// Draw Call for m_Obj
 	auto shader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader);
 	shader->UploadUniformFloat3("u_Color", m_ObjColor);
 	shader->UploadUniformInt("u_ShowCustomColor", bShowCustomColor);
-	Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix()); // Render m_Obj
+	//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix()); // Render m_Obj
 
 	// End Scene
 	Engine::Renderer::EndScene();
@@ -85,7 +83,7 @@ void TransformExampleLayer::OnImGuiRender()
 	// Transformation Demo
 	ImGui::Begin("TransformTesting");
 	if (ImGui::Button("Reset Transformations")) {
-		m_Obj->Reset();
+		//m_Obj->Reset();
 		m_Position *= 0.f;
 	}
 	ImGui::Separator();

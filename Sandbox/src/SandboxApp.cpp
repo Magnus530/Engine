@@ -10,16 +10,14 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Engine/Objects/VisualObject.h"
-#include "Engine/AssetLoaders/ObjLoader.h"
+#include "Engine/Renderer/VertexArray.h"
+#include "Engine/AssetInit/ObjLoader.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 #include "Engine/Scene/EntityInitializer.h"
-
 
 // Layers
 #include "PathfindingLayer.h"
 #include "TransformExampleLayer.h"
-
 
 class ExampleLayer : public Engine::Layer
 {
@@ -46,7 +44,7 @@ public:
 		m_ObjEntity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_ObjVA, m_ActiveScene);
 		m_ObjEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 
-		m_SquareEntity = Engine::EntityInitializer::GetInstance().EntityInit(m_SquareVA, m_ActiveScene);
+		m_SquareEntity = Engine::EntityInitializer::GetInstance().EntityInit(PrimitiveType, m_SquareVA, m_ActiveScene);
 		m_SquareEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f });
 	}
 
@@ -83,17 +81,8 @@ public:
 		flat->UploadUniformInt("u_ShowCustomColor", bShowCustomColor);
 		flat->UploadUniformFloat3("u_Color", glm::vec3(m_ObjEntity.GetComponent<Engine::RendererComponent>().Color));
 
-		/* ----- OBJ START ----- */
 		auto objTComp = m_ObjEntity.GetComponent<Engine::TransformComponent>();
 		Engine::TransformSystem::SetWorldPosition(objTComp, glm::vec3(0, testmovement, 0));
-		//glm::vec3 currentPosition(objTComp.m_Position[3]);
-		//glm::vec3 tempPos = objTComp.m_Transform[3];
-		//glm::vec3 travel = tempPos - currentPosition;
-		//glm::mat4 tempP = glm::translate(tempP, travel);
-		//glm::mat4 tempM = objTComp.m_Scale * objTComp.m_Rotation * objTComp.m_Position;
-
-		Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
-		/* ----- OBJ END ----- */
 
 		Engine::Renderer::EndScene();
 	}
@@ -124,7 +113,6 @@ public:
 private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
-	//std::shared_ptr<Engine::VertexArray> m_VertexArray;
 
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA, m_ObjVA;
@@ -138,10 +126,8 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 
-	std::shared_ptr<Engine::VisualObject> m_Obj;
-	//std::shared_ptr<Engine::EntityInitializer> m_EInit;
-private:
 	bool bShowCustomColor{};
+	int PrimitiveType = 2;
 };
 
 class Sandbox : public Engine::Application
@@ -149,9 +135,9 @@ class Sandbox : public Engine::Application
 public:
 	Sandbox()
 	{
-		//PushLayer(new ExampleLayer());
+		PushLayer(new ExampleLayer());
 		//PushLayer(new PathfindingLayer());
-		PushLayer(new TransformExampleLayer());
+		//PushLayer(new TransformExampleLayer());
 	}
 
 	~Sandbox()
