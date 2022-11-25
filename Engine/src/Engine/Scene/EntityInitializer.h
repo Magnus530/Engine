@@ -2,6 +2,7 @@
 
 #include "Engine/Objects/vertex.h"
 #include "Engine/AssetLoaders/ObjLoader.h"
+#include "Engine/Renderer/VertexArray.h"
 #include "Engine/Scene/Entity.h"
 
 #include <string>
