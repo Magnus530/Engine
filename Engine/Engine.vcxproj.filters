@@ -7,8 +7,8 @@
     <Filter Include="src\Engine">
       <UniqueIdentifier>{12A1320E-FE58-745B-6760-4DB753370F4C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Engine\AssetLoaders">
-      <UniqueIdentifier>{ABEE0D3F-1726-56D6-2030-BAF98CE67CCF}</UniqueIdentifier>
+    <Filter Include="src\Engine\AssetInit">
+      <UniqueIdentifier>{35EDAF9E-217C-3968-CA9A-4D63B6084A0E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Core">
       <UniqueIdentifier>{AA407579-16CC-E23D-1FDD-65328BE73E3E}</UniqueIdentifier>
@@ -76,7 +76,13 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\AssetInit\ObjLoader.h">
-      <Filter>src\Engine\AssetLoaders</Filter>
+      <Filter>src\Engine\AssetInit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\AssetInit\PrimitiveShape.h">
+      <Filter>src\Engine\AssetInit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\AssetInit\PrimitiveShapeFactory.h">
+      <Filter>src\Engine\AssetInit</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Application.h">
       <Filter>src\Engine\Core</Filter>
@@ -1467,12 +1473,10 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\AssetInit\PrimitiveShape.h" />
-    <ClInclude Include="src\Engine\AssetInit\PrimitiveShapeFactory.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
-      <Filter>src\Engine\AssetLoaders</Filter>
+      <Filter>src\Engine\AssetInit</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Core\Application.cpp">
       <Filter>src\Engine\Core</Filter>

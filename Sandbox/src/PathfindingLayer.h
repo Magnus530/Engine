@@ -10,8 +10,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/AssetInit/ObjLoader.h"
-#include "Engine/AssetLoaders/ObjLoader.h"
-
 
 class PathfindingLayer : public Engine::Layer
 {
