@@ -22,6 +22,10 @@ TransformExampleLayer::TransformExampleLayer()
 
 	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 	Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-2, -1, 0));
+
+	//FMOD initialize
+	m_Audio = std::make_shared<Engine::AudioEngine>();
+	m_Audio->init();
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)

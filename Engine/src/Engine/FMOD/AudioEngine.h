@@ -5,7 +5,7 @@
  * Code is used from Guy Somberg's "Game Audio Programming: Principles and practices"
  * ISBN-13: 978-1-4987-4673-1
  */
-
+#include <Windows.h>
 #include "fmod.hpp"
 #include "fmod.h"
 #include "fmod_codec.h"
@@ -15,10 +15,6 @@
 #include "fmod_errors.h"
 #include "fmod_output.h"
 #include "fmod_studio.hpp"
-#include "fmod_studio.h"
-#include "fmod_studio_common.h"
-#include "fsbank.h"
-#include "fsbank_errors.h"
 #include <glm/glm.hpp>
 #include <string>
 #include <map>
@@ -95,9 +91,9 @@ namespace Engine {
 
         void update(float fTimeDeltaSeconds);
 
-        FMOD::Studio::System* mpStudioSystem;
-        FMOD::System* mpSystem;
-        FMOD::Reverb3D* mpReverb;
+        FMOD::Studio::System* mpStudioSystem{ nullptr };
+        FMOD::System* mpSystem{ nullptr };
+        FMOD::Reverb3D* mpReverb{ nullptr };
 
         int mnNextChannelId{};                                                  // Id of the next channel a sound will play in
 

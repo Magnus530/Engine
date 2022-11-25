@@ -13,7 +13,7 @@ namespace Engine
 		mpStudioSystem = nullptr;
 		AudioEngine::errorCheck(FMOD::Studio::System::create(&mpStudioSystem));
 		AudioEngine::errorCheck(mpStudioSystem->initialize(
-			32, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_PROFILE_ENABLE, nullptr));
+			512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr));
 
 		// Create a System object.
 		mpSystem = nullptr;

@@ -158,8 +158,8 @@ public:
 	Sandbox()
 	{
 		//PushLayer(new ExampleLayer());
-		PushLayer(new PathfindingLayer());
-		//PushLayer(new TransformExampleLayer());
+		//PushLayer(new PathfindingLayer());
+		PushLayer(new TransformExampleLayer());
 	}
 
 	~Sandbox()
