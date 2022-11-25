@@ -10,7 +10,6 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Engine/Objects/VisualObject.h"
 #include "Engine/AssetLoaders/ObjLoader.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 #include "Engine/Scene/EntityInitializer.h"
