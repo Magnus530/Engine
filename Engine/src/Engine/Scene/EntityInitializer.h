@@ -3,9 +3,9 @@ https://www.youtube.com/watch?v=wP3glUDGhi8 */
 
 #pragma once
 
-#include "Engine/Objects/vertex.h"
 #include "Engine/AssetInit/ObjLoader.h"
 #include "Engine/Scene/Entity.h"
+#include "Engine/Renderer/vertex.h"
 #include "Engine/Renderer/VertexArray.h"
 
 #include <string>

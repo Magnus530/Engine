@@ -135,7 +135,7 @@
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Objects\vertex.h">
+    <ClInclude Include="src\Engine\Renderer\vertex.h">
       <Filter>src\Engine\Objects</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Pathfinding\PNode.h">
@@ -1499,7 +1499,7 @@
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp">
       <Filter>src\Engine\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Objects\vertex.cpp">
+    <ClCompile Include="src\Engine\Renderer\vertex.cpp">
       <Filter>src\Engine\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
