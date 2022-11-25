@@ -48,6 +48,19 @@ float Triangle::circle_rad() {
 	vec_c[0] = p_c[0] - p_a[0];
 	vec_c[1] = p_c[1] - p_a[1];
 
+	float m_pa[2], m_pb[2], m_pc[2];
+
+	m_pa[0] = p_a[0] + vec_a[0] / 2;
+	m_pa[1] = p_a[1] + vec_a[1] / 2;
+
+	m_pb[0] = p_b[0] + vec_b[0] / 2;
+	m_pb[1] = p_b[1] + vec_b[1] / 2;
+
+	m_pc[0] = p_c[0] + vec_c[0] / 2;
+	m_pc[1] = p_c[1] + vec_c[1] / 2;
+
+
+
 	return (v_a * v_b * v_c) / (4 * A);
 }
 
