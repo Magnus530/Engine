@@ -73,6 +73,24 @@ namespace Engine
 	Implementation* sgpImplementation = nullptr;
 
 
+
+	AudioEngine::AudioEngine()
+	{
+		init();
+
+		std::string oneShot1 = "assets/audio/sfx_sound.wav";
+		std::string mx1 = "assets/audio/Cartoon_song.wav";
+
+		loadSound(mx1, false, true, true);
+		//loadSound(oneShot1 = "assets/audio/sfx_sound.wav", false, true, true);
+		playSound(mx1, glm::vec3(), -6.f, 1.f);
+	}
+
+	AudioEngine::~AudioEngine()
+	{
+		shutdown();
+	}
+
 	//----------------------
 	// Initialize the engine
 	//----------------------
@@ -81,6 +99,14 @@ namespace Engine
 		sgpImplementation = new Implementation;
 	}
 
+	////add sounds quickly (making it public to get it in all funtions)
+	//std::string musicPath1 = "assets/audio/Cartoon_song.wav";
+	//std::string	oneShot1 = "assets/audio/sfx_sound.wav";
+	//if (Input::IsKeyPressed(E_KEY_Q))
+	//{
+	//	playSound(oneShot1, glm::vec3(), -6.f);
+	//	setChannelVolume(musicPath1, 12.f);
+	//}
 	//------------------------------
 	// Update the engine properties
 	//------------------------------
@@ -160,7 +186,7 @@ namespace Engine
 		eMode |= bIs3d ? (FMOD_3D | FMOD_3D_INVERSETAPEREDROLLOFF) : FMOD_2D;
 		eMode |= bIsLooping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
 		eMode |= bIsStreaming ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
-		eMode |= FMOD_INIT_CHANNEL_LOWPASS;												// enable low pass filtering
+		//eMode |= FMOD_INIT_CHANNEL_LOWPASS;												// enable low pass filtering
 		FMOD::Sound* pSound = nullptr;
 		AudioEngine::errorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
 		// If sound loaded correctly
@@ -239,7 +265,8 @@ namespace Engine
 			}
 
 			sgpImplementation->mChannels[nChannelId] = pChannel;
-			AudioEngine::errorCheck(pChannel->setVolume(dBToVolume(fVolumedB)));
+			this->fadeInChannel(nChannelId, fFadeInTime, dBToVolume(fVolumedB));
+			sgpImplementation->mSoundChannels[strSoundName] = pChannel;
 			AudioEngine::errorCheck(pChannel->setPaused(false));
 		}
 		return nChannelId;
@@ -605,9 +632,14 @@ namespace Engine
 		float maxdist = fMaxDistance;
 		AudioEngine::errorCheck(sgpImplementation->mpReverb->set3DAttributes(&pos, mindist, maxdist));
 	}
+/*
+	Channel::Channel(Implementation& tImplementation, int nSoundId, const AudioEngine::SoundDefinition& tSoundDefinition, const glm::vec3& vPosition, float fVolumedB)
+	{
+		
+
+	}
 
 	///TODO: WIP of changing states. Will make things easier
-	/*
 	void Channel::update(float fTimeDeltaSeconds)
 	{
 		switch(meState)
@@ -705,21 +737,39 @@ namespace Engine
 			break;
 	  }
 	}
+	*/
+	void Channel::updateChannelParameters()
+	{
+	}
+	bool Channel::shouldBeVirtual(bool bAllowOneShotVirtuals) const
+	{
+		return false;
+	}
+	bool Channel::isPlaying() const
+	{
+		return false;
+	}
+	float Channel::getVolumedB() const
+	{
+		return 0.0f;
+	}
+
+	/*
 	void AudioEngine::loadSound(int nSoundID)
 	{
-		if(soundIsLoaded(nSoundID))
+		if (soundIsLoaded(nSoundID))
 			return;
-	auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);
-	if(tFoundIt != sgpImplementation->mSounds.end())
-		return;
-	FMOD_MODE eMode= FMOD_NONBLOCKING;
-	eMode |= b3d ? (FMOD_3D | FMOD_3D_INVERSETAPEREDROLLOFF) : FMOD_2D;
-	eMode |= bLooping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
-	eMode |= bStream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
-	FMOD::Sound* pSound = nullptr;
-	AudioEngine::errorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
-	if(pSound)
-		sgpImplementation->mSounds[strSoundName] = pSound;
+		auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);
+		if (tFoundIt != sgpImplementation->mSounds.end())
+			return;
+		FMOD_MODE eMode = FMOD_NONBLOCKING;
+		eMode |= b3d ? (FMOD_3D | FMOD_3D_INVERSETAPEREDROLLOFF) : FMOD_2D;
+		eMode |= bLooping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
+		eMode |= bStream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
+		FMOD::Sound* pSound = nullptr;
+		AudioEngine::errorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
+		if (pSound)
+			sgpImplementation->mSounds[strSoundName] = pSound;
 	}
-*/
+	*/
 }

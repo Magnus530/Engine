@@ -14,6 +14,7 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 #include "Engine/AssetLoaders/ObjLoader.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 #include "Engine/Scene/EntityInitializer.h"
+#include "Engine/FMOD/AudioEngine.h"
 
 
 // Layers
@@ -24,6 +25,8 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 class ExampleLayer : public Engine::Layer
 {
 public:
+
+
 	ExampleLayer()
 		: Layer("Example"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
@@ -48,12 +51,23 @@ public:
 
 		m_SquareEntity = Engine::EntityInitializer::GetInstance().EntityInit(m_SquareVA, m_ActiveScene);
 		m_SquareEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f });
+		
+		//FMOD Audio Engine (changed to contstructor)
+		//m_AudioEngine = std::make_shared<Engine::AudioEngine>();
+		m_AudioEngine->init();
+		m_AudioEngine->set3dListenerAndOrientation(glm::vec3{ m_PCameraController.GetCamera().GetPosition().x,  m_PCameraController.GetCamera().GetPosition().y ,m_PCameraController.GetCamera().GetPosition().z }, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0));
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
 	{
 		// Update
 		m_PCameraController.OnUpdate(ts);
+		//Audio
+		//Engine::AudioEngine::update(ts);
+		//m_AudioEngine->set3dListenerAndOrientation(glm::vec3{ m_PCameraController.GetCamera().GetPosition().x, m_PCameraController.GetCamera().GetPosition().y,m_PCameraController.GetCamera().GetPosition().z},
+		//											  glm::vec3{ m_PCameraController.GetCamera().right().x, m_PCameraController.GetCamera().right().y, m_PCameraController.GetCamera().right().z, },
+		//												glm::vec3{m_PCameraController.GetCamera().up().x, m_PCameraController.GetCamera().up().y, m_PCameraController.GetCamera().up().z});
+
 
 		// Render
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
@@ -96,6 +110,7 @@ public:
 		/* ----- OBJ END ----- */
 
 		Engine::Renderer::EndScene();
+		//Engine::AudioEngine::shutdown();
 	}
 
 	virtual void OnImGuiRender() override
@@ -128,6 +143,9 @@ private:
 
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA, m_ObjVA;
+
+	std::shared_ptr<Engine::AudioEngine> m_AudioEngine;
+	//Engine::AudioEngine* m_AudioEngine{ nullptr };
 
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 

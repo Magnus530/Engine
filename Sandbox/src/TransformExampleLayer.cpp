@@ -23,6 +23,10 @@ TransformExampleLayer::TransformExampleLayer()
 	std::vector<uint32_t> indices;
 	Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 	m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
+
+	//FMOD initialize
+	m_Audio = std::make_shared<Engine::AudioEngine>();
+	//m_Audio->init();
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)

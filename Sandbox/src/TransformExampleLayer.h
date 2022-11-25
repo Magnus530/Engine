@@ -20,6 +20,8 @@ private:
 
 	std::shared_ptr<Engine::VisualObject> m_Obj;
 
+	std::shared_ptr<Engine::AudioEngine> m_Audio;
+
 private: // Transform testing
 	//bool bSetWorldPosition{};
 	glm::vec3 m_Position{};
