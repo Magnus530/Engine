@@ -17,13 +17,24 @@ namespace Engine {
 
     int PNode::GetDistanceToNode(PNode* target)
     {
-        return (int)(m_Position - target->m_Position).length() * floatConvert;
+        //return (int)(m_Position - target->m_Position).length() * floatConvert;
+        return (int)(target->m_Position - m_Position).length() * floatConvert;
     }
 
     void PNode::InitValues(PNode* start, PNode* target)
     {
         H = GetDistanceToNode(target);
         F = G + H;
+    }
+
+    void PNode::SetBlock(bool b)
+    {
+        if (b) {
+            NodeType = ENodeType::NT_Block;
+        }
+        else {
+            NodeType = ENodeType::NT_None;
+        }
     }
 
     namespace Pathfinder {
@@ -139,14 +150,15 @@ namespace Engine {
                 for (size_t t{}; t < current->mConnectedNodes.size(); t++)
                 {
                     std::shared_ptr<PNode> neighbor = current->mConnectedNodes[t];
-                    std::vector<std::shared_ptr<PNode>>::iterator it = std::find(tosearch.begin(), tosearch.end(), neighbor);
+                    //std::vector<std::shared_ptr<PNode>>::iterator it = std::find(tosearch.begin(), tosearch.end(), neighbor);
+                    auto it = std::find(tosearch.begin(), tosearch.end(), neighbor);
                     bool inSearch = (it != tosearch.end());
         
         
                     if (neighbor->IsBlock()) { continue; }
         
                     it = std::find(processed.begin(), processed.end(), neighbor);
-                    if (it != processed.end()) continue;
+                    if (it != processed.end()) { continue; }
         
                     int CostToNeighbor = current->G + current->GetDistanceToNode(neighbor.get());
         
@@ -154,7 +166,6 @@ namespace Engine {
                     {
                         neighbor->SetG(CostToNeighbor);
                         neighbor->m_Connection = current;
-                        //neighbor->m_Connection = std::enable_shared_from_this(current);
         
                         if (!inSearch) {
                             neighbor->SetH(end);

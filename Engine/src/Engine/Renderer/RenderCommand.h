@@ -28,14 +28,9 @@ namespace Engine
 			s_RendererAPI->Clear();
 		}
 
-
 		inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray)
 		{
 			s_RendererAPI->DrawIndexed(vertexArray);
-		}
-		inline static void DrawPoint(const std::shared_ptr<VertexArray>& vertexArray)
-		{
-			s_RendererAPI->DrawPoint(vertexArray);
 		}
 
 	private:

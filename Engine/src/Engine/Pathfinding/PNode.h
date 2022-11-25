@@ -18,7 +18,6 @@ namespace Engine {
 	class ENGINE_API PNode
 	{
 	public:
-		//PNode();
 		PNode(std::string name, glm::vec3 position);
 		~PNode();
 		std::string m_name;
@@ -43,7 +42,7 @@ namespace Engine {
 		void SetH(PNode* target) { H = GetDistanceToNode(target); }
 
 		bool IsBlock() const { return NodeType == ENodeType::NT_Block; }
-
+		void SetBlock(bool b);
 	};
 
 	namespace Pathfinder {
@@ -60,14 +59,14 @@ namespace Engine {
 	
 		// Spawner noder for testing 
 		inline int GridSize{ 10 };
-		//inline float GridSpacing{ 0.1f };
+		inline float GridSpacing{ 1.f };
 		inline glm::vec3 Center(0, 0, 0);
 		inline std::vector<std::shared_ptr<PNode>> m_Nodes;
 		inline std::vector<glm::vec3> m_NodeLocations;
 		inline std::string GenerateNodeName()
 		{
 			std::string name = "PNode ";
-			name += std::to_string(m_Nodes.size());
+			name += std::to_string(m_Nodes.size()+1);
 			return name;
 		}
 		inline void SpawnGrid()
@@ -79,7 +78,7 @@ namespace Engine {
 			{
 				for (size_t z{}; z < 10; z++)
 				{
-					glm::vec3 location = glm::vec3(Center.x + (/*GridSpacing **/ x) - (float)GridSize / 2, 0, Center.z + (/*GridSpacing **/ z) - (float)GridSize / 2);
+					glm::vec3 location = glm::vec3(Center.x + (GridSpacing * x) - (float)GridSize / 2, 0, Center.z + (GridSpacing * z) - (float)GridSize / 2);
 					m_Nodes.emplace_back(std::make_shared<PNode>(GenerateNodeName(), location));
 					m_NodeLocations.push_back(location);
 				}
@@ -97,8 +96,8 @@ namespace Engine {
 
 				if (m_Nodes.size() < i + 10) { continue; }
 				b = m_Nodes[(i-1) + 10];
-				a->AddConnectedNode(b);
 				b->AddConnectedNode(a);
+				a->AddConnectedNode(b);
 			}
 			E_TRACE("Created A* grid");
 			E_TRACE("{0} Connections: {1}", m_Nodes[0]->m_name, m_Nodes[0]->mConnectedNodes.size());

@@ -183,7 +183,6 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Engine\Objects\TransformObject.h" />
     <ClInclude Include="src\Engine\Objects\VisualObject.h" />
-    <ClInclude Include="src\Engine\Objects\vShader.h" />
     <ClInclude Include="src\Engine\Objects\vertex.h" />
     <ClInclude Include="src\Engine\Pathfinding\PNode.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
@@ -201,7 +200,9 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\Renderer\VertexArray.h" />
     <ClInclude Include="src\Engine\Scene\Components.h" />
     <ClInclude Include="src\Engine\Scene\Entity.h" />
+    <ClInclude Include="src\Engine\Scene\EntityInitializer.h" />
     <ClInclude Include="src\Engine\Scene\Scene.h" />
+    <ClInclude Include="src\Engine\Scene\Systems\TransformSystem.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
@@ -640,7 +641,6 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Engine\Objects\TransformObject.cpp" />
     <ClCompile Include="src\Engine\Objects\VisualObject.cpp" />
-    <ClCompile Include="src\Engine\Objects\vShader.cpp" />
     <ClCompile Include="src\Engine\Objects\vertex.cpp" />
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
@@ -655,7 +655,9 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\Engine\Renderer\Texture.cpp" />
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Engine\Scene\Entity.cpp" />
+    <ClCompile Include="src\Engine\Scene\EntityInitializer.cpp" />
     <ClCompile Include="src\Engine\Scene\Scene.cpp" />
+    <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />

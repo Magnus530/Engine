@@ -138,7 +138,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\PathfindingLayer.h" />
+    <ClInclude Include="src\TransformExampleLayer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\PathfindingLayer.cpp" />
     <ClCompile Include="src\SandboxApp.cpp" />
+    <ClCompile Include="src\TransformExampleLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

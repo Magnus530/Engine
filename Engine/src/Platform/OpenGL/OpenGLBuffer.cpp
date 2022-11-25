@@ -12,12 +12,6 @@ namespace Engine
 		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 	}	
-	OpenGLVertexBuffer::OpenGLVertexBuffer(std::vector<Vertex>& vertices)
-	{
-		glCreateBuffers(1, &m_VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-	}
 
 	OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	{
