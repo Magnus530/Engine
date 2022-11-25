@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/AssetInit/ObjLoader.h"
+#include "Engine/AssetLoaders/ObjLoader.h"
 
 
 class PathfindingLayer : public Engine::Layer
@@ -20,37 +21,25 @@ private:
 	std::shared_ptr<Engine::Texture2D> m_Texture;
 
 	Engine::PerspectiveCameraController m_PCameraController;
-	//Engine::OrthographicCameraController m_OCameraController;
 
 private:
 	/* Test VisualObject with Pathfinding */
 	//std::shared_ptr<Engine::VisualObject> m_Obj;
+	
+	std::shared_ptr<Engine::VertexArray> m_VA;
+	std::shared_ptr<Engine::Scene> m_Scene;
+	Engine::Entity m_Entity;
+
 	std::vector<glm::vec3> m_Path;
 	std::vector<glm::vec3> m_SplinePath;
 	float m_Splinetime{};
 	bool bObjPathfindActive{};
 
 private: // Visual Aid & ImGui related elements
-	bool bOverrideShaderColor{ true };
+	bool bShowShaderColor{ true };
 	std::shared_ptr<Engine::PNode> m_StartNode;
 	std::shared_ptr<Engine::PNode> m_TargetNode;
 	std::vector<std::shared_ptr<Engine::PNode>> m_BlockedNodes;
-
-//private: // Transform testing
-//	//bool bSetWorldPosition{};
-//	glm::vec3 m_Position{};
-//	bool bAddWorldPosition{};
-//	bool bAddLocalPosition{};
-//	float m_PositionStrength{ 0.f };
-//
-//	bool bAddWorldRotation{};
-//	bool bAddLocalRotation{};
-//	float m_RotationStrength{ 0.f };
-//
-//	bool bAddScale{};
-//	float m_ScaleStrength{ 0.f };
-//	bool bSetScale{};
-//	float m_SetScale{ 1.f };
 
 public:
 	PathfindingLayer()
@@ -69,6 +58,10 @@ public:
 
 		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 		//m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
+
+		m_Scene = std::make_shared<Engine::Scene>();
+		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Monkey", m_VA, m_Scene);
+		m_Entity.AddComponent<Engine::RendererComponent>();
 
 		/* Pathfinding */
 		Engine::Pathfinder::SpawnGrid();
@@ -96,10 +89,13 @@ public:
 		else { m_Splinetime = 0.99f; bObjPathfindActive = false; }
 		if (m_Splinetime > 0.99f) m_Splinetime = 0.99f;
 
+		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		if (bObjPathfindActive) {
 			glm::vec3 pos = Engine::Pathfinder::GetPositionAlongSpline(m_Path, m_Splinetime);
+
 			//E_TRACE("SplineTime: {0}, {1}, {2}", pos.x, pos.y, pos.z);
 			//m_Obj->SetWorldPosition(pos + glm::vec3(0, 0.2, 0));
+			Engine::TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0, 1, 0));
 		}
 		// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
 		static float sin{};
@@ -119,40 +115,48 @@ public:
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", glm::vec4(.7, .1, .6, 1));
 		//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix());		// Render m_Obj
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
 
+		Engine::TransformSystem::UpdateMatrix(transform);
+		Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
+
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", bShowShaderColor);
 		/* ------- RENDER NODEGRID -------- */
 		float scale = 0.3f;
 		bool alteredColor{};
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", nodeColor);
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
 		for (auto& it : Engine::Pathfinder::m_Nodes)
 		{
 			glm::vec3 position = it->m_Position;
 			if (it == m_StartNode) {
-				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", startColor);
+				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", startColor);
 				alteredColor = true;
 			}
 			else if (it == m_TargetNode) {
-				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", targetColor);
+				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", targetColor);
 				alteredColor = true;
 			}
 			else if (it->IsBlock()) {
-				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", blockColor);
+				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", blockColor);
 				alteredColor = true;
 			}
 
 			//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
+			Engine::Renderer::Submit(m_Shader, m_VA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
 			if (alteredColor) {
-				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", nodeColor);
+				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
 				alteredColor = false;
 			}
 		}
 
 		/* ----- RENDER SPLINE PATH ----- */
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", glm::vec4(1, 1, 1, 1));
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec3(1, 1, 1));
 		scale = 0.1f;
 		for (auto& it : m_Path)
 		{
 			//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 1.f, 0)));
+			Engine::Renderer::Submit(m_Shader, m_VA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 1.f, 0)));
 		}
 
 		// End Render Scene
@@ -162,42 +166,6 @@ public:
 	virtual void OnImGuiRender() override
 	{
 		ImGui::ShowDemoWindow();
-
-		//// Transformation Demo
-		//ImGui::Begin("TransformTesting");
-		//if (ImGui::Button("Reset Transformations")) {
-		//	m_Obj->Reset();
-		//	m_Position *= 0.f;
-		//}
-
-		//ImGui::Text("Position");
-		//ImGui::PushItemWidth(75.f);
-		//const char* format = "%0.5f";
-		////ImGui::Checkbox("Set World Position", &bSetWorldPosition);
-		//ImGui::SliderFloat("X", &m_Position.x, -10.f, 10.f, format);
-		//ImGui::SameLine();
-		//ImGui::SliderFloat("Y", &m_Position.y, -10.f, 10.f, format);
-		//ImGui::SameLine();
-		//ImGui::SliderFloat("Z", &m_Position.z, -10.f, 10.f, format);
-
-
-		//ImGui::PushItemWidth(100.f);
-		////ImGui::Checkbox("Add World Position", &bAddWorldPosition);
-		////ImGui::Checkbox("Add Local Position", &bAddLocalPosition);
-		////ImGui::SliderFloat("Position Strength", &m_PositionStrength, -1.f, 1.f);
-
-		//ImGui::Text("Rotation");
-		//ImGui::Checkbox("Add World Rotation", &bAddWorldRotation);
-		//ImGui::Checkbox("Add Local Rotation", &bAddLocalRotation);
-		//ImGui::SliderFloat("Rotation Strength", &m_RotationStrength, -1.f, 1.f);
-		//
-		//ImGui::Text("Scale");
-		//ImGui::Checkbox("Add Scale", &bAddScale);
-		//ImGui::SliderFloat("Scale Strength", &m_ScaleStrength, -1.f, 1.f);
-		//ImGui::Checkbox("Set Scale", &bSetScale);
-		//ImGui::SliderFloat("Set Scale", &m_SetScale, 0.f, 3.f);
-
-		//ImGui::End();
 
 		ImGui::Begin("Pathfinder");
 
@@ -328,9 +296,11 @@ public:
 				it = 0;
 			for (int i = 0; i < 100; i++)
 				selected[i] = blockSelected[i];
-			for (auto& it : m_BlockedNodes) {
+			for (auto& it : m_BlockedNodes)
 				it->SetBlock(false);
-			}
+			selected[startSelectedLocation] = 1;
+			selected[targetSelectedLocation] = 1;
+
 			m_BlockedNodes.clear();
 		}
 
@@ -338,7 +308,6 @@ public:
 		static std::vector<Engine::PNode*> nodepath;
 		if (ImGui::Button("Find path", ImVec2(100,50))) {
 			if (m_StartNode.get() && m_TargetNode.get()) {
-				//E_TRACE("Finding path between from {0} to {1}", start->m_name, end->m_name);
 				nodepath.clear();
 				m_Path.clear();
 				nodepath = Engine::Pathfinder::FindPath(m_StartNode, m_TargetNode.get());
@@ -346,7 +315,6 @@ public:
 				for (auto it = nodepath.end(); it != nodepath.begin();) {
 					m_Path.push_back((*--it)->m_Position);
 				}
-				//m_Path.push_back(start->m_Position);
 				Engine::Pathfinder::MakeKnotVector(m_Path);
 				m_Splinetime = 0.f;
 				bObjPathfindActive = true;

@@ -15,12 +15,17 @@ TransformExampleLayer::TransformExampleLayer()
 	: Layer("TransformTesting"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 {
 	m_Shader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
-	//m_Shader = Engine::Shader::Create("FlatColor", vertexSrc, fragmentSrc);
 
 	/* Loading obj */
 	std::vector<Engine::Vertex> vertices;
 	std::vector<uint32_t> indices;
 	Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
+	m_Scene = std::make_shared<Engine::Scene>();
+	m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_Scene);
+	m_Entity.AddComponent<Engine::RendererComponent>(glm::vec4(0.5f, 0.2f, 0.6f, 1.f));
+
+	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+	Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-2, -1, 0));
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
@@ -34,10 +39,8 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 	Engine::RenderCommand::Clear();
 
-
 	glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
 	glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
-
 
 	// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
 	static float sin{};
@@ -46,6 +49,7 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	float fleeting = (sinf(sin) + 1) / 2;
 
 	// ---- TRANSFORMATION TESTING ---------------------
+	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		// Position
 	//if (bSetWorldPosition)
 	//m_Obj->SetWorldPosition(m_Position);
@@ -68,11 +72,27 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 
 	//m_Obj->UpdateMatrix();
 
+	Engine::TransformSystem::SetWorldPosition(transform, m_Position);
+
+		// Rotation
+	if (bAddWorldRotation) {
+		Engine::TransformSystem::AddWorldRotation(transform, ts * m_RotationStrength, glm::vec3(0, 1.f, 0));
+	}
+	if (bAddLocalRotation) {
+		Engine::TransformSystem::AddLocalRotation(transform, ts * m_RotationStrength, glm::vec3(1.f, 0, 0));
+	}
+	
+	// Updating TransformComponent
+	Engine::TransformSystem::UpdateMatrix(transform);
+
 	// Draw Call for m_Obj
 	auto shader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader);
 	shader->UploadUniformFloat3("u_Color", m_ObjColor);
 	shader->UploadUniformInt("u_ShowCustomColor", bShowCustomColor);
+
 	//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix()); // Render m_Obj
+
+	Engine::Renderer::Submit(m_Shader, m_CubeVA, transform.m_Transform);
 
 	// End Scene
 	Engine::Renderer::EndScene();

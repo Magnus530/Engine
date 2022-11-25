@@ -1,9 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-//#include "../Renderer/VisualObject/VisualObject.h"
 #include "Engine/Objects/vertex.h"
-
 
 namespace Engine
 {

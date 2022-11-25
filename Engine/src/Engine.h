@@ -19,6 +19,7 @@
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Systems/TransformSystem.h"
+#include "Engine/Scene/EntityInitializer.h"
 
 // ---------------Renderer---------------
 #include "Engine/Renderer/Renderer.h"
@@ -40,9 +41,6 @@
 
 // --------------Mesh Objects---------------
 #include "Engine/AssetInit/ObjLoader.h"
-
-// ---------------Entry Point---------------
-//#include "Engine/Core/EntryPoint.h"
 
 // ---------------Audio Engine---------------
 #include "Engine/FMOD/AudioEngine.h"

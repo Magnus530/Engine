@@ -10,6 +10,7 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/AssetInit/ObjLoader.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
@@ -84,6 +85,8 @@ public:
 		auto objTComp = m_ObjEntity.GetComponent<Engine::TransformComponent>();
 		Engine::TransformSystem::SetWorldPosition(objTComp, glm::vec3(0, testmovement, 0));
 
+		Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
+		
 		Engine::Renderer::EndScene();
 	}
 
@@ -96,7 +99,6 @@ public:
 			auto& tag = m_ObjEntity.GetComponent<Engine::TagComponent>().Tag;
 			ImGui::Text("%s", tag.c_str());
 			auto& squareColor = m_ObjEntity.GetComponent<Engine::RendererComponent>().Color;
-			//ImGui::ColorEdit4("Obj Color", glm::value_ptr(squareColor));
 			ImGui::ColorEdit4("Obj Color", glm::value_ptr(m_ObjEntity.GetComponent<Engine::RendererComponent>().Color));
 			ImGui::Separator();
 			ImGui::Checkbox("Show Custom Color", &bShowCustomColor);

@@ -129,9 +129,6 @@
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Objects\TransformObject.h">
-      <Filter>src\Engine\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Objects\vertex.h">
       <Filter>src\Engine\Objects</Filter>
     </ClInclude>
@@ -1497,9 +1494,6 @@
     </ClCompile>
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp">
       <Filter>src\Engine\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Objects\TransformObject.cpp">
-      <Filter>src\Engine\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Objects\vertex.cpp">
       <Filter>src\Engine\Objects</Filter>

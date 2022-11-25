@@ -18,7 +18,10 @@ private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
 
-	//std::shared_ptr<Engine::VisualObject> m_Obj;
+	std::shared_ptr<Engine::VertexArray> m_CubeVA;
+
+	std::shared_ptr<Engine::Scene> m_Scene;
+	Engine::Entity m_Entity;
 
 private: // Transform testing
 	//bool bSetWorldPosition{};

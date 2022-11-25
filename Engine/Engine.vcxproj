@@ -183,7 +183,6 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\Events\MouseEvent.h" />
     <ClInclude Include="src\Engine\FMOD\AudioEngine.h" />
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="src\Engine\Objects\TransformObject.h" />
     <ClInclude Include="src\Engine\Objects\vertex.h" />
     <ClInclude Include="src\Engine\Pathfinding\PNode.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
@@ -640,7 +639,6 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp" />
-    <ClCompile Include="src\Engine\Objects\TransformObject.cpp" />
     <ClCompile Include="src\Engine\Objects\vertex.cpp" />
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
