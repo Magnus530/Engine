@@ -3,7 +3,6 @@
 #include "RenderCommand.h"
 #include "Shader.h"
 #include "Camera.h"
-#include "../Objects/VisualObject.h"
 
 namespace Engine
 {

@@ -10,7 +10,6 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Engine/Objects/VisualObject.h"
 #include "Engine/AssetLoaders/ObjLoader.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 #include "Engine/Scene/EntityInitializer.h"
@@ -100,11 +99,6 @@ public:
 		/* ----- OBJ START ----- */
 		auto objTComp = m_ObjEntity.GetComponent<Engine::TransformComponent>();
 		Engine::TransformSystem::SetWorldPosition(objTComp, glm::vec3(0, testmovement, 0));
-		//glm::vec3 currentPosition(objTComp.m_Position[3]);
-		//glm::vec3 tempPos = objTComp.m_Transform[3];
-		//glm::vec3 travel = tempPos - currentPosition;
-		//glm::mat4 tempP = glm::translate(tempP, travel);
-		//glm::mat4 tempM = objTComp.m_Scale * objTComp.m_Rotation * objTComp.m_Position;
 
 		Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
 		/* ----- OBJ END ----- */
@@ -122,7 +116,6 @@ public:
 			auto& tag = m_ObjEntity.GetComponent<Engine::TagComponent>().Tag;
 			ImGui::Text("%s", tag.c_str());
 			auto& squareColor = m_ObjEntity.GetComponent<Engine::RendererComponent>().Color;
-			//ImGui::ColorEdit4("Obj Color", glm::value_ptr(squareColor));
 			ImGui::ColorEdit4("Obj Color", glm::value_ptr(m_ObjEntity.GetComponent<Engine::RendererComponent>().Color));
 			ImGui::Separator();
 			ImGui::Checkbox("Show Custom Color", &bShowCustomColor);
@@ -139,7 +132,6 @@ public:
 private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
-	//std::shared_ptr<Engine::VertexArray> m_VertexArray;
 
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA, m_ObjVA;
@@ -156,8 +148,6 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 
-	std::shared_ptr<Engine::VisualObject> m_Obj;
-	//std::shared_ptr<Engine::EntityInitializer> m_EInit;
 private:
 	bool bShowCustomColor{};
 };
@@ -168,8 +158,8 @@ public:
 	Sandbox()
 	{
 		//PushLayer(new ExampleLayer());
-		//PushLayer(new PathfindingLayer());
-		PushLayer(new TransformExampleLayer());
+		PushLayer(new PathfindingLayer());
+		//PushLayer(new TransformExampleLayer());
 	}
 
 	~Sandbox()

@@ -19,15 +19,13 @@ namespace Engine
 
 	struct TransformComponent
 	{
-		glm::mat4 m_Transform{ 1.0f };
-		glm::mat4 m_Position{ 1.0f };
-		glm::mat4 m_Rotation{ 1.0f };
-		glm::mat4 m_Scale{ 1.0f };
+		glm::mat4 m_Transform	{ 1.f };
+		glm::mat4 m_Position	{ 1.f };
+		glm::mat4 m_Rotation	{ 1.f };
+		glm::mat4 m_Scale		{ 1.f };
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const glm::mat4& transform)
-			: m_Transform(transform) {}
 
 		operator glm::mat4& () { return m_Transform; }
 		operator const glm::mat4& () const { return m_Transform; }
