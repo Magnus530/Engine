@@ -132,18 +132,27 @@ private:
 	int PrimitiveType = 3;
 };
 
+
+
 class Sandbox : public Engine::Application
 {
 public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		//PushLayer(new PathfindingLayer());
-		//PushLayer(new TransformExampleLayer());
+		PushLayer(new PathfindingLayer());
+		PushLayer(new TransformExampleLayer());
+		
+		SetCurrentLayer(0);
+		SetGuiLayerNames();
 	}
 
 	~Sandbox()
 	{}
+
+
+private:
+	std::shared_ptr<Engine::Layer> m_CurrentLayer;
 };
 
 Engine::Application* Engine::CreateApplication()

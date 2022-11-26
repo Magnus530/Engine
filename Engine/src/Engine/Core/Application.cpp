@@ -1,6 +1,7 @@
 #include "epch.h"
 #include "Application.h"
 #include "Input.h"
+#include "imgui.h"
 
 #include "Engine/Renderer/Renderer.h"
 
@@ -22,8 +23,9 @@ namespace Engine
 
 		Renderer::Init();
 
-		m_ImGuiLayer = new ImGuiLayer();
-		PushOverlay(m_ImGuiLayer);
+		m_EditorGuiLayer = new EditorGuiLayer();
+		PushOverlay(m_EditorGuiLayer);
+		m_EditorGuiLayer->SetApplication(this);
 	}
 
 	Application::~Application()
@@ -31,6 +33,7 @@ namespace Engine
 
 	void Application::PushLayer(Layer* layer)
 	{
+		m_LayerCount++;	// Only increment on pushing non-overlay
 		m_LayerStack.PushLayer(layer);
 		layer->OnAttach();
 	}
@@ -65,20 +68,24 @@ namespace Engine
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
+
 			if (!m_Minimized)
 			{
-				for (Layer* layer : m_LayerStack)
-				{
-					layer->OnUpdate(timestep);
-				}
+				//for (Layer* layer : m_LayerStack)
+				//{
+				//	layer->OnUpdate(timestep);
+				//}
+				m_CurrentLayer->OnUpdate(timestep);	// Only update current layer
 			}
 
-			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_LayerStack)
-			{
-				layer->OnImGuiRender();
-			}
-			m_ImGuiLayer->End();
+			m_EditorGuiLayer->Begin();
+			//for (Layer* layer : m_LayerStack)
+			//{
+			//	layer->OnImGuiRender();
+			//}
+			m_EditorGuiLayer->OnImGuiRender();
+			m_CurrentLayer->OnImGuiRender();	// Only update current layer
+			m_EditorGuiLayer->End();
 
 			m_Window->OnUpdate();
 		}
@@ -102,5 +109,49 @@ namespace Engine
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;
+	}
+
+	void Application::SetGuiLayerNames()
+	{
+		m_EditorGuiLayer->SetLayerNames(GetLayerNames());
+	}
+
+	std::vector<std::string> Application::GetLayerNames() const
+	{
+		return m_LayerStack.GetLayerNames();
+	}
+
+	Layer* Application::GetLayerAtIndex(uint32_t index)
+	{
+		return m_LayerStack.GetLayerAtIndex(index);
+	}
+
+	void Application::SetCurrentLayer(uint32_t index)
+	{
+		m_CurrentLayer = GetLayerAtIndex(index);
+	}
+
+	/************* Editor Gui Layer ***************/
+	void EditorGuiLayer::OnImGuiRender()
+	{
+		ImGui::Begin("Layer Selection");
+
+		static const char* currentLayer{ m_LayerNames[0].c_str() };
+
+		ImGui::PushItemWidth(200.f);
+		if (ImGui::BeginCombo("Layer Selection", currentLayer))
+		{
+			for (uint32_t i{}; i < m_App->GetLayerCount(); i++)
+			{
+				bool b{};
+				if (ImGui::Selectable(m_LayerNames[i].c_str(), &b)) {
+					currentLayer = m_LayerNames[i].c_str();
+					m_App->SetCurrentLayer(i);
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::End();
 	}
 }

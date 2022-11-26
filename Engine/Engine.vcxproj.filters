@@ -22,9 +22,6 @@
     <Filter Include="src\Engine\ImGui">
       <UniqueIdentifier>{BC1B88A8-A814-A7FA-D146-8C7FBD9E8606}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Engine\Objects">
-      <UniqueIdentifier>{CB31A3A1-B715-64F7-2076-5E4A0C794E79}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\Engine\Pathfinding">
       <UniqueIdentifier>{0D4C45E0-F945-6E32-E2B2-0443CE4BD49E}</UniqueIdentifier>
     </Filter>
@@ -135,9 +132,6 @@
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Renderer\vertex.h">
-      <Filter>src\Engine\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Pathfinding\PNode.h">
       <Filter>src\Engine\Pathfinding</Filter>
     </ClInclude>
@@ -178,6 +172,9 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\vertex.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Components.h">
@@ -1499,9 +1496,6 @@
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp">
       <Filter>src\Engine\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Renderer\vertex.cpp">
-      <Filter>src\Engine\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
       <Filter>src\Engine\Pathfinding</Filter>
     </ClCompile>
@@ -1536,6 +1530,9 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\vertex.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Entity.cpp">
