@@ -40,7 +40,7 @@
 #include "Engine/Pathfinding/PNode.h"
 
 // --------------Mesh Objects---------------
-#include "Engine/AssetLoaders/ObjLoader.h"
+#include "Engine/AssetInit/ObjLoader.h"
 
 // ---------------Audio Engine---------------
 #include "Engine/FMOD/AudioEngine.h"

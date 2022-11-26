@@ -10,22 +10,19 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Engine/AssetLoaders/ObjLoader.h"
+
+#include "Engine/Renderer/VertexArray.h"
+#include "Engine/AssetInit/ObjLoader.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 #include "Engine/Scene/EntityInitializer.h"
-#include "Engine/FMOD/AudioEngine.h"
-
 
 // Layers
 #include "PathfindingLayer.h"
 #include "TransformExampleLayer.h"
 
-
 class ExampleLayer : public Engine::Layer
 {
 public:
-
-
 	ExampleLayer()
 		: Layer("Example"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
@@ -48,25 +45,14 @@ public:
 		m_ObjEntity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_ObjVA, m_ActiveScene);
 		m_ObjEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 
-		m_SquareEntity = Engine::EntityInitializer::GetInstance().EntityInit(m_SquareVA, m_ActiveScene);
+		m_SquareEntity = Engine::EntityInitializer::GetInstance().EntityInit(PrimitiveType, m_SquareVA, m_ActiveScene);
 		m_SquareEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f });
-		
-		//FMOD Audio Engine (changed to contstructor)
-		//m_AudioEngine = std::make_shared<Engine::AudioEngine>();
-		m_AudioEngine->init();
-		m_AudioEngine->set3dListenerAndOrientation(glm::vec3{ m_PCameraController.GetCamera().GetPosition().x,  m_PCameraController.GetCamera().GetPosition().y ,m_PCameraController.GetCamera().GetPosition().z }, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0));
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
 	{
 		// Update
 		m_PCameraController.OnUpdate(ts);
-		//Audio
-		//Engine::AudioEngine::update(ts);
-		//m_AudioEngine->set3dListenerAndOrientation(glm::vec3{ m_PCameraController.GetCamera().GetPosition().x, m_PCameraController.GetCamera().GetPosition().y,m_PCameraController.GetCamera().GetPosition().z},
-		//											  glm::vec3{ m_PCameraController.GetCamera().right().x, m_PCameraController.GetCamera().right().y, m_PCameraController.GetCamera().right().z, },
-		//												glm::vec3{m_PCameraController.GetCamera().up().x, m_PCameraController.GetCamera().up().y, m_PCameraController.GetCamera().up().z});
-
 
 		// Render
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
@@ -86,7 +72,6 @@ public:
 		sin += ts;
 		float testmovement = sinf(sin);
 		m_Texture->Bind();
-		Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement,0)));
 
 		//m_WolfLogoTexture->Bind();
 		//Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
@@ -95,16 +80,14 @@ public:
 		flat->Bind();
 		flat->UploadUniformInt("u_ShowCustomColor", bShowCustomColor);
 		flat->UploadUniformFloat3("u_Color", glm::vec3(m_ObjEntity.GetComponent<Engine::RendererComponent>().Color));
+		Engine::Renderer::Submit(flatShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement,0)));
 
-		/* ----- OBJ START ----- */
 		auto objTComp = m_ObjEntity.GetComponent<Engine::TransformComponent>();
 		Engine::TransformSystem::SetWorldPosition(objTComp, glm::vec3(0, testmovement, 0));
 
-		Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
-		/* ----- OBJ END ----- */
-
+		//Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
+		
 		Engine::Renderer::EndScene();
-		//Engine::AudioEngine::shutdown();
 	}
 
 	virtual void OnImGuiRender() override
@@ -136,9 +119,6 @@ private:
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA, m_ObjVA;
 
-	std::shared_ptr<Engine::AudioEngine> m_AudioEngine;
-	//Engine::AudioEngine* m_AudioEngine{ nullptr };
-
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
 	std::shared_ptr<Engine::Scene> m_ActiveScene; // Entities
@@ -148,22 +128,31 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 
-private:
 	bool bShowCustomColor{};
+	int PrimitiveType = 3;
 };
+
+
 
 class Sandbox : public Engine::Application
 {
 public:
 	Sandbox()
 	{
-		//PushLayer(new ExampleLayer());
-		//PushLayer(new PathfindingLayer());
+		PushLayer(new ExampleLayer());
+		PushLayer(new PathfindingLayer());
 		PushLayer(new TransformExampleLayer());
+		
+		SetCurrentLayer(0);
+		SetGuiLayerNames();
 	}
 
 	~Sandbox()
 	{}
+
+
+private:
+	std::shared_ptr<Engine::Layer> m_CurrentLayer;
 };
 
 Engine::Application* Engine::CreateApplication()

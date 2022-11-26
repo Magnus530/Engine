@@ -7,8 +7,8 @@
     <Filter Include="src\Engine">
       <UniqueIdentifier>{12A1320E-FE58-745B-6760-4DB753370F4C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Engine\AssetLoaders">
-      <UniqueIdentifier>{ABEE0D3F-1726-56D6-2030-BAF98CE67CCF}</UniqueIdentifier>
+    <Filter Include="src\Engine\AssetInit">
+      <UniqueIdentifier>{35EDAF9E-217C-3968-CA9A-4D63B6084A0E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Core">
       <UniqueIdentifier>{AA407579-16CC-E23D-1FDD-65328BE73E3E}</UniqueIdentifier>
@@ -21,9 +21,6 @@
     </Filter>
     <Filter Include="src\Engine\ImGui">
       <UniqueIdentifier>{BC1B88A8-A814-A7FA-D146-8C7FBD9E8606}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Engine\Objects">
-      <UniqueIdentifier>{CB31A3A1-B715-64F7-2076-5E4A0C794E79}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Pathfinding">
       <UniqueIdentifier>{0D4C45E0-F945-6E32-E2B2-0443CE4BD49E}</UniqueIdentifier>
@@ -75,8 +72,14 @@
     <ClInclude Include="src\Engine.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
-      <Filter>src\Engine\AssetLoaders</Filter>
+    <ClInclude Include="src\Engine\AssetInit\ObjLoader.h">
+      <Filter>src\Engine\AssetInit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\AssetInit\PrimitiveShape.h">
+      <Filter>src\Engine\AssetInit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\AssetInit\PrimitiveShapeFactory.h">
+      <Filter>src\Engine\AssetInit</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Application.h">
       <Filter>src\Engine\Core</Filter>
@@ -129,9 +132,6 @@
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Objects\vertex.h">
-      <Filter>src\Engine\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Pathfinding\PNode.h">
       <Filter>src\Engine\Pathfinding</Filter>
     </ClInclude>
@@ -172,6 +172,9 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\vertex.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Components.h">
@@ -1469,8 +1472,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
-      <Filter>src\Engine\AssetLoaders</Filter>
+    <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
+      <Filter>src\Engine\AssetInit</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Core\Application.cpp">
       <Filter>src\Engine\Core</Filter>
@@ -1492,9 +1495,6 @@
     </ClCompile>
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp">
       <Filter>src\Engine\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Objects\vertex.cpp">
-      <Filter>src\Engine\Objects</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
       <Filter>src\Engine\Pathfinding</Filter>
@@ -1530,6 +1530,9 @@
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\vertex.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Entity.cpp">

@@ -7,8 +7,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Engine/AssetLoaders/ObjLoader.h"
-
+#include "Engine/AssetInit/ObjLoader.h"
+#include "Engine/Renderer/VertexArray.h"
 
 
 TransformExampleLayer::TransformExampleLayer()
@@ -16,6 +16,10 @@ TransformExampleLayer::TransformExampleLayer()
 {
 	m_Shader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
 
+	/* Loading obj */
+	std::vector<Engine::Vertex> vertices;
+	std::vector<uint32_t> indices;
+	Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 	m_Scene = std::make_shared<Engine::Scene>();
 	m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_Scene);
 	m_Entity.AddComponent<Engine::RendererComponent>(glm::vec4(0.5f, 0.2f, 0.6f, 1.f));
@@ -51,6 +55,27 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	// ---- TRANSFORMATION TESTING ---------------------
 	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		// Position
+	//if (bSetWorldPosition)
+	//m_Obj->SetWorldPosition(m_Position);
+	//if (bAddWorldPosition)
+		//m_Obj->AddWorldPosition(glm::vec3(0, ts * m_PositionStrength, 0));
+	//if (bAddLocalPosition)
+		//m_Obj->AddLocalPosition(glm::vec3(0, ts * m_PositionStrength, 0));
+
+		// Rotation
+	//if (bAddWorldRotation)
+	//	m_Obj->AddWorldRotation(ts * m_RotationStrength, glm::vec3(0, 1.f, 0));
+	//if (bAddLocalRotation)
+	//	m_Obj->AddLocalRotation(ts * m_RotationStrength, glm::vec3(1.f, 0, 0));
+
+		// Scale
+	//if (bAddScale)
+	//	m_Obj->AddLocalScale(ts * m_ScaleStrength, glm::vec3(0, 1.f, 0));
+	//if (bSetScale)
+		//m_Obj->SetScale(glm::vec3(m_SetScale));
+
+	//m_Obj->UpdateMatrix();
+
 	Engine::TransformSystem::SetWorldPosition(transform, m_Position);
 
 		// Rotation
@@ -69,6 +94,8 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	shader->UploadUniformFloat3("u_Color", m_ObjColor);
 	shader->UploadUniformInt("u_ShowCustomColor", bShowCustomColor);
 
+	//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix()); // Render m_Obj
+
 	Engine::Renderer::Submit(m_Shader, m_CubeVA, transform.m_Transform);
 
 	// End Scene
@@ -80,6 +107,7 @@ void TransformExampleLayer::OnImGuiRender()
 	// Transformation Demo
 	ImGui::Begin("TransformTesting");
 	if (ImGui::Button("Reset Transformations")) {
+		//m_Obj->Reset();
 		m_Position *= 0.f;
 	}
 	ImGui::Separator();

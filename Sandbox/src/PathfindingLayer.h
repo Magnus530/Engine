@@ -8,9 +8,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "Engine/AssetLoaders/ObjLoader.h"
-
-
+#include "Engine/Renderer/VertexArray.h"
+#include "Engine/AssetInit/ObjLoader.h"
 
 class PathfindingLayer : public Engine::Layer
 {
@@ -22,6 +21,9 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 
 private:
+	/* Test VisualObject with Pathfinding */
+	//std::shared_ptr<Engine::VisualObject> m_Obj;
+	
 	std::shared_ptr<Engine::VertexArray> m_VA;
 	std::shared_ptr<Engine::Scene> m_Scene;
 	Engine::Entity m_Entity;
@@ -52,6 +54,8 @@ public:
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
 
+		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
+		//m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
 
 		m_Scene = std::make_shared<Engine::Scene>();
 		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Monkey", m_VA, m_Scene);
@@ -86,6 +90,9 @@ public:
 		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		if (bObjPathfindActive) {
 			glm::vec3 pos = Engine::Pathfinder::GetPositionAlongSpline(m_Path, m_Splinetime);
+
+			//E_TRACE("SplineTime: {0}, {1}, {2}", pos.x, pos.y, pos.z);
+			//m_Obj->SetWorldPosition(pos + glm::vec3(0, 0.2, 0));
 			Engine::TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0, 1, 0));
 		}
 		// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
@@ -100,11 +107,12 @@ public:
 		glm::vec4 targetColor(0, 0, 1, 1);
 		glm::vec4 blockColor(0, 0, 0, 1);
 
-
 		/* --------------------- RENDERING ------------------------ */
 		m_Texture->Bind();
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->Bind();
 
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", glm::vec4(.7, .1, .6, 1));
+		//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix());		// Render m_Obj
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
 
@@ -132,6 +140,7 @@ public:
 				alteredColor = true;
 			}
 
+			//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
 			Engine::Renderer::Submit(m_Shader, m_VA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
 			if (alteredColor) {
 				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
@@ -144,6 +153,7 @@ public:
 		scale = 0.1f;
 		for (auto& it : m_Path)
 		{
+			//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 1.f, 0)));
 			Engine::Renderer::Submit(m_Shader, m_VA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 1.f, 0)));
 		}
 

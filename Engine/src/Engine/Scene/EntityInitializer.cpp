@@ -1,5 +1,6 @@
 #include "epch.h"
 #include "EntityInitializer.h"
+#include "Engine/AssetInit/PrimitiveShapeFactory.h"
 
 namespace Engine
 {
@@ -31,20 +32,13 @@ namespace Engine
 		return tempEntity;
 	}
 
-	Engine::Entity EntityInitializer::EntityInit(std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& Scene)
+	Engine::Entity EntityInitializer::EntityInit(int shapenum, std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& Scene)
 	{
 		vertexarr.reset(Engine::VertexArray::Create()); // OpenGLVertexArray*
-		std::vector<float> squareVertices =
-		{
-			//    x      y	     z			uv
-				-0.5f, -0.5f,   0.0f,	0.0f, 0.0f,	//	Bottom	- Left 
-				 0.5f, -0.5f,   0.0f,	1.0f, 0.0f, //	Bottom	- Right
-				 0.5f,  0.5f,   0.0f,	1.0f, 1.0f, //	Top		- Right
-				-0.5f,  0.5f,   0.0f,	0.0f, 1.0f	//	Top		- Left
-		};;
+		std::vector<float> Vertices = Engine::PrimitiveShapeFactory::CreatePrimitiveShape(shapenum)->GetVertices();
 
 		std::shared_ptr<Engine::VertexBuffer> SquareVB;
-		SquareVB.reset(Engine::VertexBuffer::Create(squareVertices.data(), squareVertices.size() * sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
+		SquareVB.reset(Engine::VertexBuffer::Create(Vertices.data(), Vertices.size() * sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
 		SquareVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },
@@ -52,10 +46,10 @@ namespace Engine
 			});
 		vertexarr->AddVertexBuffer(SquareVB);
 
-		std::vector<uint32_t> squareIndices = { 0, 1, 2, 2, 3, 0 };
+		std::vector<uint32_t> Indices = Engine::PrimitiveShapeFactory::CreatePrimitiveShape(shapenum)->GetIndices();
 
 		std::shared_ptr<Engine::IndexBuffer> SquareIB;
-		SquareIB.reset(Engine::IndexBuffer::Create(squareIndices)); // OpenGLIndexBuffer*
+		SquareIB.reset(Engine::IndexBuffer::Create(Indices)); // OpenGLIndexBuffer*
 		vertexarr->SetIndexBuffer(SquareIB);
 
 		// Return Enum obj name when native enum shape is created.
