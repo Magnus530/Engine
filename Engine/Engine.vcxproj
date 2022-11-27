@@ -94,6 +94,12 @@
       <AdditionalDependencies>..\vendor\FMOD\libs\**.lib;opengl32.lib;opengl32.lib;fmodstudioL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>vendor\FMOD\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <PostBuildEvent>
+      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmod.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -121,6 +127,12 @@
       <AdditionalDependencies>..\vendor\FMOD\libs\**.lib;opengl32.lib;opengl32.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>vendor\FMOD\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <PostBuildEvent>
+      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmod.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
@@ -148,6 +160,12 @@
       <AdditionalDependencies>..\vendor\FMOD\libs\**.lib;opengl32.lib;opengl32.lib;fmodstudio_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>vendor\FMOD\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <PostBuildEvent>
+      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmod.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h" />

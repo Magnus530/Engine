@@ -116,6 +116,7 @@ private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
 
+	std::shared_ptr<Engine::AudioEngine> m_Audio;
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA, m_ObjVA;
 

@@ -28,8 +28,10 @@ TransformExampleLayer::TransformExampleLayer()
 	Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-2, -1, 0));
 
 	//FMOD initialize
+
+
 	m_Audio = std::make_shared<Engine::AudioEngine>();
-	m_Audio->init();
+	m_Audio->loadSound("../../assets/audio/Cartoon_song.wav", false, false, false);
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
@@ -88,6 +90,9 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	
 	// Updating TransformComponent
 	Engine::TransformSystem::UpdateMatrix(transform);
+
+	// updating AudioEngine
+	Engine::AudioEngine::update(ts);
 
 	// Draw Call for m_Obj
 	auto shader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader);

@@ -5,16 +5,12 @@
  * Code is used from Guy Somberg's "Game Audio Programming: Principles and practices"
  * ISBN-13: 978-1-4987-4673-1
  */
-#include <Windows.h>
+#include "fmod_studio.hpp"
 #include "fmod.hpp"
-#include "fmod.h"
-#include "fmod_codec.h"
 #include "fmod_common.h"
 #include "fmod_dsp.h"
 #include "fmod_dsp_effects.h"
 #include "fmod_errors.h"
-#include "fmod_output.h"
-#include "fmod_studio.hpp"
 #include <glm/glm.hpp>
 #include <string>
 #include <map>

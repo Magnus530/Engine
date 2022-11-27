@@ -126,6 +126,16 @@ project "Engine"
 		"fmodstudio_vc.lib"
 		}
 		
+		
+	filter { "system:windows"}
+	postbuildcommands
+	{
+		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmod.dll $(TargetDir)"),
+		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodL.dll $(TargetDir)"),
+		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudio.dll $(TargetDir)"),
+		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudioL.dll $(TargetDir)")
+	}
+
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"

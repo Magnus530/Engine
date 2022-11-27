@@ -1,6 +1,6 @@
 #include "epch.h"
 #include "AudioEngine.h"
-
+#include <combaseapi.h>
 namespace Engine 
 {
 	//*********************** IMPLEMENTATION CODE*********************//
@@ -9,16 +9,16 @@ namespace Engine
 	//--------------------------------------------------------------
 	Implementation::Implementation()
 	{
+		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 		// Create a System studio object and initialize.
-		mpStudioSystem = nullptr;
 		AudioEngine::errorCheck(FMOD::Studio::System::create(&mpStudioSystem));
 		AudioEngine::errorCheck(mpStudioSystem->initialize(
-			512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr));
+			32, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_3D_RIGHTHANDED, nullptr));
 
 		// Create a System object.
-		mpSystem = nullptr;
 		AudioEngine::errorCheck(mpStudioSystem->getCoreSystem(&mpSystem));
 		mpReverb = nullptr;
+
 		mnNextChannelId = 0;
 	}
 
@@ -77,13 +77,6 @@ namespace Engine
 	AudioEngine::AudioEngine()
 	{
 		init();
-
-		std::string oneShot1 = "assets/audio/sfx_sound.wav";
-		std::string mx1 = "assets/audio/Cartoon_song.wav";
-
-		loadSound(mx1, false, true, true);
-		//loadSound(oneShot1 = "assets/audio/sfx_sound.wav", false, true, true);
-		playSound(mx1, glm::vec3(), -6.f, 1.f);
 	}
 
 	AudioEngine::~AudioEngine()
@@ -117,6 +110,7 @@ namespace Engine
 
 	void AudioEngine::shutdown()
 	{
+		CoUninitialize();
 		delete sgpImplementation;
 	}
 
@@ -169,13 +163,13 @@ namespace Engine
 	//--------------------------------------------------------
 	void AudioEngine::loadSound(const std::string& strSoundName, bool bIs3d, bool bIsLooping, bool bIsStreaming)
 	{
-		FMOD_CREATESOUNDEXINFO exinfo;
-		memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
-		exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-		exinfo.numchannels = 2;
-		exinfo.defaultfrequency = 48000;
-		exinfo.length = exinfo.defaultfrequency * exinfo.numchannels * sizeof(signed short) * 5;
-		exinfo.format = FMOD_SOUND_FORMAT_PCM24;
+		//FMOD_CREATESOUNDEXINFO exinfo;
+		//memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
+		//exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+		//exinfo.numchannels = 2;
+		//exinfo.defaultfrequency = 48000;
+		//exinfo.length = exinfo.defaultfrequency * exinfo.numchannels * sizeof(signed short) * 5;
+		//exinfo.format = FMOD_SOUND_FORMAT_PCM24;
 
 		// check cache, if we allready have loaded the sound previously
 		auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);
@@ -186,7 +180,7 @@ namespace Engine
 		eMode |= bIs3d ? (FMOD_3D | FMOD_3D_INVERSETAPEREDROLLOFF) : FMOD_2D;
 		eMode |= bIsLooping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
 		eMode |= bIsStreaming ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
-		//eMode |= FMOD_INIT_CHANNEL_LOWPASS;												// enable low pass filtering
+		eMode |= FMOD_INIT_CHANNEL_LOWPASS;												// enable low pass filtering
 		FMOD::Sound* pSound = nullptr;
 		AudioEngine::errorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
 		// If sound loaded correctly
