@@ -24,6 +24,8 @@ namespace Engine
 		glm::mat4 m_Rotation	{ 1.f };
 		glm::mat4 m_Scale		{ 1.f };
 
+		glm::vec3 GetPosition() const { return m_Transform[3]; }
+
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
 
@@ -48,6 +50,10 @@ namespace Engine
 
 	struct PathfindingComponent
 	{
+		std::shared_ptr<class PNode> m_StartNode;
+		std::shared_ptr<class PNode> m_IntermediateTargetNode;
+		std::shared_ptr<class PNode> m_TargetNode;
+
 		PathfindingComponent() = default;
 		PathfindingComponent(const PathfindingComponent&) = default;
 	};

@@ -3,10 +3,6 @@
 
 namespace Engine {
 
-    //PNode::PNode()
-    //{
-    //}
-
     PNode::PNode(std::string name, glm::vec3 position)
         : m_name{name}, m_Position {position}
     {
@@ -17,8 +13,7 @@ namespace Engine {
 
     int PNode::GetDistanceToNode(PNode* target)
     {
-        //return (int)(m_Position - target->m_Position).length() * floatConvert;
-        return (int)(target->m_Position - m_Position).length() * floatConvert;
+        return (int)(glm::length(m_Position - target->m_Position) * floatConvert);
     }
 
     void PNode::InitValues(PNode* start, PNode* target)
@@ -39,14 +34,13 @@ namespace Engine {
 
     namespace Pathfinder {
 
-        glm::vec3 GetPositionAlongSpline(std::vector<glm::vec3> splinepoints, float t)
+        glm::vec3 GetPositionAlongSpline(std::vector<glm::vec3>& splinepoints, float t)
         {
             if (splinepoints.size() == 0) {
-                //if (StartNode) return StartNode->GetActorLocation();
                 return glm::vec3();
             }
             int degree = m_SplineDegree;
-            if (splinepoints.size() == 2) degree = 1;
+
             glm::vec3 pos{};
             for (size_t j{}; j < splinepoints.size(); j++) {
                 pos += splinepoints[j] * Bid(t, j, degree);
@@ -88,6 +82,41 @@ namespace Engine {
             }
         }
 
+        glm::vec3 GetPositionofNode(uint32_t index)
+        {
+            if (index > m_Nodes.size() + 1)
+                return glm::vec3();
+            return m_Nodes[index]->m_Position;
+        }
+
+        std::shared_ptr<PNode> GetNodeAtIndex(uint32_t index)
+        {
+            if (index > m_Nodes.size() + 1)
+                return nullptr;
+            return m_Nodes[index];
+        }
+
+        std::shared_ptr<PNode> GetNodeClosestToPosition(glm::vec3 position)
+        {
+            float length = glm::length(m_Nodes[0]->m_Position - position);
+            std::shared_ptr<PNode> node = m_Nodes[0];
+
+            for (size_t i{}; i < m_NodeLocations.size(); i++)
+            {
+                float l = glm::length(m_NodeLocations[i] - position);
+                if (l < length) {
+                    length = l;
+                    node = m_Nodes[i];
+                }
+            }
+            return node;
+        }
+
+        std::vector<PNode*> FindPath(std::shared_ptr<PNode> start, PNode* end)
+        {
+            return std::vector<PNode*>();
+        }
+
         float Bid(float t, int it, int d)
         {
             if (d == 0) {
@@ -99,6 +128,7 @@ namespace Engine {
             return (Wid(t, it, d) * Bid(t, it, d - 1)) + ((1 - Wid(t, it + 1, d)) * Bid(t, it + 1, d - 1));
 
         }
+
         float Wid(float t, int it, int d)
         {
             if (m_Knotvector[it] < m_Knotvector[it + d]) {
@@ -107,10 +137,13 @@ namespace Engine {
             return 0.0f;
         }
         
-        std::vector<PNode*> FindPath(std::shared_ptr<PNode> start, PNode* end)
+        //std::vector<PNode*> FindPath(std::shared_ptr<PNode> start, PNode* end)
+        std::vector<PNode*> FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end)
         {
             std::vector<PNode*> path;
-        
+            
+            std::shared_ptr<PNode> closestNode{ start };     // If node is closed off, go to the closest one in, air length
+            closestNode->InitValues(start.get(), end.get());
             std::vector<std::shared_ptr<PNode>> tosearch;
             tosearch.push_back(start);
             std::vector<std::shared_ptr<PNode>> processed;
@@ -118,24 +151,28 @@ namespace Engine {
             while (tosearch.size() > 0)
             {
                 std::shared_ptr<PNode> current = tosearch[0];
-                current->InitValues(start.get(), end);
+                current->InitValues(start.get(), end.get());
         
                 for (auto& it : tosearch)
                 {
                     if (it == current) { continue; }
-                    it->InitValues(start.get(), end);
+                    it->InitValues(start.get(), end.get());
                     if (it->F < current->F || it->F == current->F && it->H < current->H)
                         current = it;
                 }
         
-                if (current.get() == end) {
+                /* Setting closest node */
+                if (closestNode->GetDistanceToNode(end.get()) > current->GetDistanceToNode(end.get()))
+                    closestNode = current;
+                
+                /* FOUND PATH: Setting Path */
+                if (current.get() == end.get()) {
                     /* Går bakover fra Target til Start */
-                    PNode* currentTile = end;
+                    PNode* currentTile = end.get();
                     while (currentTile != start.get()) {
                         path.push_back(currentTile);
                         currentTile = currentTile->m_Connection.get();
                     }
-                    E_INFO("FOUND PATH. From {0} to {1}", start->m_name, end->m_name);
                     return path;
                 }
         
@@ -150,10 +187,8 @@ namespace Engine {
                 for (size_t t{}; t < current->mConnectedNodes.size(); t++)
                 {
                     std::shared_ptr<PNode> neighbor = current->mConnectedNodes[t];
-                    //std::vector<std::shared_ptr<PNode>>::iterator it = std::find(tosearch.begin(), tosearch.end(), neighbor);
                     auto it = std::find(tosearch.begin(), tosearch.end(), neighbor);
                     bool inSearch = (it != tosearch.end());
-        
         
                     if (neighbor->IsBlock()) { continue; }
         
@@ -168,12 +203,14 @@ namespace Engine {
                         neighbor->m_Connection = current;
         
                         if (!inSearch) {
-                            neighbor->SetH(end);
+                            neighbor->SetH(end.get());
                             tosearch.push_back(neighbor);
                         }
                     }
                 }
             }
+            /* If a path was not found, find the path to the closestNode */
+            path = FindPath(start, closestNode);
             return path;
         }
     }

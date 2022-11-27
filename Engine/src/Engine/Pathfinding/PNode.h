@@ -2,7 +2,7 @@
 #include "glm/glm.hpp"
 
 namespace Engine {
-	inline int floatConvert{ 10 };
+	inline float floatConvert{ 1000.f };
 
 	enum class ENodeType
 	{
@@ -15,7 +15,7 @@ namespace Engine {
 		NT_Block
 	};
 
-	class ENGINE_API PNode
+	class PNode
 	{
 	public:
 		PNode(std::string name, glm::vec3 position);
@@ -46,16 +46,18 @@ namespace Engine {
 	};
 
 	namespace Pathfinder {
-		/* B-Spline */
+		// B-Spline
 		inline int m_SplineDegree = 2;
 		inline std::vector<float> m_Knotvector;
-		glm::vec3 GetPositionAlongSpline(std::vector<glm::vec3> splinepoints, float t);
+		glm::vec3 GetPositionAlongSpline(std::vector<glm::vec3>& splinepoints, float t);	// B-Spline through path
 		void MakeKnotVector(std::vector<glm::vec3> nodelocations);
 		float Bid(float t, int it, int d);
 		float Wid(float t, int it, int d);
 
-		std::vector<PNode*> FindPath(std::shared_ptr<PNode> start, PNode* end);
-		
+		std::vector<PNode*> FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end);
+		glm::vec3 GetPositionofNode(uint32_t index);
+		std::shared_ptr<PNode> GetNodeAtIndex(uint32_t index);
+		std::shared_ptr<PNode> GetNodeClosestToPosition(glm::vec3 position);
 	
 		// Spawner noder for testing 
 		inline int GridSize{ 10 };
@@ -99,9 +101,6 @@ namespace Engine {
 				b->AddConnectedNode(a);
 				a->AddConnectedNode(b);
 			}
-			E_TRACE("Created A* grid");
-			E_TRACE("{0} Connections: {1}", m_Nodes[0]->m_name, m_Nodes[0]->mConnectedNodes.size());
-			E_TRACE("{0} Connections: {1}", m_Nodes[10]->m_name, m_Nodes[10]->mConnectedNodes.size());
 		}
 	}
 }

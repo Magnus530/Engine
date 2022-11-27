@@ -25,12 +25,15 @@ private:
 	//std::shared_ptr<Engine::VisualObject> m_Obj;
 	
 	std::shared_ptr<Engine::VertexArray> m_VA;
+	std::shared_ptr<Engine::VertexArray> m_PlaneVA;
 	std::shared_ptr<Engine::Scene> m_Scene;
 	Engine::Entity m_Entity;
+	Engine::Entity m_Plane;
 
 	std::vector<glm::vec3> m_Path;
 	std::vector<glm::vec3> m_SplinePath;
 	float m_Splinetime{};
+	float m_SplineSpeed{ 1.f };
 	bool bObjPathfindActive{};
 
 private: // Visual Aid & ImGui related elements
@@ -41,8 +44,11 @@ private: // Visual Aid & ImGui related elements
 
 public:
 	PathfindingLayer()
-		: Layer("New3DLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
+		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
+		/* Pathfinding */
+		Engine::Pathfinder::SpawnGrid();
+
 		m_Shader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
 		m_Textureshader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
@@ -60,9 +66,15 @@ public:
 		m_Scene = std::make_shared<Engine::Scene>();
 		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Monkey", m_VA, m_Scene);
 		m_Entity.AddComponent<Engine::RendererComponent>();
+		m_Entity.AddComponent<Engine::PathfindingComponent>();
 
-		/* Pathfinding */
-		Engine::Pathfinder::SpawnGrid();
+		/* Set m_Entity location to Pathfinding Node 1 */
+		glm::vec3 startPosition = Engine::Pathfinder::GetPositionofNode(0);
+		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition);
+		m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode = Engine::Pathfinder::GetNodeAtIndex(0);
+
+		m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
+		m_Plane.AddComponent<Engine::RendererComponent>();
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -83,16 +95,25 @@ public:
 		glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
 
-		if (m_Splinetime < 0.99f) m_Splinetime += (ts * 1.f)/* / (float)Engine::Pathfinder::m_NodeLocations.size()*/;
-		else { m_Splinetime = 0.99f; bObjPathfindActive = false; }
+		if (m_Splinetime < 0.99f) 
+			m_Splinetime += (ts * m_SplineSpeed)/* / (float)Engine::Pathfinder::m_NodeLocations.size()*/;
+		else { // Reached Target
+			m_Splinetime = 0.99f; 
+
+			// Set Entity StartNode to TargetNode
+			if (bObjPathfindActive) {
+				auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
+				pathfinder.m_StartNode = pathfinder.m_TargetNode;
+				E_INFO("Reached Node");
+			}
+			bObjPathfindActive = false; 
+		}
 		if (m_Splinetime > 0.99f) m_Splinetime = 0.99f;
 
 		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		if (bObjPathfindActive) {
 			glm::vec3 pos = Engine::Pathfinder::GetPositionAlongSpline(m_Path, m_Splinetime);
 
-			//E_TRACE("SplineTime: {0}, {1}, {2}", pos.x, pos.y, pos.z);
-			//m_Obj->SetWorldPosition(pos + glm::vec3(0, 0.2, 0));
 			Engine::TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0, 1, 0));
 		}
 		// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
@@ -112,7 +133,6 @@ public:
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->Bind();
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", glm::vec4(.7, .1, .6, 1));
-		//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix());		// Render m_Obj
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
 
@@ -121,13 +141,16 @@ public:
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", bShowShaderColor);
 		/* ------- RENDER NODEGRID -------- */
+		auto pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
+
 		float scale = 0.3f;
 		bool alteredColor{};
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
 		for (auto& it : Engine::Pathfinder::m_Nodes)
 		{
 			glm::vec3 position = it->m_Position;
-			if (it == m_StartNode) {
+			//if (it == m_StartNode) {
+			if (it == pathfinder.m_StartNode) {
 				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", startColor);
 				alteredColor = true;
 			}
@@ -141,7 +164,7 @@ public:
 			}
 
 			//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
-			Engine::Renderer::Submit(m_Shader, m_VA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
+			Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
 			if (alteredColor) {
 				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
 				alteredColor = false;
@@ -154,7 +177,7 @@ public:
 		for (auto& it : m_Path)
 		{
 			//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 1.f, 0)));
-			Engine::Renderer::Submit(m_Shader, m_VA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 1.f, 0)));
+			Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0)));
 		}
 
 		// End Render Scene
@@ -205,16 +228,15 @@ public:
 					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
 
 				}
-				// Set Target
-				else if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
-					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.1f, 0.1f, 0.6f, 1.f));
-					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.3f, 0.3f, 1.f, 1.f));
-
-				}
 				// Set Start
-				else {
+				else if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
 					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.6f, 0.1f, 0.1f, 1.f));
 					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1.f, 0.3f, 0.3f, 1.f));
+				}
+				// Set Target
+				else {
+					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.1f, 0.1f, 0.6f, 1.f));
+					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.3f, 0.3f, 1.f, 1.f));
 				}
 
 				bool bHeader{};
@@ -235,7 +257,6 @@ public:
 				{
 					std::shared_ptr<Engine::PNode> node = Engine::Pathfinder::m_Nodes[location];
 					selected[location] = 1;
-
 					// Set a block Node
 					if (ImGui::IsKeyDown(ImGuiKey_LeftAlt)) 
 					{
@@ -251,17 +272,8 @@ public:
 							m_BlockedNodes.push_back(node);
 						}
 					}
-					// Set Target Node
-					else if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
-						targetSelected[location] = 1;
-						if (location != targetSelectedLocation && targetSelectedLocation) {
-							targetSelected[targetSelectedLocation] = 0;
-						}
-						targetSelectedLocation = location;
-						m_TargetNode = node;
-					}
 					// Set Start Node
-					else
+					else if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) 
 					{
 						startSelected[location] = 1;
 						if (location != startSelectedLocation) {
@@ -269,6 +281,16 @@ public:
 						}
 						startSelectedLocation = location;
 						m_StartNode = node;
+					}
+					// Set Target Node
+					else
+					{
+						targetSelected[location] = 1;
+						if (location != targetSelectedLocation && targetSelectedLocation) {
+							targetSelected[targetSelectedLocation] = 0;
+						}
+						targetSelectedLocation = location;
+						m_TargetNode = node;
 					}
 
 					// Remove selected at location if in-active
@@ -286,9 +308,10 @@ public:
 				ImGui::PopStyleColor();
 			}
 		ImGui::PopStyleColor();
-		// NODE MENU END ------------------------------------------------------------------------
+		// NODE MENU END ---------------------------------------------------------------------------------
 
 
+		// CLEAR BLOCKED NODE ----------------------------------------------------------------------------
 		if (ImGui::Button("Clear Blocked Nodes", ImVec2(100.f, 20.f))) {
 			for (auto& it : blockSelected)
 				it = 0;
@@ -302,22 +325,48 @@ public:
 			m_BlockedNodes.clear();
 		}
 
-
+		// FINDING PATH ---------------------------------------------------------------------------------
 		static std::vector<Engine::PNode*> nodepath;
 		if (ImGui::Button("Find path", ImVec2(100,50))) {
-			if (m_StartNode.get() && m_TargetNode.get()) {
+			//if (m_StartNode.get() && m_TargetNode.get()) {
+			if (m_TargetNode.get())
+			{
 				nodepath.clear();
 				m_Path.clear();
-				nodepath = Engine::Pathfinder::FindPath(m_StartNode, m_TargetNode.get());
-				m_Path.push_back(m_StartNode->m_Position);
+				//nodepath = Engine::Pathfinder::FindPath(m_StartNode, m_TargetNode);
+				auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
+				auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+				pathfinder.m_TargetNode = m_TargetNode;
+
+				// Check if the Entity should not move
+				const bool b = (m_TargetNode == pathfinder.m_StartNode);
+
+
+				if (!b) {
+				if (bObjPathfindActive) {
+					pathfinder.m_StartNode = Engine::Pathfinder::GetNodeClosestToPosition(transform.GetPosition());
+				}
+				nodepath = Engine::Pathfinder::FindPath(pathfinder.m_StartNode, m_TargetNode);	// Finding path through node grid
+				m_Path.push_back(pathfinder.m_StartNode->m_Position);
 				for (auto it = nodepath.end(); it != nodepath.begin();) {
 					m_Path.push_back((*--it)->m_Position);
 				}
+				// Make path a minimum of 3 points, for
+				if (m_Path.size() == 2) {
+					glm::vec3 middle = m_Path[0] + ((m_Path[1] - m_Path[0]) * 0.5f);
+					m_Path.insert(++m_Path.begin(), middle);
+				}
+
 				Engine::Pathfinder::MakeKnotVector(m_Path);
 				m_Splinetime = 0.f;
 				bObjPathfindActive = true;
+				}
 			}
 		}
+		ImGui::Separator();
+
+		ImGui::PushItemWidth(150.f);
+		ImGui::SliderFloat("Spline Speed", &m_SplineSpeed, 0.f, 2.f, "%0.1f");
 
 		ImGui::End();
 	}
