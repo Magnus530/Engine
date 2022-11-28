@@ -19,6 +19,7 @@ namespace Engine {
 	{
 	public:
 		PNode(std::string name, glm::vec3 position);
+		PNode(glm::vec3 position);
 		~PNode();
 		std::string m_name;
 
@@ -45,62 +46,63 @@ namespace Engine {
 		void SetBlock(bool b);
 	};
 
-	namespace Pathfinder {
-		// B-Spline
-		inline int m_SplineDegree = 2;
-		inline std::vector<float> m_Knotvector;
-		glm::vec3 GetPositionAlongSpline(std::vector<glm::vec3>& splinepoints, float t);	// B-Spline through path
-		void MakeKnotVector(std::vector<glm::vec3> nodelocations);
-		float Bid(float t, int it, int d);
-		float Wid(float t, int it, int d);
-
-		std::vector<PNode*> FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end);
-		glm::vec3 GetPositionofNode(uint32_t index);
-		std::shared_ptr<PNode> GetNodeAtIndex(uint32_t index);
-		std::shared_ptr<PNode> GetNodeClosestToPosition(glm::vec3 position);
-	
-		// Spawner noder for testing 
-		inline int GridSize{ 10 };
-		inline float GridSpacing{ 1.f };
-		inline glm::vec3 Center(0, 0, 0);
-		inline std::vector<std::shared_ptr<PNode>> m_Nodes;
-		inline std::vector<glm::vec3> m_NodeLocations;
-		inline std::string GenerateNodeName()
-		{
-			std::string name = "PNode ";
-			name += std::to_string(m_Nodes.size()+1);
-			return name;
-		}
-		inline void SpawnGrid()
-		{
-			std::shared_ptr<PNode> a;
-			std::shared_ptr<PNode> b;
-
-			for (size_t x{}; x < 10; x++)
-			{
-				for (size_t z{}; z < 10; z++)
-				{
-					glm::vec3 location = glm::vec3(Center.x + (GridSpacing * x) - (float)GridSize / 2, 0, Center.z + (GridSpacing * z) - (float)GridSize / 2);
-					m_Nodes.emplace_back(std::make_shared<PNode>(GenerateNodeName(), location));
-					m_NodeLocations.push_back(location);
-				}
-			}
-			for (size_t i{1}; i < m_Nodes.size(); i++)
-			{
-				if (m_Nodes.size() < i + 1) { break; }
-
-				a = m_Nodes[i - 1];
-				b = m_Nodes[i];
-				if (i%10!=0 || i==0) {
-					a->AddConnectedNode(b);
-					b->AddConnectedNode(a);
-				}
-
-				if (m_Nodes.size() < i + 10) { continue; }
-				b = m_Nodes[(i-1) + 10];
-				b->AddConnectedNode(a);
-				a->AddConnectedNode(b);
-			}
-		}
-	}
+//	namespace Pathfinder {
+//		// B-Spline
+//		inline int m_SplineDegree = 2;
+//		inline std::vector<float> m_Knotvector;
+//		glm::vec3 GetPositionAlongSpline(std::vector<glm::vec3>& splinepoints, float t);	// B-Spline through path
+//		void MakeKnotVector(std::vector<glm::vec3> nodelocations);
+//		float Bid(float t, int it, int d);
+//		float Wid(float t, int it, int d);
+//
+//		// Pathfinding 
+//		std::vector<PNode*> FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end);
+//		glm::vec3 GetPositionofNode(uint32_t index);
+//		std::shared_ptr<PNode> GetNodeAtIndex(uint32_t index);
+//		std::shared_ptr<PNode> GetNodeClosestToPosition(glm::vec3 position);
+//	
+//		// Node Spawn 
+//		inline int GridSize{ 10 };
+//		inline float GridSpacing{ 1.f };
+//		inline glm::vec3 Center(0, 0, 0);
+//		inline std::vector<std::shared_ptr<PNode>> m_Nodes;
+//		inline std::vector<glm::vec3> m_NodeLocations;
+//		inline std::string GenerateNodeName()
+//		{
+//			std::string name = "PNode ";
+//			name += std::to_string(m_Nodes.size()+1);
+//			return name;
+//		}
+//		inline void SpawnGrid()
+//		{
+//			std::shared_ptr<PNode> a;
+//			std::shared_ptr<PNode> b;
+//
+//			for (size_t x{}; x < 10; x++)
+//			{
+//				for (size_t z{}; z < 10; z++)
+//				{
+//					glm::vec3 location = glm::vec3(Center.x + (GridSpacing * x) - (float)GridSize / 2, 0, Center.z + (GridSpacing * z) - (float)GridSize / 2);
+//					m_Nodes.emplace_back(std::make_shared<PNode>(GenerateNodeName(), location));
+//					m_NodeLocations.push_back(location);
+//				}
+//			}
+//			for (size_t i{1}; i < m_Nodes.size(); i++)
+//			{
+//				if (m_Nodes.size() < i + 1) { break; }
+//
+//				a = m_Nodes[i - 1];
+//				b = m_Nodes[i];
+//				if (i%10!=0 || i==0) {
+//					a->AddConnectedNode(b);
+//					b->AddConnectedNode(a);
+//				}
+//
+//				if (m_Nodes.size() < i + 10) { continue; }
+//				b = m_Nodes[(i-1) + 10];
+//				b->AddConnectedNode(a);
+//				a->AddConnectedNode(b);
+//			}
+//		}
+//	}
 }

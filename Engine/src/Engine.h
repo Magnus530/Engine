@@ -19,6 +19,7 @@
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Systems/TransformSystem.h"
+#include "Engine/Scene/Systems/PathfindingSystem.h"
 #include "Engine/Scene/EntityInitializer.h"
 
 // ---------------Renderer---------------

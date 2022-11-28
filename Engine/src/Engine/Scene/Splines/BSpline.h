@@ -18,12 +18,13 @@ namespace Engine {
 	class BSplineCreator
 	{
 	public:
-		std::vector<float> MakeKnotVector(std::vector<glm::vec3> controlpoints);
+		static void MakeKnotVector(BSpline& bSpline);
+		static glm::vec3 GetPositionAlongSpline(BSpline& bSpline, float t);
 
-		static float Bid(float t, int it, int d);
-		static float Wid(float t, int it, int d);
+		static float Bid(std::vector<float>& knotVector, float t, int it, int d);
+		static float Wid(std::vector<float>& knotVector, float t, int it, int d);
 
-	private:
-		static std::vector<float> m_KnotVector;
+	//private:
+		//static std::vector<float> m_KnotVector;
 	};
 }

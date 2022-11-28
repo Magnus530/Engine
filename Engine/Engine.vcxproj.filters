@@ -31,6 +31,9 @@
     <Filter Include="src\Engine\Scene">
       <UniqueIdentifier>{AF1338A9-9B0C-57FB-C43E-3C80B0963607}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Scene\Splines">
+      <UniqueIdentifier>{9CAC03A1-88D1-5221-B11C-38B19DA0513F}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Scene\Systems">
       <UniqueIdentifier>{B6A886B6-A2CD-D536-CB18-BBC6B79CD454}</UniqueIdentifier>
     </Filter>
@@ -188,6 +191,12 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Scene.h">
       <Filter>src\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Splines\BSpline.h">
+      <Filter>src\Engine\Scene\Splines</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Systems\PathfindingSystem.h">
+      <Filter>src\Engine\Scene\Systems</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Systems\TransformSystem.h">
       <Filter>src\Engine\Scene\Systems</Filter>
@@ -1470,7 +1479,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Scene\Systems\PathfindingSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1545,6 +1553,9 @@
     <ClCompile Include="src\Engine\Scene\Scene.cpp">
       <Filter>src\Engine\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Splines\BSpline.cpp">
+      <Filter>src\Engine\Scene\Splines</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp">
       <Filter>src\Engine\Scene\Systems</Filter>
     </ClCompile>
@@ -1578,5 +1589,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Systems\PathfindingSystem.cpp" />
   </ItemGroup>
 </Project>
