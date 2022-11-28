@@ -31,7 +31,7 @@ namespace Engine
 				}
 				case 4:
 				{
-					pShape = std::make_shared<Engine::Sphere>();
+					pShape = std::make_shared<Engine::Sphere>(2, 1.0f);
 					break;
 				}
 				default:
