@@ -46,14 +46,6 @@ public:
 	PathfindingLayer()
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		E_TRACE("float: {0}", sizeof(float));
-		E_TRACE("glm::vec3: {0}", sizeof(glm::vec3));
-		E_TRACE("glm::mat4: {0}", sizeof(glm::mat4));
-		E_TRACE("NodeGrid: {0}", sizeof(Engine::NodeGrid));
-		E_TRACE("PNode: {0}", sizeof(Engine::PNode));
-		E_TRACE("TransformComponent: {0}", sizeof(Engine::TransformComponent));
-		E_TRACE("PathfindingComponent: {0}", sizeof(Engine::PathfindingComponent));
-
 		/* Pathfinding */
 		//Engine::Pathfinder::SpawnGrid();
 		//Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), 1.f, 10);
@@ -83,8 +75,8 @@ public:
 		//Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition);
 		//m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode = Engine::Pathfinder::GetNodeAtIndex(0);
 		std::shared_ptr<Engine::PNode> startNode = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, 0);
-		glm::vec3 startPosition = startNode->m_Position;
-		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition);
+		glm::vec3 startPosition = startNode->m_Data->m_Position;
+		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition + glm::vec3(0, 0.5f, 0)); //Manually adding extra height
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode = startNode;
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_Grid = Engine::NodeGridSystem::GetGridAtIndex(0);
 
@@ -110,7 +102,7 @@ public:
 		glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
 
-		// PATHFINDING: Moving m_Entity along path
+		/*--------------------- PATHFINDING: Moving m_Entity along path -----------------------------*/
 		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
 		transform.m_Speed = m_SplineSpeed;
@@ -133,7 +125,7 @@ public:
 
 		//	Engine::TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0, 1, 0));
 		//}
-
+		/************************************************************************************************/
 
 		// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
 		static float sin{};
@@ -168,7 +160,7 @@ public:
 		//for (auto& it : Engine::Pathfinder::m_Nodes)
 		for (auto& it : Engine::NodeGridSystem::GetGridAtIndex(0)->m_Nodes)
 		{
-			glm::vec3 position = it->m_Position;
+			glm::vec3 position = it->m_Data->m_Position;
 			//if (it == m_StartNode) {
 			if (it == pathfinder.m_StartNode) {
 				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", startColor);
@@ -216,50 +208,43 @@ public:
 		{
 			ImGui::BeginTooltip();
 			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-			ImGui::TextUnformatted("RED: click to select start node\nBLUE: hold SHIFT to select target node\nGREY: hold ALT to set nodes to block");
+			ImGui::TextUnformatted("LEFT CLICK: Set target\nRIGHT CLICK: Make node a path obstruction");
 			ImGui::PopTextWrapPos();
 			ImGui::EndTooltip();
 		}
 		
-		// ----------------------------------------- NODE MENU BEGIN ------------------------------------------------------------------------
-		/* Start and Target node selection */
-		static int startSelected[100];
-		static int startSelectedLocation{ -1 };
 
+		// ----------------------------------------- NODE MENU BEGIN ------------------------------------------------------------------------
+		// Target Nodes
 		static int targetSelected[100];
 		static int targetSelectedLocation{ -1 };
-		/* Blocked Nodes */
+		// Blocked Nodes 
 		static int blockSelected[100];
 
 		static int selected[100];
-		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.5, 0.5, 0.5, 1));
 		for (int y = 0; y < 10; y++)
 			for (int x = 0; x < 10; x++)
 			{
 				if (x > 0)
 					ImGui::SameLine();
 				int location = x * 10 + y;
-				//std::string name = Engine::Pathfinder::m_Nodes[location]->m_name;
-				std::string name = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location)->m_name;
+				std::string name{ Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location)->m_Data->m_Name };
 				name.insert(5, "\n");
 
-
+				//** SET STYLE
 				// Set Block
-				if (ImGui::IsKeyDown(ImGuiKey_LeftAlt)) {
-					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.2f, 0.2f, 0.2f, 1.f));
-					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
-
-				}
-				// Set Start
-				else if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) {
-					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.6f, 0.1f, 0.1f, 1.f));
-					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1.f, 0.3f, 0.3f, 1.f));
+				if (ImGui::IsMouseDown(1)) 
+				{
+					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.6f, 0.6f, 0.6f, 1.f));
+					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.6f, 0.6f, 0.6f, 1.f));
 				}
 				// Set Target
-				else {
-					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.1f, 0.1f, 0.6f, 1.f));
-					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.3f, 0.3f, 1.f, 1.f));
+				else 
+				{
+					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.4f, 0.2f, 0.3f, 1.f));
+					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.7f, 0.3f, 0.5f, 1.f));
 				}
+				//*********
 
 				bool bHeader{};
 				if (blockSelected[location]) {
@@ -270,67 +255,61 @@ public:
 					ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 1.f, 1.f));
 					bHeader = true;
 				}
-				else if (startSelected[location]) {
-					ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(1.f, 0.1f, 0.1f, 1.f));
-					bHeader = true;
-				}
 
+				// Creating the selectable grid 
 				if (ImGui::Selectable(name.c_str(), selected[location] != 0, 0, ImVec2(50.f, 50.f)))
 				{
-					//std::shared_ptr<Engine::PNode> node = Engine::Pathfinder::m_Nodes[location];
-					std::shared_ptr<Engine::PNode> node = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location);
-					selected[location] = 1;
-					// Set a block Node
-					if (ImGui::IsKeyDown(ImGuiKey_LeftAlt)) 
-					{
-						if (blockSelected[location]) {
-							blockSelected[location] = 0;
-							node->SetBlock(false);
-							auto it = std::find(m_BlockedNodes.begin(), m_BlockedNodes.end(), node);
-							m_BlockedNodes.erase(it);
-						}
-						else {
-							blockSelected[location] = 1;
-							node->SetBlock(true);	
-							m_BlockedNodes.push_back(node);
-						}
-					}
-					// Set Start Node
-					else if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) 
-					{
-						startSelected[location] = 1;
-						if (location != startSelectedLocation) {
-							startSelected[startSelectedLocation] = 0;
-						}
-						startSelectedLocation = location;
-						m_StartNode = node;
-					}
-					// Set Target Node
-					else
-					{
-						targetSelected[location] = 1;
-						if (location != targetSelectedLocation && targetSelectedLocation) {
-							targetSelected[targetSelectedLocation] = 0;
-						}
-						targetSelectedLocation = location;
-						m_TargetNode = node;
-					}
-
 					// Remove selected at location if in-active
 					for (int i = 0; i < 100; i++)
 						selected[i] = blockSelected[i];
-					if (startSelectedLocation != -1)
-						selected[startSelectedLocation] = 1;
 					if (targetSelectedLocation != -1)
 						selected[targetSelectedLocation] = 1;
 				}
+
+				//** Left click - Set target and start pathfinding
+				if (ImGui::IsItemClicked(0)) {
+					std::shared_ptr<Engine::PNode> node = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location);
+
+					targetSelected[location] = 1;
+					if (location != targetSelectedLocation && targetSelectedLocation != -1) {
+						targetSelected[targetSelectedLocation] = 0;
+					}
+					targetSelectedLocation = location;
+					m_TargetNode = node;
+
+					//** INIT PATHFINDING ******
+					auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
+					auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+					pathfinder.m_TargetNode = m_TargetNode;
+					Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0, 0.5f, 0));
+					//********
+				}
+
+				//** Right click - Set node to block 
+				if (ImGui::IsItemClicked(1)) {
+					std::shared_ptr<Engine::PNode> node = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location);
+
+					if (blockSelected[location]) {
+						blockSelected[location] = 0;
+						selected[location] = 0;
+						node->SetBlock(false);
+						auto it = std::find(m_BlockedNodes.begin(), m_BlockedNodes.end(), node);
+						m_BlockedNodes.erase(it);
+					}
+					else {
+						selected[location] = 1;
+						blockSelected[location] = 1;
+						node->SetBlock(true);
+						m_BlockedNodes.push_back(node);
+					}
+				}
+
 				if (bHeader)
 					ImGui::PopStyleColor();
 
 				ImGui::PopStyleColor();
 				ImGui::PopStyleColor();
 			}
-		ImGui::PopStyleColor();
 		// NODE MENU END ---------------------------------------------------------------------------------
 
 
@@ -342,56 +321,58 @@ public:
 				selected[i] = blockSelected[i];
 			for (auto& it : m_BlockedNodes)
 				it->SetBlock(false);
-			selected[startSelectedLocation] = 1;
 			selected[targetSelectedLocation] = 1;
 
 			m_BlockedNodes.clear();
 		}
 
 		// FINDING PATH ---------------------------------------------------------------------------------
-		static std::vector<Engine::PNode*> nodepath;
-		if (ImGui::Button("Find path", ImVec2(100,50))) {
-			//if (m_StartNode.get() && m_TargetNode.get()) {
-			if (m_TargetNode.get())
-			{
-				nodepath.clear();
-				m_Path.clear();
-				//nodepath = Engine::Pathfinder::FindPath(m_StartNode, m_TargetNode);
-				auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
-				auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-				pathfinder.m_TargetNode = m_TargetNode;
-
-				// Check if the Entity should not move
-				const bool b = (m_TargetNode == pathfinder.m_StartNode);
-
-
-				if (!b) {
-					if (pathfinder.bStartedPathfinding)
-						pathfinder.m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, transform.GetPosition());
-					Engine::PathfindingSystem::FindPath(pathfinder);
-					pathfinder.bStartedPathfinding = true;
-				//if (bObjPathfindActive) {
-				//	pathfinder.m_StartNode = Engine::Pathfinder::GetNodeClosestToPosition(transform.GetPosition());
-				//}
-					//if (!pathfinder.bReachedTarget)
-						//pathfinder.m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, transform.GetPosition());
-				//nodepath = Engine::Pathfinder::FindPath(pathfinder.m_StartNode, m_TargetNode);	// Finding path through node grid
-				//m_Path.push_back(pathfinder.m_StartNode->m_Position);
-				//for (auto it = nodepath.end(); it != nodepath.begin();) {
-				//	m_Path.push_back((*--it)->m_Position);
-				//}
-				//// Make path a minimum of 3 points, for
-				//if (m_Path.size() == 2) {
-				//	glm::vec3 middle = m_Path[0] + ((m_Path[1] - m_Path[0]) * 0.5f);
-				//	m_Path.insert(++m_Path.begin(), middle);
-				//}
-
-				//Engine::Pathfinder::MakeKnotVector(m_Path);
-				//m_Splinetime = 0.f;
-				//bObjPathfindActive = true;
-				}
-			}
-		}
+		//static std::vector<Engine::PNode*> nodepath;
+		//if (ImGui::Button("Find path", ImVec2(100,50))) {
+		//	if (m_TargetNode.get())
+		//	{
+		//		//nodepath.clear();
+		//		//m_Path.clear();
+		//		//nodepath = Engine::Pathfinder::FindPath(m_StartNode, m_TargetNode);
+		//
+		//		//** INIT PATHFINDING
+		//		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
+		//		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+		//		pathfinder.m_TargetNode = m_TargetNode;
+		//		Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0,0.5f,0));
+		//
+		//
+		//		// Check if the Entity should not move
+		//		//const bool b = (pathfinder.m_TargetNode == pathfinder.m_StartNode);
+		//		//if (!b) {
+		//			//if (pathfinder.bStartedPathfinding)
+		//				//pathfinder.m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, transform.GetPosition());
+		//			//Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0,0.5f,0));
+		//			//pathfinder.bStartedPathfinding = true;
+		//
+		//		// OLD
+		//		//if (bObjPathfindActive) {
+		//		//	pathfinder.m_StartNode = Engine::Pathfinder::GetNodeClosestToPosition(transform.GetPosition());
+		//		//}
+		//			//if (!pathfinder.bReachedTarget)
+		//				//pathfinder.m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, transform.GetPosition());
+		//		//nodepath = Engine::Pathfinder::FindPath(pathfinder.m_StartNode, m_TargetNode);	// Finding path through node grid
+		//		//m_Path.push_back(pathfinder.m_StartNode->m_Position);
+		//		//for (auto it = nodepath.end(); it != nodepath.begin();) {
+		//		//	m_Path.push_back((*--it)->m_Position);
+		//		//}
+		//		//// Make path a minimum of 3 points, for
+		//		//if (m_Path.size() == 2) {
+		//		//	glm::vec3 middle = m_Path[0] + ((m_Path[1] - m_Path[0]) * 0.5f);
+		//		//	m_Path.insert(++m_Path.begin(), middle);
+		//		//}
+		//
+		//		//Engine::Pathfinder::MakeKnotVector(m_Path);
+		//		//m_Splinetime = 0.f;
+		//		//bObjPathfindActive = true;
+		//		//}
+		//	}
+		//}
 		ImGui::Separator();
 
 		ImGui::PushItemWidth(150.f);

@@ -3,38 +3,26 @@
 
 namespace Engine {
 
-    PNode::PNode(std::string name, glm::vec3 position)
-        : m_name{name}, m_Position {position}
-    {
-    }
-    PNode::PNode(glm::vec3 position)
-        : m_Position{position}
-    {
-    }
-    PNode::~PNode()
-    {
-    }
+    //int PNode::GetDistanceToNode(PNode* target)
+    //{
+    //    return (int)(glm::length(m_Position - target->m_Position) * floatConvert);
+    //}
 
-    int PNode::GetDistanceToNode(PNode* target)
-    {
-        return (int)(glm::length(m_Position - target->m_Position) * floatConvert);
-    }
+    //void PNode::InitValues(PNode* start, PNode* target)
+    //{
+    //    H = GetDistanceToNode(target);
+    //    F = G + H;
+    //}
 
-    void PNode::InitValues(PNode* start, PNode* target)
-    {
-        H = GetDistanceToNode(target);
-        F = G + H;
-    }
-
-    void PNode::SetBlock(bool b)
-    {
-        if (b) {
-            NodeType = ENodeType::NT_Block;
-        }
-        else {
-            NodeType = ENodeType::NT_None;
-        }
-    }
+    //void PNode::SetBlock(bool b)
+    //{
+    //    if (b) {
+    //        NodeType = ENodeType::NT_Block;
+    //    }
+    //    else {
+    //        NodeType = ENodeType::NT_None;
+    //    }
+    //}
 
     //namespace Pathfinder {
 

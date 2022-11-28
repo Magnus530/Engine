@@ -4,46 +4,103 @@
 namespace Engine {
 	inline float floatConvert{ 1000.f };
 
-	enum class ENodeType
+	//enum ENodeType : unsigned short	// redundant
+	//{
+	//	NT_None,
+	//	NT_Start,
+	//	NT_Path,
+	//	NT_Target,
+	//	NT_Checked,
+	//	NT_Processed,
+	//	NT_Block
+	//};
+
+	struct PathNodeNeighbors
 	{
-		NT_None,
-		NT_Start,
-		NT_Path,
-		NT_Target,
-		NT_Checked,
-		NT_Processed,
-		NT_Block
+		std::vector<std::shared_ptr<class PNode>> neighbors;
+	};
+
+	struct PathNodeDistanceValues
+	{
+		int F;	// Total DistanceValue
+		int G;	// DistanceValue from StartNode to this
+		int H;	// DistanceValue from EndNode to this
+	};
+
+	struct PathNodeData
+	{
+		//const char* m_Name;
+		std::string m_Name;
+		glm::vec3 m_Position;
+		bool bIsObstruction{};
 	};
 
 	class PNode
 	{
 	public:
-		PNode(std::string name, glm::vec3 position);
-		PNode(glm::vec3 position);
-		~PNode();
-		std::string m_name;
+		PNode(glm::vec3 position)
+		{
+			//m_Data = new PathNodeData();
+			//m_Neighbors = new PathNodeNeighbors();
+			m_Data = std::make_shared<PathNodeData>();
+			m_Neighbors = std::make_shared<PathNodeNeighbors>();
+			m_DistanceValues = std::make_shared<PathNodeDistanceValues>();
 
-		ENodeType NodeType = ENodeType::NT_None;
+			m_Data->m_Position = position;
+		}
+		PNode(std::string name, glm::vec3 position) 
+			: PNode(position)
+		{
+			m_Data->m_Name = name;
+		}
+		~PNode()
+		{
+		}
 
-		glm::vec3 m_Position;
-		std::vector<std::shared_ptr<PNode>> mConnectedNodes;
-		void AddConnectedNode(std::shared_ptr<PNode> node) { mConnectedNodes.push_back(node); }
+		std::shared_ptr<PathNodeData> m_Data;
+		//std::string m_name;
+		//glm::vec3 m_Position;
+		//ENodeType NodeType = ENodeType::NT_None;
+
+		std::shared_ptr<PathNodeNeighbors> m_Neighbors;
+
+		//PathNodeDirectConnection* m_DirectConnection;
 		/* Direct connection to next node when moving through the path from the end node */
+		//std::shared_ptr<PNode> m_Connection;
 		std::shared_ptr<PNode> m_Connection;
+		//std::vector<std::shared_ptr<PNode>> mConnectedNodes;
 
-		int F;	// Total DistanceValue
-		int G;	// DistanceValue from StartNode to this
-		int H;	// DistanceValue from EndNode to this
+		std::shared_ptr<PathNodeDistanceValues> m_DistanceValues;
+		//int F;	// Total DistanceValue
+		//int G;	// DistanceValue from StartNode to this
+		//int H;	// DistanceValue from EndNode to this
 
+		void AddConnectedNode(std::shared_ptr<PNode> node) { 
+			m_Neighbors->neighbors.push_back(node);
+			//mConnectedNodes.push_back(node); 
+		}
 
-		int GetDistanceToNode(PNode* target);
-		void InitValues(PNode* start, PNode* target);
+		int GetDistanceToNode(PNode* target)
+		{
+			return (int)(glm::length(m_Data->m_Position - target->m_Data->m_Position) * floatConvert);
+		}
+		void InitValues(PNode* target)
+		{
+			m_DistanceValues->H = GetDistanceToNode(target);
+			m_DistanceValues->F = m_DistanceValues->G + m_DistanceValues->H;
+		}
 
-		void SetG(int g) { G = g; F = G + H; }
-		void SetH(PNode* target) { H = GetDistanceToNode(target); }
+		void SetG(int g) { m_DistanceValues->G = g;  m_DistanceValues->F = m_DistanceValues->G + m_DistanceValues->H; }
+		void SetH(PNode* target) { m_DistanceValues->H = GetDistanceToNode(target); }
 
-		bool IsBlock() const { return NodeType == ENodeType::NT_Block; }
-		void SetBlock(bool b);
+		bool IsBlock() const { 
+			return m_Data->bIsObstruction;
+			//return NodeType == ENodeType::NT_Block; 
+		}
+		void SetBlock(bool b)
+		{
+			m_Data->bIsObstruction = true;
+		}
 	};
 
 //	namespace Pathfinder {

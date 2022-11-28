@@ -1556,6 +1556,9 @@
     <ClCompile Include="src\Engine\Scene\Splines\BSpline.cpp">
       <Filter>src\Engine\Scene\Splines</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Systems\PathfindingSystem.cpp">
+      <Filter>src\Engine\Scene\Systems</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp">
       <Filter>src\Engine\Scene\Systems</Filter>
     </ClCompile>
@@ -1589,6 +1592,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Scene\Systems\PathfindingSystem.cpp" />
   </ItemGroup>
 </Project>

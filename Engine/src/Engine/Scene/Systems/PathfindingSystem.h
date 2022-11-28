@@ -21,21 +21,17 @@ namespace Engine {
 	class PathfindingSystem
 	{
 	public://Functions
-		static void FindPath(PathfindingComponent& comp/*, std::shared_ptr<PNode> start, std::shared_ptr<PNode> end*/);
+		static void FindPath(PathfindingComponent& comp, const glm::vec3 currentPosition);
 		static void MoveAlongPath(PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime);
 
 		static std::shared_ptr<PNode> GetNodeClosestToPosition(uint32_t gridIndex, glm::vec3 position);
 
 	private://Data
-		static std::vector<std::shared_ptr<PNode>> FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, bool* blocked = nullptr, std::shared_ptr<PNode> intermediate = nullptr);
+		static std::vector<std::shared_ptr<PNode>> FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked = nullptr);
 
 		//static glm::vec3 GetPositionAlongSpline(std::vector<glm::vec3>& splinepoints, float t);
 	};
 
-	//namespace PathNode {
-	//	static std::vector<std::shared_ptr<NodeGrid>> m_NodeGrids;
-
-	//}
 	// Creation of Nodegrids
 	class NodeGridSystem
 	{
@@ -51,11 +47,6 @@ namespace Engine {
 	private:
 		// Generate names for the nodes within a Node Grid
 		static void GenerateNodeNamesForGrid(std::shared_ptr<NodeGrid> grid);
-
-		//struct Grids {
-		//};
-		//static Grids* m_Grids;
-		//inline std::vector<std::shared_ptr<NodeGrid>> m_NodeGrids; // Several node grids and not just one?
 	};
 
 }
