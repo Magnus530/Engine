@@ -9,7 +9,7 @@ namespace Engine
 	//--------------------------------------------------------------
 	Implementation::Implementation()
 	{
-		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+		//CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 		// Create a System studio object and initialize.
 		AudioEngine::errorCheck(FMOD::Studio::System::create(&mpStudioSystem));
 		AudioEngine::errorCheck(mpStudioSystem->initialize(

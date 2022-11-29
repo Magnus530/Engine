@@ -31,7 +31,7 @@ TransformExampleLayer::TransformExampleLayer()
 
 
 	m_Audio = std::make_shared<Engine::AudioEngine>();
-	m_Audio->loadSound("../../assets/audio/Cartoon_song.wav", false, false, false);
+	m_Audio->loadSound("assets/audio/Cartoon_song.wav", false, false, false);
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)

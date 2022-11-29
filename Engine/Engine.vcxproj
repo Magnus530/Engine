@@ -95,9 +95,7 @@
       <AdditionalLibraryDirectories>vendor\FMOD\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmod.dll $(TargetDir)
-copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
-copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)
+      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
 copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -128,9 +126,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
       <AdditionalLibraryDirectories>vendor\FMOD\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmod.dll $(TargetDir)
-copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
-copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)
+      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
 copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -161,9 +157,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
       <AdditionalLibraryDirectories>vendor\FMOD\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmod.dll $(TargetDir)
-copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
-copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)
+      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
 copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

@@ -130,9 +130,9 @@ project "Engine"
 	filter { "system:windows"}
 	postbuildcommands
 	{
-		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmod.dll $(TargetDir)"),
+		--("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmod.dll $(TargetDir)"),
 		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodL.dll $(TargetDir)"),
-		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudio.dll $(TargetDir)"),
+		--("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudio.dll $(TargetDir)"),
 		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudioL.dll $(TargetDir)")
 	}
 
@@ -171,7 +171,7 @@ project "Sandbox"
 	links
 	{
 		"Engine",
-		"fmod_vc.lib"
+		"fmodL_vc.lib"
 	}
 
 	filter
@@ -201,8 +201,8 @@ project "Sandbox"
 	filter { "system:windows"}
 	postbuildcommands
 	{
-		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmod.dll $(TargetDir)"),
+		--("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmod.dll $(TargetDir)"),
 		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodL.dll $(TargetDir)"),
-		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudio.dll $(TargetDir)"),
+		--("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudio.dll $(TargetDir)"),
 		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudioL.dll $(TargetDir)")
 	}
