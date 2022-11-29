@@ -3,7 +3,7 @@
 
 namespace Engine {
 
-    //*************************************** PATHFINDING SYSTEM ********************************************//
+    //************************************************************************ PATHFINDING SYSTEM **********************************************************************************//
 	void PathfindingSystem::FindPath(PathfindingComponent& comp, const glm::vec3 currentPosition)
 	{
         //** Init Pathfinding
@@ -16,7 +16,6 @@ namespace Engine {
         //*** END Init Pathfinding ***
 
         // Bit reduntant for pathfinding component to have array of node pointers, when it only uses their locations
-        //comp.m_CurrentPath = FindPath(comp.m_StartNode, comp.m_TargetNode, &comp.bBlocked, comp.m_IntermediateTargetNode);
         comp.m_CurrentPath = FindPath(comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bBlocked);
         const bool NoMovIntermediate = comp.m_StartNode == comp.m_IntermediateTargetNode;
         if (NoMovIntermediate) {
@@ -97,7 +96,7 @@ namespace Engine {
 
 
         std::shared_ptr<PNode> closestNode{ start };     // If node is closed off, go to the closest one in, air length
-        closestNode->InitValues(/*start.get(), */end.get());
+        closestNode->InitValues(end.get());
         std::vector<std::shared_ptr<PNode>> tosearch;
         tosearch.push_back(start);
         std::vector<std::shared_ptr<PNode>> processed;
@@ -105,7 +104,7 @@ namespace Engine {
         while (tosearch.size() > 0)
         {
             std::shared_ptr<PNode> current = tosearch[0];
-            current->InitValues(/*start.get(), */end.get());
+            current->InitValues(end.get());
 
             /* Choosing node to process from the insearch array */
             for (auto& it : tosearch)
@@ -177,7 +176,7 @@ namespace Engine {
         CreateGridAtLocation(glm::vec3(0, 0, 0), 1.f, 10);
     }
 
-    //********************************* NODE GRID SYSTEM ********************************//
+    //************************************************************************* NODE GRID SYSTEM ***************************************************************************************************//
     //NodeGridSystem::Grids* NodeGridSystem::m_Grids = new NodeGridSystem::Grids();
     static std::vector<std::shared_ptr<NodeGrid>> m_NodeGrids;
 
@@ -201,7 +200,6 @@ namespace Engine {
             {
                 glm::vec3 loc = glm::vec3(location.x + (gridSpacing * x) - (float)gridSize / 2, 0, location.z + (gridSpacing * z) - (float)gridSize / 2);
                 nodes.emplace_back(std::make_shared<PNode>(loc));
-                //m_NodeLocations.push_back(location);
             }
         }
         for (size_t i{ 1 }; i < nodes.size(); i++)

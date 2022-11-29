@@ -28,8 +28,6 @@ namespace Engine {
 
 	private://Data
 		static std::vector<std::shared_ptr<PNode>> FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked = nullptr);
-
-		//static glm::vec3 GetPositionAlongSpline(std::vector<glm::vec3>& splinepoints, float t);
 	};
 
 	// Creation of Nodegrids

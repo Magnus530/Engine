@@ -42,12 +42,20 @@ private: // Visual Aid & ImGui related elements
 	std::shared_ptr<Engine::PNode> m_TargetNode;
 	std::vector<std::shared_ptr<Engine::PNode>> m_BlockedNodes;
 
+	struct test
+	{
+		glm::vec3 v;
+		int f, g, h;
+	};
 public:
 	PathfindingLayer()
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
+		E_TRACE("PathNodeData : {0}", sizeof(Engine::PathNodeData));
+		E_TRACE("test : {0}", sizeof(test));
+		E_TRACE("short : {0}", sizeof(short));
+
 		/* Pathfinding */
-		//Engine::Pathfinder::SpawnGrid();
 		//Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), 1.f, 10);
 		Engine::NodeGridSystem::CreateGrid();
 
@@ -63,7 +71,6 @@ public:
 		std::vector<uint32_t> indices;
 
 		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
-		//m_Obj = std::make_shared<Engine::VisualObject>(vertices, indices);
 
 		m_Scene = std::make_shared<Engine::Scene>();
 		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Monkey", m_VA, m_Scene);
@@ -71,9 +78,6 @@ public:
 		m_Entity.AddComponent<Engine::PathfindingComponent>();
 
 		/* Set m_Entity location to Pathfinding Node 1 */
-		//glm::vec3 startPosition = Engine::Pathfinder::GetPositionofNode(0);
-		//Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition);
-		//m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode = Engine::Pathfinder::GetNodeAtIndex(0);
 		std::shared_ptr<Engine::PNode> startNode = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, 0);
 		glm::vec3 startPosition = startNode->m_Data->m_Position;
 		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition + glm::vec3(0, 0.5f, 0)); //Manually adding extra height
@@ -108,23 +112,6 @@ public:
 		transform.m_Speed = m_SplineSpeed;
 		if (pathfinder.bStartedPathfinding)
 			Engine::PathfindingSystem::MoveAlongPath(pathfinder, transform, ts);
-		
-		//m_Splinetime = std::clamp<float>(m_Splinetime += (ts * m_SplineSpeed), 0.f, 1.f)/* / (float)Engine::Pathfinder::m_NodeLocations.size()*/;
-		//if (m_Splinetime >= 1.f) {
-		//	// Set Entity StartNode to TargetNode
-		//	if (bObjPathfindActive) {
-		//		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
-		//		pathfinder.m_StartNode = pathfinder.m_TargetNode;
-		//		E_INFO("Reached Node");
-		//	}
-		//	bObjPathfindActive = false; 
-		//}
-		//auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-		//if (bObjPathfindActive) {
-		//	glm::vec3 pos = Engine::Pathfinder::GetPositionAlongSpline(m_Path, m_Splinetime);
-
-		//	Engine::TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0, 1, 0));
-		//}
 		/************************************************************************************************/
 
 		// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
@@ -152,16 +139,13 @@ public:
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", bShowShaderColor);
 		/* ------- RENDER NODEGRID -------- */
-		//auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
 
 		float scale = 0.3f;
 		bool alteredColor{};
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
-		//for (auto& it : Engine::Pathfinder::m_Nodes)
 		for (auto& it : Engine::NodeGridSystem::GetGridAtIndex(0)->m_Nodes)
 		{
 			glm::vec3 position = it->m_Data->m_Position;
-			//if (it == m_StartNode) {
 			if (it == pathfinder.m_StartNode) {
 				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", startColor);
 				alteredColor = true;
@@ -175,7 +159,6 @@ public:
 				alteredColor = true;
 			}
 
-			//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
 			Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
 			if (alteredColor) {
 				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
@@ -186,10 +169,8 @@ public:
 		/* ----- RENDER SPLINE PATH ----- */
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec3(1, 1, 1));
 		scale = 0.1f;
-		//for (auto& it : m_Path)
 		for (auto& it : pathfinder.m_SplinePath->m_Controlpoints)
 		{
-			//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 1.f, 0)));
 			Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0)));
 		}
 
@@ -326,53 +307,6 @@ public:
 			m_BlockedNodes.clear();
 		}
 
-		// FINDING PATH ---------------------------------------------------------------------------------
-		//static std::vector<Engine::PNode*> nodepath;
-		//if (ImGui::Button("Find path", ImVec2(100,50))) {
-		//	if (m_TargetNode.get())
-		//	{
-		//		//nodepath.clear();
-		//		//m_Path.clear();
-		//		//nodepath = Engine::Pathfinder::FindPath(m_StartNode, m_TargetNode);
-		//
-		//		//** INIT PATHFINDING
-		//		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
-		//		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-		//		pathfinder.m_TargetNode = m_TargetNode;
-		//		Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0,0.5f,0));
-		//
-		//
-		//		// Check if the Entity should not move
-		//		//const bool b = (pathfinder.m_TargetNode == pathfinder.m_StartNode);
-		//		//if (!b) {
-		//			//if (pathfinder.bStartedPathfinding)
-		//				//pathfinder.m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, transform.GetPosition());
-		//			//Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0,0.5f,0));
-		//			//pathfinder.bStartedPathfinding = true;
-		//
-		//		// OLD
-		//		//if (bObjPathfindActive) {
-		//		//	pathfinder.m_StartNode = Engine::Pathfinder::GetNodeClosestToPosition(transform.GetPosition());
-		//		//}
-		//			//if (!pathfinder.bReachedTarget)
-		//				//pathfinder.m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, transform.GetPosition());
-		//		//nodepath = Engine::Pathfinder::FindPath(pathfinder.m_StartNode, m_TargetNode);	// Finding path through node grid
-		//		//m_Path.push_back(pathfinder.m_StartNode->m_Position);
-		//		//for (auto it = nodepath.end(); it != nodepath.begin();) {
-		//		//	m_Path.push_back((*--it)->m_Position);
-		//		//}
-		//		//// Make path a minimum of 3 points, for
-		//		//if (m_Path.size() == 2) {
-		//		//	glm::vec3 middle = m_Path[0] + ((m_Path[1] - m_Path[0]) * 0.5f);
-		//		//	m_Path.insert(++m_Path.begin(), middle);
-		//		//}
-		//
-		//		//Engine::Pathfinder::MakeKnotVector(m_Path);
-		//		//m_Splinetime = 0.f;
-		//		//bObjPathfindActive = true;
-		//		//}
-		//	}
-		//}
 		ImGui::Separator();
 
 		ImGui::PushItemWidth(150.f);
