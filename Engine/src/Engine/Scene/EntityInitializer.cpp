@@ -6,6 +6,12 @@ namespace Engine
 {
 	EntityInitializer* EntityInitializer::m_Instance = new EntityInitializer;
 
+	Engine::Entity EntityInitializer::EntityInit(const std::string objname, std::shared_ptr<Engine::Scene>& Scene)
+	{
+		Engine::Entity tempEntity = Scene->CreateEntity(objname);
+		return tempEntity;
+	}
+
 	Engine::Entity EntityInitializer::EntityInit(const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& Scene)
 	{
 		std::vector<Engine::Vertex> vertices;

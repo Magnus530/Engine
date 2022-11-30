@@ -36,18 +36,17 @@ namespace Engine {
 	public:
 		uint32_t CreateObstructionSphere(float r, glm::vec3 p) {
 			//m_spheres.emplace_back( r, p );
-			m_nodecollection.emplace_back(ObstructionSphereNodes());
+			m_spherecollection.emplace_back(ObstructionSphereNodes());
 			return m_spherecount++;
-			//return m_spheres.size() - 1;	// returns ObstructionSphere ID
 		}
 		//PathObstructionSphere GetObstructionSphere(uint32_t index) const { return m_spheres[index]; }
-		std::vector<std::shared_ptr<class PNode>>& GetObstructionSphereNodes(uint32_t index) { return m_nodecollection[index].m_nodes; }
+		std::vector<ObstructionSphereNodes>& GetNodeCollections() { return m_spherecollection; }
+		std::vector<std::shared_ptr<class PNode>>& GetObstructionSphereNodes(uint32_t index) { return m_spherecollection[index].m_nodes; }
 
 
 	private:
 		uint32_t m_spherecount{};
-		//std::vector<PathObstructionSphere> m_spheres;
-		std::vector<ObstructionSphereNodes> m_nodecollection;
+		std::vector<ObstructionSphereNodes> m_spherecollection;
 	};
 
 }

@@ -48,6 +48,7 @@ namespace Engine {
 
 		static uint32_t CreateObstructionSphere(uint32_t gridIndex, float radius, glm::vec3 position);
 		static void UpdateObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex, float radius, glm::vec3 position);
+		static void UpdateFalseObstructionNodes(uint32_t gridIndex);
 
 	private:
 		// Generate names for the nodes within a Node Grid

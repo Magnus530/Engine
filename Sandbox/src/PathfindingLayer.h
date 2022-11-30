@@ -37,9 +37,10 @@ private:
 	float m_SplineSpeed{ 1.f };
 	bool bObjPathfindActive{};
 
-	Engine::Entity m_Obstructor;
-	
-	uint32_t m_ObstructionSphere;
+	//Engine::Entity m_Obstructor;
+	std::vector<Engine::Entity> m_Obstructors;
+
+	//uint32_t m_ObstructionSphere;
 
 private: // Visual Aid & ImGui related elements
 	bool bShowShaderColor{ true };
@@ -86,16 +87,15 @@ public:
 		m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
 		m_Plane.AddComponent<Engine::RendererComponent>();
 
-		// Set Obstruction Volumes
-		m_Obstructor = Engine::EntityInitializer::GetInstance().EntityInit("BeveledCube", m_BeveledCubeVA, m_Scene);
-		m_Obstructor.AddComponent<Engine::RendererComponent>();
-		m_Obstructor.AddComponent<Engine::ObstructionSphereComponent>();
-		auto& obstruction = m_Obstructor.GetComponent<Engine::ObstructionSphereComponent>();
-		auto& transform = m_Obstructor.GetComponent<Engine::TransformComponent>();
-		obstruction.m_radius = 2.f;
-		obstruction.m_obstructionSphere = Engine::NodeGridSystem::CreateObstructionSphere(0, obstruction.m_radius, transform.GetPosition());
+		// Creating Pathfinding Obstructions 
+		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, så Initialiserer den for seg selv her
+
+		CreateObstructor(glm::vec3(  5.f,  0.f,   5.f), 4.f);
+		CreateObstructor(glm::vec3( -5.f,  0.f,   5.f), 3.f);
 	}
 
+	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
+	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
 	void OnUpdate(Engine::Timestep ts) override
 	{
 		// Update 
@@ -120,6 +120,8 @@ public:
 		transform.m_Speed = m_SplineSpeed;
 		if (pathfinder.bStartedPathfinding)
 			Engine::PathfindingSystem::MoveAlongPath(pathfinder, transform, ts);
+
+		Engine::NodeGridSystem::UpdateFalseObstructionNodes(0);
 		/************************************************************************************************/
 
 		// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
@@ -144,8 +146,13 @@ public:
 
 		Engine::TransformSystem::UpdateMatrix(transform);
 		Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
-		auto& transform2 = m_Obstructor.GetComponent<Engine::TransformComponent>();
-		Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
+
+		/*-----------RENDER OBSTRUCTIONS---------------*/
+		for (uint32_t i{}; i < m_Obstructors.size(); i++)
+		{
+			auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
+			Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
+		}
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", bShowShaderColor);
 		/* ------- RENDER NODEGRID -------- */
@@ -188,6 +195,8 @@ public:
 		Engine::Renderer::EndScene();
 	}
 
+	//----------------------------------------------------------------IMGUI-------------------------------------------------------------------------------------------------------------------------
+	//----------------------------------------------------------------IMGUI-------------------------------------------------------------------------------------------------------------------------
 	virtual void OnImGuiRender() override
 	{
 		ImGui::ShowDemoWindow();
@@ -203,7 +212,6 @@ public:
 			ImGui::PopTextWrapPos();
 			ImGui::EndTooltip();
 		}
-		
 
 		// ----------------------------------------- NODE MENU BEGIN ------------------------------------------------------------------------
 		// Target Nodes
@@ -305,17 +313,17 @@ public:
 
 
 		// CLEAR BLOCKED NODE ----------------------------------------------------------------------------
-		if (ImGui::Button("Clear Blocked Nodes", ImVec2(100.f, 20.f))) {
-			for (auto& it : blockSelected)
-				it = 0;
-			for (int i = 0; i < 100; i++)
-				selected[i] = blockSelected[i];
-			for (auto& it : m_BlockedNodes)
-				it->SetObstructionStatus(false);
-			selected[targetSelectedLocation] = 1;
-
-			m_BlockedNodes.clear();
-		}
+		//if (ImGui::Button("Clear Blocked Nodes", ImVec2(100.f, 20.f))) {
+		//	for (auto& it : blockSelected)
+		//		it = 0;
+		//	for (int i = 0; i < 100; i++)
+		//		selected[i] = blockSelected[i];
+		//	for (auto& it : m_BlockedNodes)
+		//		it->SetObstructionStatus(false);
+		//	selected[targetSelectedLocation] = 1;
+		//
+		//	m_BlockedNodes.clear();
+		//}
 
 		ImGui::Separator();
 		
@@ -326,29 +334,126 @@ public:
 
 
 
-		// ADJUST SPHERE OBSTRTUCTION SPHERE ------------------------------------------------------------------------------------
+		// ADJUST OBSTRTUCTION ENTITIES ------------------------------------------------------------------------------------
 		ImGui::Separator();
-		ImGui::PushItemWidth(150.f);
-		static float radius{ 2.f };
-		static glm::vec3 pos{ 0.f };
-		const bool r = ImGui::SliderFloat("Obstruction Sphere Radius", &radius, 0.f, 5.f, "%0.1f");
+		if (ImGui::Button("CREATE\nObstruction", ImVec2(100.f, 100.f)))
+			CreateObstructor();
 
-		ImGui::PushItemWidth(100.f);
-		const bool x = ImGui::SliderFloat("X", &pos.x, -5.f, 5.f, "%0.1f");
 		ImGui::SameLine();
-		const bool z = ImGui::SliderFloat("Z", &pos.z, -5.f, 5.f, "%0.1f");
+		if (ImGui::Button("DELETE\nObstruction", ImVec2(100.f, 100.f)))
+			DeleteObstructor();
 
-		if (r || x || z) {
-			auto& obs = m_Obstructor.GetComponent<Engine::ObstructionSphereComponent>();
-			obs.m_radius = radius;
-			auto& transform = m_Obstructor.GetComponent<Engine::TransformComponent>();
-			Engine::TransformSystem::SetWorldPosition(transform, pos);
-			Engine::TransformSystem::UpdateMatrix(transform);
-			Engine::NodeGridSystem::UpdateObstructionSphere(0, obs.m_obstructionSphere, obs.m_radius, transform.GetPosition());
+		uint32_t size = m_Obstructors.size();
+		//std::vector<glm::vec3> positions;
+		//std::vector<bool> bRadius;
+		//std::vector<bool> bPositionsX;
+		//std::vector<bool> bPositionsZ;
+		//for (uint32_t i{}; i < size; i++) {
+		//	positions.push_back(glm::vec3(0.f));
+		//	bRadius.push_back(false);
+		//	bPositionsX.push_back(false);
+		//	bPositionsZ.push_back(false);
+		//}
+		
+		static auto ID = ImGui::GetActiveID();
+		for (uint32_t i{}; i < size; i++)
+		{
+			ImGui::Separator();
+			ImGui::PushID(i);
+			//E_TRACE("ImGuiID {0}", ImGui::GetActiveID());
+			auto& obstruction = m_Obstructors[i].GetComponent<Engine::ObstructionSphereComponent>();
+			auto& transform = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
+
+			std::string text = "Obstruction " + std::to_string(obstruction.m_ID);
+			ImGui::Text(text.c_str());
+			ImGui::PushItemWidth(150.f);
+			
+			const bool r = ImGui::SliderFloat("Radius", &obstruction.m_radius, 0.f, 5.f, "%.1f");
+
+			glm::vec3 pos = transform.GetPosition();
+			ImGui::PushItemWidth(100.f);
+
+			const bool x = ImGui::SliderFloat("X", &pos.x, -5.f, 5.f, "%0.1f");
+
+			ImGui::SameLine();
+			const bool z = ImGui::SliderFloat("Z", &pos.z, -5.f, 5.f, "%0.1f");
+			//ImGui::GetActiveID();
+
+			if (r || x || z) {
+				ID = ImGui::GetActiveID();
+				
+				Engine::TransformSystem::SetWorldPosition(transform, pos);
+				Engine::TransformSystem::UpdateMatrix(transform);
+				//E_TRACE("radius {0}", obstruction.m_radius);
+				Engine::NodeGridSystem::UpdateObstructionSphere(0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
+			}
+			ImGui::PopID();
+			ImGui::Separator();
 		}
 
-		ImGui::Separator();
+		if (ImGui::Button("UpdateTEST", ImVec2(100.f, 75.f)))
+			for (uint32_t i{}; i < size; i++)
+			{
+				auto& obstruction = m_Obstructors[i].GetComponent<Engine::ObstructionSphereComponent>();
+				auto& transform = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
+				Engine::NodeGridSystem::UpdateObstructionSphere(0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
+			}
+
+
+		//if (at != -1)
+		//{
+		//	auto& obstruction = m_Obstructors[at].GetComponent<Engine::ObstructionSphereComponent>();
+		//	auto& transform = m_Obstructors[at].GetComponent<Engine::TransformComponent>();
+		//	Engine::TransformSystem::SetWorldPosition(transform, positions[at]);
+		//	Engine::TransformSystem::UpdateMatrix(transform);
+		//	Engine::NodeGridSystem::UpdateObstructionSphere(0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
+		//}
+		//positions.clear();
 
 		ImGui::End();
+	}
+
+	void InitVertexArray(std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr)
+	{
+		std::vector<Engine::Vertex> vertices;
+		std::vector<uint32_t> indices;
+
+		Engine::ObjLoader::ReadFile(objname, vertices, indices);
+		vertexarr.reset(Engine::VertexArray::Create());
+		std::shared_ptr<Engine::VertexBuffer> ObjVB;
+		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
+		ObjVB->SetLayout
+		({
+			{ Engine::ShaderDataType::Float3, "a_Position" },
+			{ Engine::ShaderDataType::Float3, "a_Normal" },
+			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
+			});
+		vertexarr->AddVertexBuffer(ObjVB);
+
+		std::shared_ptr<Engine::IndexBuffer> ObjIB;
+		ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
+		vertexarr->SetIndexBuffer(ObjIB);
+	}
+
+	void CreateObstructor() {
+		CreateObstructor(glm::vec3(0.f));
+	}
+	void CreateObstructor(glm::vec3 pos, float radius = 2.f)
+	{
+		Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit("Obstructor " + std::to_string(m_Obstructors.size()-1), m_Scene);
+		ent.AddComponent<Engine::RendererComponent>();
+		ent.AddComponent<Engine::ObstructionSphereComponent>();
+		auto& obs = ent.GetComponent<Engine::ObstructionSphereComponent>();
+		obs.m_radius = radius;
+		auto& t = ent.GetComponent<Engine::TransformComponent>();
+		Engine::TransformSystem::SetWorldPosition(t, pos);
+		obs.m_ID = Engine::NodeGridSystem::CreateObstructionSphere(0, obs.m_radius, t.GetPosition());
+		
+		m_Obstructors.push_back(ent);
+	}
+	void DeleteObstructor()
+	{
+		if (m_Obstructors.size() == 0) return;
+		m_Obstructors.erase(--m_Obstructors.end());
 	}
 };

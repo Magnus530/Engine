@@ -69,8 +69,8 @@ namespace Engine
 
 	struct ObstructionSphereComponent
 	{
-		float m_radius{};
-		uint32_t m_obstructionSphere;
+		float m_radius{ 2.f };
+		uint32_t m_ID{};
 	};
 
 	//class TestComponent

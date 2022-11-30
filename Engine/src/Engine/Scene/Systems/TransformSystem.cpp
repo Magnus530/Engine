@@ -3,7 +3,7 @@
 #include <glm/gtx/transform.hpp>
 
 namespace Engine {
-	void TransformSystem::UpdateMatrix(TransformComponent& comp)
+	void TransformSystem::UpdateMatrix(TransformComponent& comp)	// TODO: Change transformsystem to only need m_Transform matrix. Stop using Scale Rotation and Position seperately
 	{
 		comp.m_Transform = comp.m_Scale * comp.m_Rotation * comp.m_Position;
 	}
@@ -11,6 +11,7 @@ namespace Engine {
 	void TransformSystem::SetWorldPosition(TransformComponent& comp, glm::vec3 position)
 	{
 		comp.m_Position = glm::translate(glm::inverse(comp.m_Rotation) * glm::mat4(1.f), position) * comp.m_Rotation;
+		UpdateMatrix(comp);
 	}
 	void TransformSystem::AddWorldPosition(TransformComponent& comp, glm::vec3 addPosition)
 	{

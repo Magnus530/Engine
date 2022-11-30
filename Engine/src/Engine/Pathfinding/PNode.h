@@ -28,9 +28,9 @@ namespace Engine {
 	public:
 		PNode(glm::vec3 position)
 		{
-			m_Data = std::make_shared<PathNodeData>();
-			m_Neighbors = std::make_shared<PathNodeNeighbors>();
-			m_DistanceValues = std::make_shared<PathNodeDistanceValues>();
+			m_Data			  = std::make_unique<PathNodeData>();
+			m_Neighbors		  = std::make_unique<PathNodeNeighbors>();
+			m_DistanceValues  = std::make_unique<PathNodeDistanceValues>();
 
 			m_Data->m_Position = position;
 		}
@@ -43,10 +43,10 @@ namespace Engine {
 		{
 		}
 
-		std::shared_ptr<PathNodeData> m_Data;
-		std::shared_ptr<PathNodeNeighbors> m_Neighbors;
+		std::unique_ptr<PathNodeData> m_Data;
+		std::unique_ptr<PathNodeDistanceValues> m_DistanceValues;
+		std::unique_ptr<PathNodeNeighbors> m_Neighbors;
 		std::shared_ptr<PNode> m_Connection;
-		std::shared_ptr<PathNodeDistanceValues> m_DistanceValues;
 
 
 		void AddConnectedNode(std::shared_ptr<PNode> node) { 

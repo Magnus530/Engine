@@ -180,6 +180,9 @@ namespace Engine {
     //NodeGridSystem::Grids* NodeGridSystem::m_Grids = new NodeGridSystem::Grids();
     static std::vector<std::shared_ptr<NodeGrid>> m_NodeGrids;
 
+    /* Nodes, that potentially, are no longer obstructions */
+    static std::vector<std::shared_ptr<PNode>> m_PotentiallyFalseObstructions;
+
     std::shared_ptr<NodeGrid> NodeGridSystem::GetGridAtIndex(uint32_t index)
     {
         return m_NodeGrids[0];
@@ -197,43 +200,79 @@ namespace Engine {
         std::vector<std::shared_ptr<PNode>>& nodes = grid->m_Nodes;
 
         // Set nodes within the sphere to Obstructions
-        for (auto& it : nodes)
-        {
-            float distance = glm::length(position - it->m_Data->m_Position);
-            if (distance < radius) {
-               it->SetObstructionStatus(true);
-               grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex).push_back(it);
-            }
-        }
+        UpdateObstructionSphere(gridIndex, sphereIndex, radius, position);
         return sphereIndex;
     }
 
     void NodeGridSystem::UpdateObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex, float radius, glm::vec3 position)
     {
-        // First remove nodes outside of new sphere radius
+        // Remove nodes outside of new sphere radius
         NodeGrid* grid = m_NodeGrids[gridIndex].get();
         std::vector<std::shared_ptr<PNode>>& nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
-        //grid->m_ObstructionSpheres.GetObstructionSphere(sphereIndex).SetValues(radius, position);
-        for (auto& it : nodes)
+        for (const auto it : nodes)
         {
             float distance = glm::length(position - it->m_Data->m_Position);
+            //int distance = (int)(glm::length(position - it->m_Data->m_Position) * 1000);
             if (distance > radius) {
-                it->SetObstructionStatus(false);
+            //if (distance > (int)(radius * 1000)) {
+                if (std::find(m_PotentiallyFalseObstructions.begin(), m_PotentiallyFalseObstructions.end(), it) == m_PotentiallyFalseObstructions.end())
+                    m_PotentiallyFalseObstructions.push_back(it);
             }
         }
-        grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex).clear(); // clear node array
-
+        nodes.clear();
 
         // Set nodes within the sphere to Obstructions
+        std::vector<std::shared_ptr<PNode>> newnodes;
         std::vector<std::shared_ptr<PNode>> gridnodes = grid->m_Nodes;
         for (auto& it : gridnodes)
         {
             float distance = glm::length(position - it->m_Data->m_Position);
-            if (distance < radius)
+            if (distance < radius) {
                 it->SetObstructionStatus(true);
-            grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex).push_back(it);
+                nodes.push_back(it);
+            }
         }
+        //UpdateFalseObstructionNodes(gridIndex);
     }
+
+    void NodeGridSystem::UpdateFalseObstructionNodes(uint32_t gridIndex)
+    {
+        if (m_PotentiallyFalseObstructions.size() == 0) {
+            return;
+        }
+
+        auto nodeGrids = m_NodeGrids[gridIndex];
+        std::vector<std::shared_ptr<PNode>> nodes;
+
+        for (auto& it : nodeGrids->m_ObstructionSpheres.GetNodeCollections())
+            for (auto& it2 : it.m_nodes) {
+                //if (std::find(it.m_nodes.begin(), it.m_nodes.end(), it2) == it.m_nodes.end())
+                    nodes.push_back(it2);
+            }
+
+        //for (const auto& node : nodes) {
+        //    auto it = std::find(m_UpdateObstructionStatus.begin(), m_UpdateObstructionStatus.end(), node);
+        //    if (it == m_UpdateObstructionStatus.end())
+        //        m_UpdateObstructionStatus.erase(it);
+        //}
+
+        //for (auto it : m_UpdateObstructionStatus)
+        if (m_PotentiallyFalseObstructions.begin() != m_PotentiallyFalseObstructions.end())
+            for (auto it = m_PotentiallyFalseObstructions.begin(); it != m_PotentiallyFalseObstructions.end();)
+            {
+                if (m_PotentiallyFalseObstructions.begin() == m_PotentiallyFalseObstructions.end())
+                    break;
+                if (std::find(nodes.begin(), nodes.end(), (*it)) == nodes.end())
+                    (it++);
+                else
+                    m_PotentiallyFalseObstructions.erase(it);
+            }
+            
+        for (auto& obs : m_PotentiallyFalseObstructions)
+            obs->SetObstructionStatus(false);
+        m_PotentiallyFalseObstructions.clear();
+    }
+
     void NodeGridSystem::CreateGridAtLocation(glm::vec3 location, float gridSpacing, int gridSize)
     {
         std::vector<std::shared_ptr<PNode>> nodes;
