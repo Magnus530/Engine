@@ -61,7 +61,7 @@ namespace Engine
 		float m_SplineMovement{};	// How far along the spline has the Entity gone?
 		bool bStartedPathfinding{};
 		bool bReachedTarget{};
-		bool bBlocked{};
+		bool bIsObstructed{};
 
 		PathfindingComponent() = default;
 		PathfindingComponent(const PathfindingComponent&) = default;

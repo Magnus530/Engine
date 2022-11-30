@@ -138,6 +138,9 @@
     <ClInclude Include="src\Engine\Pathfinding\PNode.h">
       <Filter>src\Engine\Pathfinding</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Pathfinding\PathObstructionVolumes.h">
+      <Filter>src\Engine\Pathfinding</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>

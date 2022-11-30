@@ -36,24 +36,20 @@ private:
 	float m_SplineSpeed{ 1.f };
 	bool bObjPathfindActive{};
 
+	uint32_t m_ObstructionSphere;
+
 private: // Visual Aid & ImGui related elements
 	bool bShowShaderColor{ true };
 	std::shared_ptr<Engine::PNode> m_StartNode;
 	std::shared_ptr<Engine::PNode> m_TargetNode;
 	std::vector<std::shared_ptr<Engine::PNode>> m_BlockedNodes;
 
-	struct test
-	{
-		glm::vec3 v;
-		int f, g, h;
-	};
+
 public:
 	PathfindingLayer()
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		E_TRACE("PathNodeData : {0}", sizeof(Engine::PathNodeData));
-		E_TRACE("test : {0}", sizeof(test));
-		E_TRACE("short : {0}", sizeof(short));
+		E_TRACE("PathBlocking Sphere : {0}", sizeof(Engine::PathObstructionSphere));
 
 		/* Pathfinding */
 		//Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), 1.f, 10);
@@ -86,6 +82,10 @@ public:
 
 		m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
 		m_Plane.AddComponent<Engine::RendererComponent>();
+
+		// Set Obstruction Volumes
+		//Engine::NodeGridSystem::SetSphereBlock(0, m_ObstructionSphere);
+		m_ObstructionSphere = Engine::NodeGridSystem::CreateObstructionSphere(0, 2.f, glm::vec3(0.f));
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -154,7 +154,7 @@ public:
 				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", targetColor);
 				alteredColor = true;
 			}
-			else if (it->IsBlock()) {
+			else if (it->IsObstruction()) {
 				std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", blockColor);
 				alteredColor = true;
 			}
@@ -273,14 +273,14 @@ public:
 					if (blockSelected[location]) {
 						blockSelected[location] = 0;
 						selected[location] = 0;
-						node->SetBlock(false);
+						node->SetObstructionStatus(false);
 						auto it = std::find(m_BlockedNodes.begin(), m_BlockedNodes.end(), node);
 						m_BlockedNodes.erase(it);
 					}
 					else {
 						selected[location] = 1;
 						blockSelected[location] = 1;
-						node->SetBlock(true);
+						node->SetObstructionStatus(true);
 						m_BlockedNodes.push_back(node);
 					}
 				}
@@ -301,16 +301,37 @@ public:
 			for (int i = 0; i < 100; i++)
 				selected[i] = blockSelected[i];
 			for (auto& it : m_BlockedNodes)
-				it->SetBlock(false);
+				it->SetObstructionStatus(false);
 			selected[targetSelectedLocation] = 1;
 
 			m_BlockedNodes.clear();
 		}
 
 		ImGui::Separator();
-
+		
+		// SPLINE SPEED ------------------------------------------------------------------------------------
 		ImGui::PushItemWidth(150.f);
 		ImGui::SliderFloat("Spline Speed", &m_SplineSpeed, 0.f, 2.f, "%0.1f");
+		
+
+
+
+		// ADJUST SPHERE OBSTRTUCTION SPHERE ------------------------------------------------------------------------------------
+		ImGui::Separator();
+		ImGui::PushItemWidth(150.f);
+		static float radius{ 2.f };
+		static glm::vec3 pos{ 0.f };
+		const bool r = ImGui::SliderFloat("Obstruction Sphere Radius", &radius, 0.f, 5.f, "%0.1f");
+
+		ImGui::PushItemWidth(100.f);
+		const bool x = ImGui::SliderFloat("X", &pos.x, -5.f, 5.f, "%0.1f");
+		ImGui::SameLine();
+		const bool z = ImGui::SliderFloat("Z", &pos.z, -5.f, 5.f, "%0.1f");
+
+		if (r || x || z)
+			Engine::NodeGridSystem::UpdateObstructionSphere(0, m_ObstructionSphere, radius, pos);
+
+		ImGui::Separator();
 
 		ImGui::End();
 	}

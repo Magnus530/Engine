@@ -1,4 +1,4 @@
-#include "epch.h"
+﻿#include "epch.h"
 #include "PathfindingSystem.h"
 
 namespace Engine {
@@ -16,7 +16,7 @@ namespace Engine {
         //*** END Init Pathfinding ***
 
         // Bit reduntant for pathfinding component to have array of node pointers, when it only uses their locations
-        comp.m_CurrentPath = FindPath(comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bBlocked);
+        comp.m_CurrentPath = FindPath(comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bIsObstructed);
         const bool NoMovIntermediate = comp.m_StartNode == comp.m_IntermediateTargetNode;
         if (NoMovIntermediate) {
             comp.bStartedPathfinding = false;
@@ -121,7 +121,7 @@ namespace Engine {
 
             /* FOUND PATH: Setting Path */
             if (current.get() == end.get()) {
-                /* G�r bakover fra Target til Start */
+                /* Går bakover fra Target til Start */
                 std::shared_ptr<PNode> currentTile = end;
                 while (currentTile != start) {
                     path.push_back(currentTile);
@@ -144,7 +144,7 @@ namespace Engine {
                 auto it = std::find(tosearch.begin(), tosearch.end(), neighbor);
                 bool inSearch = (it != tosearch.end());
 
-                if (neighbor->IsBlock()) { continue; }
+                if (neighbor->IsObstruction()) { continue; }
 
                 it = std::find(processed.begin(), processed.end(), neighbor);
                 if (it != processed.end()) { continue; }
@@ -187,6 +187,50 @@ namespace Engine {
     std::shared_ptr<PNode> NodeGridSystem::GetNodeAtIndexWithinGrid(uint32_t gridIndex, uint32_t nodeIndex)
     {
         return m_NodeGrids[gridIndex]->m_Nodes[nodeIndex];
+    }
+    uint32_t NodeGridSystem::CreateObstructionSphere(uint32_t gridIndex, float radius, glm::vec3 position)
+    {
+        NodeGrid* grid = m_NodeGrids[gridIndex].get();
+        uint32_t sphereIndex = grid->m_ObstructionSpheres.CreateObstructionSphere(radius, position);
+        // Get indexed grid
+        std::vector<std::shared_ptr<PNode>>& nodes = grid->m_Nodes;
+
+        // Set nodes within the sphere to Obstructions
+        for (auto& it : nodes)
+        {
+            float distance = glm::length(position - it->m_Data->m_Position);
+            if (distance < radius) {
+               it->SetObstructionStatus(true);
+               grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex).push_back(it);
+            }
+        }
+        return sphereIndex;
+    }
+    void NodeGridSystem::UpdateObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex, float radius, glm::vec3 position)
+    {
+        // First remove nodes outside of new sphere radius
+        NodeGrid* grid = m_NodeGrids[gridIndex].get();
+        std::vector<std::shared_ptr<PNode>>& nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
+        grid->m_ObstructionSpheres.GetObstructionSphere(sphereIndex).SetValues(radius, position);
+        for (auto& it : nodes)
+        {
+            float distance = glm::length(position - it->m_Data->m_Position);
+            if (distance > radius) {
+                it->SetObstructionStatus(false);
+            }
+        }
+        grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex).clear(); // clear node array
+
+
+        // Set nodes within the sphere to Obstructions
+        std::vector<std::shared_ptr<PNode>> gridnodes = grid->m_Nodes;
+        for (auto& it : gridnodes)
+        {
+            float distance = glm::length(position - it->m_Data->m_Position);
+            if (distance < radius)
+                it->SetObstructionStatus(true);
+            grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex).push_back(it);
+        }
     }
     void NodeGridSystem::CreateGridAtLocation(glm::vec3 location, float gridSpacing, int gridSize)
     {

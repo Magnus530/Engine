@@ -184,6 +184,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\FMOD\AudioEngine.h" />
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Engine\Pathfinding\PNode.h" />
+    <ClInclude Include="src\Engine\Pathfinding\PathObstructionVolumes.h" />
     <ClInclude Include="src\Engine\Renderer\Buffer.h" />
     <ClInclude Include="src\Engine\Renderer\Camera.h" />
     <ClInclude Include="src\Engine\Renderer\GraphicsContext.h" />

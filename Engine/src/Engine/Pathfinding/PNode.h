@@ -64,12 +64,12 @@ namespace Engine {
 		void SetG(int g) { m_DistanceValues->G = g;  m_DistanceValues->F = m_DistanceValues->G + m_DistanceValues->H; }
 		void SetH(PNode* target) { m_DistanceValues->H = GetDistanceToNode(target); }
 
-		bool IsBlock() const { 
+		bool IsObstruction() const { 
 			return m_Data->bIsObstruction;
 		}
-		void SetBlock(bool b)
+		void SetObstructionStatus(bool b)
 		{
-			m_Data->bIsObstruction = true;
+			m_Data->bIsObstruction = b;
 		}
 	};
 }

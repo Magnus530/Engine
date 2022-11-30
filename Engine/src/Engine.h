@@ -39,6 +39,7 @@
 
 // --------------Pathfinding---------------
 #include "Engine/Pathfinding/PNode.h"
+#include "Engine/Pathfinding/PathObstructionVolumes.h"
 
 // --------------Mesh Objects---------------
 #include "Engine/AssetInit/ObjLoader.h"
