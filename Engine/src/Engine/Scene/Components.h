@@ -67,12 +67,18 @@ namespace Engine
 		PathfindingComponent(const PathfindingComponent&) = default;
 	};
 
-	class TestComponent
+	struct ObstructionSphereComponent
 	{
-	public:
-		TestComponent();
-		~TestComponent();
-
-		int data{};
+		float m_radius{};
+		uint32_t m_obstructionSphere;
 	};
+
+	//class TestComponent
+	//{
+	//public:
+	//	TestComponent();
+	//	~TestComponent();
+
+	//	int data{};
+	//};
 }

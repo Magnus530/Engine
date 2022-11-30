@@ -26,6 +26,7 @@ private:
 	
 	std::shared_ptr<Engine::VertexArray> m_VA;
 	std::shared_ptr<Engine::VertexArray> m_PlaneVA;
+	std::shared_ptr<Engine::VertexArray> m_BeveledCubeVA;
 	std::shared_ptr<Engine::Scene> m_Scene;
 	Engine::Entity m_Entity;
 	Engine::Entity m_Plane;
@@ -36,6 +37,8 @@ private:
 	float m_SplineSpeed{ 1.f };
 	bool bObjPathfindActive{};
 
+	Engine::Entity m_Obstructor;
+	
 	uint32_t m_ObstructionSphere;
 
 private: // Visual Aid & ImGui related elements
@@ -49,7 +52,7 @@ public:
 	PathfindingLayer()
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		E_TRACE("PathBlocking Sphere : {0}", sizeof(Engine::PathObstructionSphere));
+		//E_TRACE("PathBlocking Sphere : {0}", sizeof(Engine::PathObstructionSphere));
 
 		/* Pathfinding */
 		//Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), 1.f, 10);
@@ -84,8 +87,13 @@ public:
 		m_Plane.AddComponent<Engine::RendererComponent>();
 
 		// Set Obstruction Volumes
-		//Engine::NodeGridSystem::SetSphereBlock(0, m_ObstructionSphere);
-		m_ObstructionSphere = Engine::NodeGridSystem::CreateObstructionSphere(0, 2.f, glm::vec3(0.f));
+		m_Obstructor = Engine::EntityInitializer::GetInstance().EntityInit("BeveledCube", m_BeveledCubeVA, m_Scene);
+		m_Obstructor.AddComponent<Engine::RendererComponent>();
+		m_Obstructor.AddComponent<Engine::ObstructionSphereComponent>();
+		auto& obstruction = m_Obstructor.GetComponent<Engine::ObstructionSphereComponent>();
+		auto& transform = m_Obstructor.GetComponent<Engine::TransformComponent>();
+		obstruction.m_radius = 2.f;
+		obstruction.m_obstructionSphere = Engine::NodeGridSystem::CreateObstructionSphere(0, obstruction.m_radius, transform.GetPosition());
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -136,6 +144,8 @@ public:
 
 		Engine::TransformSystem::UpdateMatrix(transform);
 		Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
+		auto& transform2 = m_Obstructor.GetComponent<Engine::TransformComponent>();
+		Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", bShowShaderColor);
 		/* ------- RENDER NODEGRID -------- */
@@ -328,8 +338,14 @@ public:
 		ImGui::SameLine();
 		const bool z = ImGui::SliderFloat("Z", &pos.z, -5.f, 5.f, "%0.1f");
 
-		if (r || x || z)
-			Engine::NodeGridSystem::UpdateObstructionSphere(0, m_ObstructionSphere, radius, pos);
+		if (r || x || z) {
+			auto& obs = m_Obstructor.GetComponent<Engine::ObstructionSphereComponent>();
+			obs.m_radius = radius;
+			auto& transform = m_Obstructor.GetComponent<Engine::TransformComponent>();
+			Engine::TransformSystem::SetWorldPosition(transform, pos);
+			Engine::TransformSystem::UpdateMatrix(transform);
+			Engine::NodeGridSystem::UpdateObstructionSphere(0, obs.m_obstructionSphere, obs.m_radius, transform.GetPosition());
+		}
 
 		ImGui::Separator();
 

@@ -188,6 +188,7 @@ namespace Engine {
     {
         return m_NodeGrids[gridIndex]->m_Nodes[nodeIndex];
     }
+
     uint32_t NodeGridSystem::CreateObstructionSphere(uint32_t gridIndex, float radius, glm::vec3 position)
     {
         NodeGrid* grid = m_NodeGrids[gridIndex].get();
@@ -206,12 +207,13 @@ namespace Engine {
         }
         return sphereIndex;
     }
+
     void NodeGridSystem::UpdateObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex, float radius, glm::vec3 position)
     {
         // First remove nodes outside of new sphere radius
         NodeGrid* grid = m_NodeGrids[gridIndex].get();
         std::vector<std::shared_ptr<PNode>>& nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
-        grid->m_ObstructionSpheres.GetObstructionSphere(sphereIndex).SetValues(radius, position);
+        //grid->m_ObstructionSpheres.GetObstructionSphere(sphereIndex).SetValues(radius, position);
         for (auto& it : nodes)
         {
             float distance = glm::length(position - it->m_Data->m_Position);
