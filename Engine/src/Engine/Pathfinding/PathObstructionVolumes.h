@@ -39,8 +39,14 @@ namespace Engine {
 			m_spherecollection.emplace_back(ObstructionSphereNodes());
 			return m_spherecount++;
 		}
-		//PathObstructionSphere GetObstructionSphere(uint32_t index) const { return m_spheres[index]; }
-		std::vector<ObstructionSphereNodes>& GetNodeCollections() { return m_spherecollection; }
+		//ObstructionSphereNodes& GetObstructionSpheres() { return m_spherecollection; }
+		void EraseSphere(uint32_t index) {
+			m_spherecount--;
+			auto& it = m_spherecollection.begin();
+			(it += index);
+			m_spherecollection.erase(it);
+		}
+		std::vector<ObstructionSphereNodes>& GetSphereCollections() { return m_spherecollection; }
 		std::vector<std::shared_ptr<class PNode>>& GetObstructionSphereNodes(uint32_t index) { return m_spherecollection[index].m_nodes; }
 
 

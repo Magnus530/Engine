@@ -90,8 +90,8 @@ public:
 		// Creating Pathfinding Obstructions 
 		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, så Initialiserer den for seg selv her
 
-		CreateObstructor(glm::vec3(  5.f,  0.f,   5.f), 4.f);
-		CreateObstructor(glm::vec3( -5.f,  0.f,   5.f), 3.f);
+		CreateObstructor(glm::vec3(  5.f,  0.f,   5.f), 2.f);
+		//CreateObstructor(glm::vec3( -5.f,  0.f,   5.f), 3.f);
 	}
 
 	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
@@ -453,7 +453,9 @@ public:
 	}
 	void DeleteObstructor()
 	{
-		if (m_Obstructors.size() == 0) return;
+		uint32_t size = m_Obstructors.size();
+		if (size == 0) return;
+		Engine::NodeGridSystem::DeleteObstructionSphere(0, size - 1);
 		m_Obstructors.erase(--m_Obstructors.end());
 	}
 };

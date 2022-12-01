@@ -204,17 +204,28 @@ namespace Engine {
         return sphereIndex;
     }
 
+    void NodeGridSystem::DeleteObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex)
+    {
+        NodeGrid* grid = m_NodeGrids[gridIndex].get();
+        std::vector<std::shared_ptr<PNode>> nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
+        for (const auto it : nodes)
+            m_PotentiallyFalseObstructions.push_back(it);
+        grid->m_ObstructionSpheres.EraseSphere(sphereIndex);
+    }   
+
     void NodeGridSystem::UpdateObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex, float radius, glm::vec3 position)
     {
+        int floatToInt = 1000;
+        int intRadius = (int)(radius * floatToInt);
+
         // Remove nodes outside of new sphere radius
         NodeGrid* grid = m_NodeGrids[gridIndex].get();
         std::vector<std::shared_ptr<PNode>>& nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
-        for (const auto it : nodes)
+        for (const auto& it : nodes)
         {
-            float distance = glm::length(position - it->m_Data->m_Position);
-            //int distance = (int)(glm::length(position - it->m_Data->m_Position) * 1000);
-            if (distance > radius) {
-            //if (distance > (int)(radius * 1000)) {
+            //float distance = glm::length(position - it->m_Data->m_Position);
+            int distance = (int)(glm::length(position - it->m_Data->m_Position) * floatToInt);
+            if (distance > intRadius) {
                 if (std::find(m_PotentiallyFalseObstructions.begin(), m_PotentiallyFalseObstructions.end(), it) == m_PotentiallyFalseObstructions.end())
                     m_PotentiallyFalseObstructions.push_back(it);
             }
@@ -222,12 +233,13 @@ namespace Engine {
         nodes.clear();
 
         // Set nodes within the sphere to Obstructions
-        std::vector<std::shared_ptr<PNode>> newnodes;
         std::vector<std::shared_ptr<PNode>> gridnodes = grid->m_Nodes;
         for (auto& it : gridnodes)
         {
-            float distance = glm::length(position - it->m_Data->m_Position);
-            if (distance < radius) {
+            //float distance = glm::length(position - it->m_Data->m_Position);
+            //float distance = glm::length(position - it->m_Data->m_Position);
+            int distance = (int)(glm::length(position - it->m_Data->m_Position) * floatToInt);
+            if (distance <= intRadius) {
                 it->SetObstructionStatus(true);
                 nodes.push_back(it);
             }
@@ -237,36 +249,28 @@ namespace Engine {
 
     void NodeGridSystem::UpdateFalseObstructionNodes(uint32_t gridIndex)
     {
-        if (m_PotentiallyFalseObstructions.size() == 0) {
-            return;
-        }
+        if (m_PotentiallyFalseObstructions.size() == 0) return;
 
-        auto nodeGrids = m_NodeGrids[gridIndex];
+        auto& nodeGrids = m_NodeGrids[gridIndex];
         std::vector<std::shared_ptr<PNode>> nodes;
 
-        for (auto& it : nodeGrids->m_ObstructionSpheres.GetNodeCollections())
-            for (auto& it2 : it.m_nodes) {
-                //if (std::find(it.m_nodes.begin(), it.m_nodes.end(), it2) == it.m_nodes.end())
+        for (const auto& it : nodeGrids->m_ObstructionSpheres.GetSphereCollections())
+            for (const auto& it2 : it.m_nodes)
                     nodes.push_back(it2);
-            }
 
-        //for (const auto& node : nodes) {
-        //    auto it = std::find(m_UpdateObstructionStatus.begin(), m_UpdateObstructionStatus.end(), node);
-        //    if (it == m_UpdateObstructionStatus.end())
-        //        m_UpdateObstructionStatus.erase(it);
-        //}
-
-        //for (auto it : m_UpdateObstructionStatus)
-        if (m_PotentiallyFalseObstructions.begin() != m_PotentiallyFalseObstructions.end())
-            for (auto it = m_PotentiallyFalseObstructions.begin(); it != m_PotentiallyFalseObstructions.end();)
-            {
-                if (m_PotentiallyFalseObstructions.begin() == m_PotentiallyFalseObstructions.end())
-                    break;
-                if (std::find(nodes.begin(), nodes.end(), (*it)) == nodes.end())
-                    (it++);
-                else
+        for (auto it = m_PotentiallyFalseObstructions.begin(); it != m_PotentiallyFalseObstructions.end();)
+        {
+            bool b{};
+            for (const auto& it2 : nodes) {
+                if (it2 == (*it)) {
                     m_PotentiallyFalseObstructions.erase(it);
+                    b = true;
+                    break;
+                }
             }
+            if (m_PotentiallyFalseObstructions.size() == 0) break;
+            if (!b) (++it);
+        }
             
         for (auto& obs : m_PotentiallyFalseObstructions)
             obs->SetObstructionStatus(false);

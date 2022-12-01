@@ -47,6 +47,7 @@ namespace Engine {
 		static std::shared_ptr<PNode> GetNodeAtIndexWithinGrid(uint32_t gridIndex, uint32_t nodeIndex);
 
 		static uint32_t CreateObstructionSphere(uint32_t gridIndex, float radius, glm::vec3 position);
+		static void DeleteObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex);
 		static void UpdateObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex, float radius, glm::vec3 position);
 		static void UpdateFalseObstructionNodes(uint32_t gridIndex);
 
