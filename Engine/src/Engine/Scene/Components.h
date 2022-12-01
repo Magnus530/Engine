@@ -78,7 +78,6 @@ namespace Engine
 	//public:
 	//	TestComponent();
 	//	~TestComponent();
-
 	//	int data{};
 	//};
 }

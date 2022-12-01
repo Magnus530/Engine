@@ -37,7 +37,6 @@ private:
 	float m_SplineSpeed{ 1.f };
 	bool bObjPathfindActive{};
 
-	//Engine::Entity m_Obstructor;
 	std::vector<Engine::Entity> m_Obstructors;
 
 	//uint32_t m_ObstructionSphere;
@@ -90,8 +89,7 @@ public:
 		// Creating Pathfinding Obstructions 
 		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, så Initialiserer den for seg selv her
 
-		CreateObstructor(glm::vec3(  5.f,  0.f,   5.f), 2.f);
-		//CreateObstructor(glm::vec3( -5.f,  0.f,   5.f), 3.f);
+		//CreateObstructor(glm::vec3(  5.f,  0.f,   5.f), 2.f);
 	}
 
 	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
@@ -311,28 +309,12 @@ public:
 			}
 		// NODE MENU END ---------------------------------------------------------------------------------
 
-
-		// CLEAR BLOCKED NODE ----------------------------------------------------------------------------
-		//if (ImGui::Button("Clear Blocked Nodes", ImVec2(100.f, 20.f))) {
-		//	for (auto& it : blockSelected)
-		//		it = 0;
-		//	for (int i = 0; i < 100; i++)
-		//		selected[i] = blockSelected[i];
-		//	for (auto& it : m_BlockedNodes)
-		//		it->SetObstructionStatus(false);
-		//	selected[targetSelectedLocation] = 1;
-		//
-		//	m_BlockedNodes.clear();
-		//}
-
 		ImGui::Separator();
 		
 		// SPLINE SPEED ------------------------------------------------------------------------------------
 		ImGui::PushItemWidth(150.f);
 		ImGui::SliderFloat("Spline Speed", &m_SplineSpeed, 0.f, 2.f, "%0.1f");
 		
-
-
 
 		// ADJUST OBSTRTUCTION ENTITIES ------------------------------------------------------------------------------------
 		ImGui::Separator();
@@ -344,23 +326,12 @@ public:
 			DeleteObstructor();
 
 		uint32_t size = m_Obstructors.size();
-		//std::vector<glm::vec3> positions;
-		//std::vector<bool> bRadius;
-		//std::vector<bool> bPositionsX;
-		//std::vector<bool> bPositionsZ;
-		//for (uint32_t i{}; i < size; i++) {
-		//	positions.push_back(glm::vec3(0.f));
-		//	bRadius.push_back(false);
-		//	bPositionsX.push_back(false);
-		//	bPositionsZ.push_back(false);
-		//}
-		
+
 		static auto ID = ImGui::GetActiveID();
 		for (uint32_t i{}; i < size; i++)
 		{
 			ImGui::Separator();
 			ImGui::PushID(i);
-			//E_TRACE("ImGuiID {0}", ImGui::GetActiveID());
 			auto& obstruction = m_Obstructors[i].GetComponent<Engine::ObstructionSphereComponent>();
 			auto& transform = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
 
@@ -377,38 +348,18 @@ public:
 
 			ImGui::SameLine();
 			const bool z = ImGui::SliderFloat("Z", &pos.z, -5.f, 5.f, "%0.1f");
-			//ImGui::GetActiveID();
 
 			if (r || x || z) {
 				ID = ImGui::GetActiveID();
 				
 				Engine::TransformSystem::SetWorldPosition(transform, pos);
 				Engine::TransformSystem::UpdateMatrix(transform);
-				//E_TRACE("radius {0}", obstruction.m_radius);
 				Engine::NodeGridSystem::UpdateObstructionSphere(0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
 			}
 			ImGui::PopID();
 			ImGui::Separator();
 		}
 
-		if (ImGui::Button("UpdateTEST", ImVec2(100.f, 75.f)))
-			for (uint32_t i{}; i < size; i++)
-			{
-				auto& obstruction = m_Obstructors[i].GetComponent<Engine::ObstructionSphereComponent>();
-				auto& transform = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
-				Engine::NodeGridSystem::UpdateObstructionSphere(0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
-			}
-
-
-		//if (at != -1)
-		//{
-		//	auto& obstruction = m_Obstructors[at].GetComponent<Engine::ObstructionSphereComponent>();
-		//	auto& transform = m_Obstructors[at].GetComponent<Engine::TransformComponent>();
-		//	Engine::TransformSystem::SetWorldPosition(transform, positions[at]);
-		//	Engine::TransformSystem::UpdateMatrix(transform);
-		//	Engine::NodeGridSystem::UpdateObstructionSphere(0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
-		//}
-		//positions.clear();
 
 		ImGui::End();
 	}

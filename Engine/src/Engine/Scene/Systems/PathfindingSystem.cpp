@@ -181,7 +181,7 @@ namespace Engine {
     static std::vector<std::shared_ptr<NodeGrid>> m_NodeGrids;
 
     /* Nodes, that potentially, are no longer obstructions */
-    static std::vector<std::shared_ptr<PNode>> m_PotentiallyFalseObstructions;
+    static std::vector<std::shared_ptr<PNode>> m_PotentiallyFalseObstructions;  // TODO: make separate object. Created on Updating ObstructionComponent 
 
     std::shared_ptr<NodeGrid> NodeGridSystem::GetGridAtIndex(uint32_t index)
     {
@@ -223,7 +223,6 @@ namespace Engine {
         std::vector<std::shared_ptr<PNode>>& nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
         for (const auto& it : nodes)
         {
-            //float distance = glm::length(position - it->m_Data->m_Position);
             int distance = (int)(glm::length(position - it->m_Data->m_Position) * floatToInt);
             if (distance > intRadius) {
                 if (std::find(m_PotentiallyFalseObstructions.begin(), m_PotentiallyFalseObstructions.end(), it) == m_PotentiallyFalseObstructions.end())
@@ -236,15 +235,12 @@ namespace Engine {
         std::vector<std::shared_ptr<PNode>> gridnodes = grid->m_Nodes;
         for (auto& it : gridnodes)
         {
-            //float distance = glm::length(position - it->m_Data->m_Position);
-            //float distance = glm::length(position - it->m_Data->m_Position);
             int distance = (int)(glm::length(position - it->m_Data->m_Position) * floatToInt);
             if (distance <= intRadius) {
                 it->SetObstructionStatus(true);
                 nodes.push_back(it);
             }
         }
-        //UpdateFalseObstructionNodes(gridIndex);
     }
 
     void NodeGridSystem::UpdateFalseObstructionNodes(uint32_t gridIndex)
@@ -258,18 +254,23 @@ namespace Engine {
             for (const auto& it2 : it.m_nodes)
                     nodes.push_back(it2);
 
-        for (auto it = m_PotentiallyFalseObstructions.begin(); it != m_PotentiallyFalseObstructions.end();)
+        const auto vec = m_PotentiallyFalseObstructions;
+        for (auto it = vec.begin(); it != vec.end(); it++)
         {
-            bool b{};
             for (const auto& it2 : nodes) {
-                if (it2 == (*it)) {
-                    m_PotentiallyFalseObstructions.erase(it);
-                    b = true;
-                    break;
+                if (it2 == (*it)) 
+                {
+                    for (auto it3 = m_PotentiallyFalseObstructions.begin(); it3 != m_PotentiallyFalseObstructions.end();) 
+                    {
+                        if ((*it3) == (*it)) {
+                            m_PotentiallyFalseObstructions.erase(it3);
+                            break;
+                        }
+                        else
+                            it3++;
+                    }
                 }
             }
-            if (m_PotentiallyFalseObstructions.size() == 0) break;
-            if (!b) (++it);
         }
             
         for (auto& obs : m_PotentiallyFalseObstructions)
