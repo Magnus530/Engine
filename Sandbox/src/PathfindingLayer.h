@@ -47,6 +47,10 @@ private: // Visual Aid & ImGui related elements
 	std::shared_ptr<Engine::PNode> m_TargetNode;
 	std::vector<std::shared_ptr<Engine::PNode>> m_BlockedNodes;
 
+private: // Screen Raytracing
+	glm::vec2 mousePos;
+	Engine::Entity m_BeveledCube;
+
 
 public:
 	PathfindingLayer()
@@ -85,6 +89,9 @@ public:
 
 		m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
 		m_Plane.AddComponent<Engine::RendererComponent>();
+
+		m_BeveledCube = Engine::EntityInitializer::GetInstance().EntityInit("BeveledCube", m_Scene);
+		//Engine::TransformSystem::SetWorldPosition(m_BeveledCube.GetComponent<Engine::TransformComponent>(), glm::vec3(0.f));
 
 		// Creating Pathfinding Obstructions 
 		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, så Initialiserer den for seg selv her
@@ -144,6 +151,9 @@ public:
 
 		Engine::TransformSystem::UpdateMatrix(transform);
 		Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
+		
+		Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, m_BeveledCube.GetComponent<Engine::TransformComponent>().m_Transform);		// Render m_BeveledCube
+		
 
 		/*-----------RENDER OBSTRUCTIONS---------------*/
 		for (uint32_t i{}; i < m_Obstructors.size(); i++)
@@ -151,6 +161,7 @@ public:
 			auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
 			Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
 		}
+
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", bShowShaderColor);
 		/* ------- RENDER NODEGRID -------- */
@@ -364,6 +375,33 @@ public:
 		ImGui::End();
 	}
 
+	//----------------------------------------------------------------ON EVENT-------------------------------------------------------------------------------------------------------------------------
+	virtual void OnEvent(Engine::Event& e)
+	{
+		if (e.GetEventType() == Engine::EventType::MouseMoved)
+		{
+			Engine::MouseMovedEvent& event = (Engine::MouseMovedEvent&)e;
+			mousePos.x = event.GetX();
+			mousePos.y = event.GetY();
+		}
+
+		if (e.GetEventType() == Engine::EventType::MouseButtonPressed && Engine::Input::IsMouseButtonPressed(E_MOUSE_BUTTON_1))
+		{
+			glm::vec3 ray{};
+			Engine::RayCast::FromScreenPosition(ray, mousePos, m_PCameraController.GetCamera().GetProjectionMatrix(), m_PCameraController.GetCamera().GetViewMatrix());
+
+			glm::vec3 pos = m_PCameraController.GetCamera().GetPosition();
+			glm::vec3 Intersection;
+			if (Engine::RayCast::IntersectionWithPlaneXZ(Intersection, ray, pos))
+				Engine::TransformSystem::SetWorldPosition(m_BeveledCube.GetComponent<Engine::TransformComponent>(), Intersection);
+
+			E_TRACE("Intersection: {0}, {1}, {2}", Intersection.x, Intersection.y, Intersection.z);
+		}
+	}
+
+
+
+	//----------------------------------------------------------------Smaller Specific Functions-------------------------------------------------------------------------------------------------------------------------
 	void InitVertexArray(std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr)
 	{
 		std::vector<Engine::Vertex> vertices;

@@ -175,6 +175,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\Core\LayerStack.h" />
     <ClInclude Include="src\Engine\Core\Log.h" />
     <ClInclude Include="src\Engine\Core\MouseButtonCodes.h" />
+    <ClInclude Include="src\Engine\RayCast\RayCast.h" />
     <ClInclude Include="src\Engine\Core\Timestep.h" />
     <ClInclude Include="src\Engine\Core\Window.h" />
     <ClInclude Include="src\Engine\Events\ApplicationEvent.h" />
@@ -639,6 +640,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\Engine\Core\Layer.cpp" />
     <ClCompile Include="src\Engine\Core\LayerStack.cpp" />
     <ClCompile Include="src\Engine\Core\Log.cpp" />
+    <ClCompile Include="src\Engine\RayCast\RayCast.cpp" />
     <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp" />
