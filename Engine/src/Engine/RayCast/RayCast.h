@@ -10,14 +10,18 @@ namespace Engine {
 	public:	// Raycast functions
 		static void FromScreenPosition(glm::vec3& ray, glm::vec2 screenPosition, glm::mat4 projection, glm::mat4 view);
 
-		static bool IntersectionWithPlaneXZ(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos);
-		static bool IntersectionWithPlaneXY(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos);
-		static bool IntersectionWithPlaneZY(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos);
+		static bool IntersectWithWAPlaneXZ(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos);
+		static bool IntersectWithWAPlaneXY(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos);
+		static bool IntersectWithWAPlaneZY(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos);
+
+		static bool IntersectWithAlignedPlane(glm::vec3& intersect_OUT, const glm::vec3& planeNormal, const glm::vec3& planePosition, const glm::vec3& ray, const glm::vec3& rayPosition);
+
+		static bool IntersectSphere(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& rayPosition, const glm::vec3& spherePosition, const float& sphereRadius);
 
 	private: // IMPL funcitons
-		static void IntersectionWithPlaneXZ_IMPL(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos);
-		static void IntersectionWithPlaneXY_IMPL(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos);
-		static void IntersectionWithPlaneZY_IMPL(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos);
+		static void IntersectWithWAPlaneXZ_IMPL(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos);
+		static void IntersectWithWAPlaneXY_IMPL(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos);
+		static void IntersectWithWAPlaneZY_IMPL(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos);
 
 	private:
 		struct WindowSize

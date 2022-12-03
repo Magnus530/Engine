@@ -392,10 +392,14 @@ public:
 
 			glm::vec3 pos = m_PCameraController.GetCamera().GetPosition();
 			glm::vec3 Intersection;
-			if (Engine::RayCast::IntersectionWithPlaneXZ(Intersection, ray, pos))
+			//if (Engine::RayCast::IntersectWithWAPlaneXZ(Intersection, ray, pos))
+			//glm::vec3 normal(0, sqrtf(2) / 2, sqrtf(2) / 2);
+			//if (Engine::RayCast::IntersectWithAlignedPlane(Intersection, normal, { 0,0,0 }, ray, pos))
+			if (Engine::RayCast::IntersectSphere(Intersection, ray, pos, { 0,0,0 }, 2.f))
 				Engine::TransformSystem::SetWorldPosition(m_BeveledCube.GetComponent<Engine::TransformComponent>(), Intersection);
 
 			E_TRACE("Intersection: {0}, {1}, {2}", Intersection.x, Intersection.y, Intersection.z);
+			//E_INFO("Radius: {0}", glm::length(m_BeveledCube.GetComponent<Engine::TransformComponent>().GetPosition() - glm::vec3(0)));
 		}
 	}
 

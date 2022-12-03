@@ -25,6 +25,9 @@
     <Filter Include="src\Engine\Pathfinding">
       <UniqueIdentifier>{0D4C45E0-F945-6E32-E2B2-0443CE4BD49E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\RayCast">
+      <UniqueIdentifier>{78813987-6465-FADC-CDC5-F42FB9C8E45E}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
     </Filter>
@@ -140,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Pathfinding\PathObstructionVolumes.h">
       <Filter>src\Engine\Pathfinding</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\RayCast\RayCast.h">
+      <Filter>src\Engine\RayCast</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
@@ -1482,7 +1488,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\RayCast\RayCast.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1511,6 +1516,9 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
       <Filter>src\Engine\Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\RayCast\RayCast.cpp">
+      <Filter>src\Engine\RayCast</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp">
       <Filter>src\Engine\Renderer</Filter>
@@ -1596,6 +1604,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\RayCast\RayCast.cpp" />
   </ItemGroup>
 </Project>
