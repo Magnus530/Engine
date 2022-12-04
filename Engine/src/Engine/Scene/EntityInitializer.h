@@ -25,6 +25,7 @@ namespace Engine
 
 		static EntityInitializer& GetInstance() { return *m_Instance; }
 
+		static Engine::Entity EntityInit(const std::string objname, std::shared_ptr<Engine::Scene>& Scene);
 		static Engine::Entity EntityInit(const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& Scene);
 		static Engine::Entity EntityInit(int shapenum, std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& Scene);
 
