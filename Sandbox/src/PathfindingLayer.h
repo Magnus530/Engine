@@ -47,9 +47,9 @@ private: // Visual Aid & ImGui related elements
 	std::shared_ptr<Engine::PNode> m_TargetNode;
 	std::vector<std::shared_ptr<Engine::PNode>> m_BlockedNodes;
 
-private: // Screen Raytracing
+private: // Screen RayCasting
 	glm::vec2 mousePos;
-	Engine::Entity m_BeveledCube;
+	//Engine::Entity m_BeveledCube;
 
 
 public:
@@ -90,7 +90,7 @@ public:
 		m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
 		m_Plane.AddComponent<Engine::RendererComponent>();
 
-		m_BeveledCube = Engine::EntityInitializer::GetInstance().EntityInit("BeveledCube", m_Scene);
+		//m_BeveledCube = Engine::EntityInitializer::GetInstance().EntityInit("BeveledCube", m_Scene);
 		//Engine::TransformSystem::SetWorldPosition(m_BeveledCube.GetComponent<Engine::TransformComponent>(), glm::vec3(0.f));
 
 		// Creating Pathfinding Obstructions 
@@ -152,7 +152,7 @@ public:
 		Engine::TransformSystem::UpdateMatrix(transform);
 		Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
 		
-		Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, m_BeveledCube.GetComponent<Engine::TransformComponent>().m_Transform);		// Render m_BeveledCube
+		//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, m_BeveledCube.GetComponent<Engine::TransformComponent>().m_Transform);		// Render m_BeveledCube
 		
 
 		/*-----------RENDER OBSTRUCTIONS---------------*/
@@ -224,107 +224,107 @@ public:
 
 		// ----------------------------------------- NODE MENU BEGIN ------------------------------------------------------------------------
 		// Target Nodes
-		static int targetSelected[100];
-		static int targetSelectedLocation{ -1 };
-		// Blocked Nodes 
-		static int blockSelected[100];
+		//static int targetSelected[100];
+		//static int targetSelectedLocation{ -1 };
+		//// Blocked Nodes 
+		//static int blockSelected[100];
 
-		static int selected[100];
-		for (int y = 0; y < 10; y++)
-			for (int x = 0; x < 10; x++)
-			{
-				if (x > 0)
-					ImGui::SameLine();
-				int location = x * 10 + y;
-				std::string name{ Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location)->m_Data->m_Name };
-				name.insert(5, "\n");
+		//static int selected[100];
+		//for (int y = 0; y < 10; y++)
+		//	for (int x = 0; x < 10; x++)
+		//	{
+		//		if (x > 0)
+		//			ImGui::SameLine();
+		//		int location = x * 10 + y;
+		//		std::string name{ Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location)->m_Data->m_Name };
+		//		name.insert(5, "\n");
 
-				//** SET STYLE
-				// Set Block
-				if (ImGui::IsMouseDown(1)) 
-				{
-					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.6f, 0.6f, 0.6f, 1.f));
-					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.6f, 0.6f, 0.6f, 1.f));
-				}
-				// Set Target
-				else 
-				{
-					ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.4f, 0.2f, 0.3f, 1.f));
-					ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.7f, 0.3f, 0.5f, 1.f));
-				}
-				//*********
+		//		//** SET STYLE
+		//		// Set Block
+		//		if (ImGui::IsMouseDown(1)) 
+		//		{
+		//			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.6f, 0.6f, 0.6f, 1.f));
+		//			ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.6f, 0.6f, 0.6f, 1.f));
+		//		}
+		//		// Set Target
+		//		else 
+		//		{
+		//			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.4f, 0.2f, 0.3f, 1.f));
+		//			ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.7f, 0.3f, 0.5f, 1.f));
+		//		}
+		//		//*********
 
-				bool bHeader{};
-				if (blockSelected[location]) {
-					ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.4f, 0.4f, 0.4f, 1.f));
-					bHeader = true;
-				}
-				else if (targetSelected[location]) {
-					ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 1.f, 1.f));
-					bHeader = true;
-				}
+		//		bool bHeader{};
+		//		if (blockSelected[location]) {
+		//			ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.4f, 0.4f, 0.4f, 1.f));
+		//			bHeader = true;
+		//		}
+		//		else if (targetSelected[location]) {
+		//			ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 1.f, 1.f));
+		//			bHeader = true;
+		//		}
 
-				// Creating the selectable grid 
-				if (ImGui::Selectable(name.c_str(), selected[location] != 0, 0, ImVec2(50.f, 50.f)))
-				{
-					// Remove selected at location if in-active
-					for (int i = 0; i < 100; i++)
-						selected[i] = blockSelected[i];
-					if (targetSelectedLocation != -1)
-						selected[targetSelectedLocation] = 1;
-				}
+		//		// Creating the selectable grid 
+		//		if (ImGui::Selectable(name.c_str(), selected[location] != 0, 0, ImVec2(50.f, 50.f)))
+		//		{
+		//			// Remove selected at location if in-active
+		//			for (int i = 0; i < 100; i++)
+		//				selected[i] = blockSelected[i];
+		//			if (targetSelectedLocation != -1)
+		//				selected[targetSelectedLocation] = 1;
+		//		}
 
-				//** Left click - Set target and start pathfinding
-				if (ImGui::IsItemClicked(0)) {
-					std::shared_ptr<Engine::PNode> node = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location);
+		//		//** Left click - Set target and start pathfinding
+		//		if (ImGui::IsItemClicked(0)) {
+		//			std::shared_ptr<Engine::PNode> node = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location);
 
-					targetSelected[location] = 1;
-					if (location != targetSelectedLocation && targetSelectedLocation != -1) {
-						targetSelected[targetSelectedLocation] = 0;
-					}
-					targetSelectedLocation = location;
-					m_TargetNode = node;
+		//			targetSelected[location] = 1;
+		//			if (location != targetSelectedLocation && targetSelectedLocation != -1) {
+		//				targetSelected[targetSelectedLocation] = 0;
+		//			}
+		//			targetSelectedLocation = location;
+		//			m_TargetNode = node;
 
-					//** INIT PATHFINDING ******
-					auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
-					auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-					pathfinder.m_TargetNode = m_TargetNode;
-					Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0, 0.5f, 0));
-					//********
-				}
+		//			//** INIT PATHFINDING ******
+		//			auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
+		//			auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+		//			pathfinder.m_TargetNode = m_TargetNode;
+		//			Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0, 0.5f, 0));
+		//			//********
+		//		}
 
-				//** Right click - Set node to block 
-				if (ImGui::IsItemClicked(1)) {
-					std::shared_ptr<Engine::PNode> node = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location);
+		//		//** Right click - Set node to block 
+		//		if (ImGui::IsItemClicked(1)) {
+		//			std::shared_ptr<Engine::PNode> node = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, location);
 
-					if (blockSelected[location]) {
-						blockSelected[location] = 0;
-						selected[location] = 0;
-						node->SetObstructionStatus(false);
-						auto it = std::find(m_BlockedNodes.begin(), m_BlockedNodes.end(), node);
-						m_BlockedNodes.erase(it);
-					}
-					else {
-						selected[location] = 1;
-						blockSelected[location] = 1;
-						node->SetObstructionStatus(true);
-						m_BlockedNodes.push_back(node);
-					}
-				}
+		//			if (blockSelected[location]) {
+		//				blockSelected[location] = 0;
+		//				selected[location] = 0;
+		//				node->SetObstructionStatus(false);
+		//				auto it = std::find(m_BlockedNodes.begin(), m_BlockedNodes.end(), node);
+		//				m_BlockedNodes.erase(it);
+		//			}
+		//			else {
+		//				selected[location] = 1;
+		//				blockSelected[location] = 1;
+		//				node->SetObstructionStatus(true);
+		//				m_BlockedNodes.push_back(node);
+		//			}
+		//		}
 
-				if (bHeader)
-					ImGui::PopStyleColor();
+		//		if (bHeader)
+		//			ImGui::PopStyleColor();
 
-				ImGui::PopStyleColor();
-				ImGui::PopStyleColor();
-			}
+		//		ImGui::PopStyleColor();
+		//		ImGui::PopStyleColor();
+		//	}
 		// NODE MENU END ---------------------------------------------------------------------------------
 
 		ImGui::Separator();
 		
 		// SPLINE SPEED ------------------------------------------------------------------------------------
 		ImGui::PushItemWidth(150.f);
-		ImGui::SliderFloat("Spline Speed", &m_SplineSpeed, 0.f, 2.f, "%0.1f");
+		ImGui::SliderFloat("Monkey Movement Speed", &m_SplineSpeed, 0.f, 2.f, "%0.1f");
 		
 
 		// ADJUST OBSTRTUCTION ENTITIES ------------------------------------------------------------------------------------
@@ -392,13 +392,20 @@ public:
 
 			glm::vec3 pos = m_PCameraController.GetCamera().GetPosition();
 			glm::vec3 Intersection;
-			//if (Engine::RayCast::IntersectWithWAPlaneXZ(Intersection, ray, pos))
-			//glm::vec3 normal(0, sqrtf(2) / 2, sqrtf(2) / 2);
-			//if (Engine::RayCast::IntersectWithAlignedPlane(Intersection, normal, { 0,0,0 }, ray, pos))
-			if (Engine::RayCast::IntersectSphere(Intersection, ray, pos, { 0,0,0 }, 2.f))
-				Engine::TransformSystem::SetWorldPosition(m_BeveledCube.GetComponent<Engine::TransformComponent>(), Intersection);
 
-			E_TRACE("Intersection: {0}, {1}, {2}", Intersection.x, Intersection.y, Intersection.z);
+			// Start Pathfinding
+			if (Engine::RayCast::IntersectWithWAPlaneXZ(Intersection, ray, pos)) 
+			{
+				auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+				m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, transform.GetPosition());
+				m_TargetNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, Intersection);
+
+				auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
+				pathfinder.m_TargetNode = m_TargetNode;
+				Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0, 0.5f, 0));
+			}
+
+			//E_TRACE("Intersection: {0}, {1}, {2}", Intersection.x, Intersection.y, Intersection.z);
 			//E_INFO("Radius: {0}", glm::length(m_BeveledCube.GetComponent<Engine::TransformComponent>().GetPosition() - glm::vec3(0)));
 		}
 	}
