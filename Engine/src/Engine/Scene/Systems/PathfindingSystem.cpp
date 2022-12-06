@@ -171,10 +171,6 @@ namespace Engine {
     }
 
 
-    void NodeGridSystem::CreateGrid()
-    {
-        CreateGridAtLocation(glm::vec3(0, 0, 0), 1.f, 10);
-    }
 
     //************************************************************************* NODE GRID SYSTEM ***************************************************************************************************//
     //NodeGridSystem::Grids* NodeGridSystem::m_Grids = new NodeGridSystem::Grids();
@@ -278,35 +274,126 @@ namespace Engine {
         m_PotentiallyFalseObstructions.clear();
     }
 
-    void NodeGridSystem::CreateGridAtLocation(glm::vec3 location, float gridSpacing, int gridSize)
+    void NodeGridSystem::CreateGrid()
+    {
+        CreateGridAtLocation(glm::vec3(0, 0, 0), glm::vec3(10, 0, 10), 1.f);
+    }
+    void NodeGridSystem::CreateGridAtLocation(glm::vec3 location, glm::vec3 extent, int resolution)
     {
         std::vector<std::shared_ptr<PNode>> nodes;
-        std::shared_ptr<PNode> a;
-        std::shared_ptr<PNode> b;
+        std::shared_ptr<PNode> node;
 
-        for (size_t x{}; x < 10; x++)
+        int extent_X = (int)(extent.x);
+        int extent_Z = (int)(extent.z);
+        
+        float xzRatio = 2.f * ((float)extent_X / (float)extent_Z);
+        float step = 1.f / (float)resolution;
+
+        for (float x{}; x < extent_X; x += step)
         {
-            for (size_t z{}; z < 10; z++)
+            for (float z{}; z < extent_Z; z+=step)
             {
-                glm::vec3 loc = glm::vec3(location.x + (gridSpacing * x) - (float)gridSize / 2, 0, location.z + (gridSpacing * z) - (float)gridSize / 2);
+                glm::vec3 loc = glm::vec3(location.x + (x) - ((float)extent_X/2.f), 0, location.z + (z) - ((float)extent_Z/2.f));
                 nodes.emplace_back(std::make_shared<PNode>(loc));
             }
         }
-        for (size_t i{ 1 }; i < nodes.size(); i++)
+        int ext_X = extent_X * resolution;
+        int ext_Z = extent_Z * resolution;
+        for (int x{}; x < ext_X; x++)
         {
-            if (nodes.size() < i + 1) { break; }
+            for (int z{}; z < ext_Z; z++)
+            {
+                node = nodes[(x * ext_Z) + z];
 
-            a = nodes[i - 1];
-            b = nodes[i];
-            if (i % 10 != 0 || i == 0) {
-                a->AddConnectedNode(b);
-                b->AddConnectedNode(a);
+                int a = (x * ext_Z) + z+1;
+                int b = ((x+1) * ext_Z) + z;
+                int c = (x * ext_Z) + z-1 ;
+                int d = ((x-1) * ext_Z) + z;
+                // Diagonal nodes
+                int e = b + 1;
+                int f = b - 1;
+                int g = d - 1;
+                int h = d + 1;
+
+                // CORNERS  ------------------------
+                    //Top Left
+                if (c<0 && d<0) {
+                    node->AddConnectedNode(nodes[a]);
+                    node->AddConnectedNode(nodes[b]);
+                    node->AddConnectedNode(nodes[e]);
+                    continue;
+                }
+                    //Top Right
+                if (x == ext_X -1 && z == 0) {
+                    node->AddConnectedNode(nodes[a]);
+                    node->AddConnectedNode(nodes[d]);
+                    node->AddConnectedNode(nodes[h]);
+                    continue;
+                }
+                    // Bottom Left
+                if (x == 0 && z == ext_Z -1) {
+                    node->AddConnectedNode(nodes[b]);
+                    node->AddConnectedNode(nodes[c]);
+                    node->AddConnectedNode(nodes[f]);
+                    continue;
+                }
+                    // Bottom Right
+                if (x == ext_X -1 && z == ext_Z -1) {
+                    node->AddConnectedNode(nodes[c]);
+                    node->AddConnectedNode(nodes[d]);
+                    node->AddConnectedNode(nodes[g]);
+                    continue;
+                }
+
+                // EDGES    ------------------------
+                    // Top
+                if (z == 0) {
+                    node->AddConnectedNode(nodes[a]);
+                    node->AddConnectedNode(nodes[b]);
+                    node->AddConnectedNode(nodes[d]);
+                    node->AddConnectedNode(nodes[e]);
+                    node->AddConnectedNode(nodes[h]);
+                    continue;
+                }
+                    // Left
+                if (x == 0) {
+                    node->AddConnectedNode(nodes[a]);
+                    node->AddConnectedNode(nodes[b]);
+                    node->AddConnectedNode(nodes[c]);
+                    node->AddConnectedNode(nodes[f]);
+                    node->AddConnectedNode(nodes[e]);
+                    continue;
+                }
+                    // Bottom
+                if (z == ext_Z -1) {
+                    node->AddConnectedNode(nodes[b]);
+                    node->AddConnectedNode(nodes[c]);
+                    node->AddConnectedNode(nodes[d]);
+                    node->AddConnectedNode(nodes[f]);
+                    node->AddConnectedNode(nodes[g]);
+                    continue;
+                }
+                    // Right
+                if (x == ext_X -1) {
+                    node->AddConnectedNode(nodes[a]);
+                    node->AddConnectedNode(nodes[c]);
+                    node->AddConnectedNode(nodes[d]);
+                    node->AddConnectedNode(nodes[g]);
+                    node->AddConnectedNode(nodes[h]);
+                    continue;
+                }
+
+                // NO SPECIAL CASE  ------------------
+                node->AddConnectedNode(nodes[a]);
+                node->AddConnectedNode(nodes[b]);
+                node->AddConnectedNode(nodes[c]);
+                node->AddConnectedNode(nodes[d]);
+
+                node->AddConnectedNode(nodes[e]);
+                node->AddConnectedNode(nodes[f]);
+                node->AddConnectedNode(nodes[g]);
+                node->AddConnectedNode(nodes[h]);
             }
-
-            if (nodes.size() < i + 10) { continue; }
-            b = nodes[(i - 1) + 10];
-            b->AddConnectedNode(a);
-            a->AddConnectedNode(b);
         }
         m_NodeGrids.emplace_back(std::make_shared<NodeGrid>(location, glm::vec3(10, 0, 10), nodes));
         GenerateNodeNamesForGrid(m_NodeGrids[m_NodeGrids.size() - 1]);
