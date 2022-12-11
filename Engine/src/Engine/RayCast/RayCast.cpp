@@ -35,49 +35,75 @@ namespace Engine {
 	}
 
 	/*------------------------------------------- INTERSECTIONS ----------------------------------------------*/
-	bool RayCast::IntersectionWithPlaneXZ(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos)
+	bool RayCast::IntersectWithWAPlaneXZ(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos)
 	{
 		if ((ray.y >= 0.f && pos.y >= 0.f) || (ray.y <= 0.f && pos.y <= 0.f))
 			return false;
 		
-		IntersectionWithPlaneXZ_IMPL(intersection_OUT, ray, pos);
+		IntersectWithWAPlaneXZ_IMPL(intersect_OUT, ray, pos);
 		return true;
 	}
-	bool RayCast::IntersectionWithPlaneXY(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos)
+	bool RayCast::IntersectWithWAPlaneXY(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos)
 	{
 		if ((ray.z >= 0.f && pos.z >= 0.f) || (ray.z <= 0.f && pos.z <= 0.f))
 			return false;
 
-		IntersectionWithPlaneXY_IMPL(intersection_OUT, ray, pos);
+		IntersectWithWAPlaneXY_IMPL(intersect_OUT, ray, pos);
 		return true;
 	}
 
-	bool RayCast::IntersectionWithPlaneZY(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos)
+	bool RayCast::IntersectWithWAPlaneZY(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos)
 	{
 		if ((ray.x >= 0.f && pos.x >= 0.f) || (ray.x <= 0.f && pos.x <= 0.f)) 
 			return false;
 		
-		IntersectionWithPlaneZY_IMPL(intersection_OUT, ray, pos);
+		IntersectWithWAPlaneZY_IMPL(intersect_OUT, ray, pos);
 		return true;
 	}
 
+	bool RayCast::IntersectWithAlignedPlane(glm::vec3& intersect_OUT, const glm::vec3& planeNormal, const glm::vec3& planePosition, const glm::vec3& ray, const glm::vec3& rayPosition)
+	{
+		float u = glm::dot((planePosition - rayPosition), planeNormal);
+		float l = glm::dot(ray, planeNormal);
+		float t = u / l;
+		if (t <= 0.f)
+			return false;
+
+		glm::vec3 loc = rayPosition + (ray * t);
+		intersect_OUT = loc;
+		return true;
+	}
+
+	bool RayCast::IntersectSphere(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& rayPosition, const glm::vec3& spherePosition, const float& sphereRadius)
+	{
+		float tr = glm::dot(spherePosition - rayPosition, ray);
+		float y = glm::length(spherePosition - (rayPosition + ray * tr));
+		if (y < sphereRadius) 
+		{
+			float x = sqrt(pow(sphereRadius, 2) - pow(y, 2));
+			intersect_OUT = rayPosition + ray * (tr-x);
+			return true;
+		}
+		return false;
+	}
+
 	/*------------------------------------- IMPL FUNCTIONS --------------------------------------*/
-	void RayCast::IntersectionWithPlaneXZ_IMPL(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos)
+	void RayCast::IntersectWithWAPlaneXZ_IMPL(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos)
 	{
-		intersection_OUT.y = 0.f;
-		intersection_OUT.x = ((-pos.y * ray.x) / ray.y) + pos.x;
-		intersection_OUT.z = ((-pos.y * ray.z) / ray.y) + pos.z;
+		intersect_OUT.y = 0.f;
+		intersect_OUT.x = ((-pos.y * ray.x) / ray.y) + pos.x;
+		intersect_OUT.z = ((-pos.y * ray.z) / ray.y) + pos.z;
 	}
-	void RayCast::IntersectionWithPlaneXY_IMPL(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos)
+	void RayCast::IntersectWithWAPlaneXY_IMPL(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos)
 	{
-		intersection_OUT.z = 0.f;
-		intersection_OUT.x = ((-pos.z * ray.x) / ray.z) + pos.x;
-		intersection_OUT.y = ((-pos.z * ray.y) / ray.z) + pos.y;
+		intersect_OUT.z = 0.f;
+		intersect_OUT.x = ((-pos.z * ray.x) / ray.z) + pos.x;
+		intersect_OUT.y = ((-pos.z * ray.y) / ray.z) + pos.y;
 	}
-	void RayCast::IntersectionWithPlaneZY_IMPL(glm::vec3& intersection_OUT, const glm::vec3& ray, const glm::vec3& pos)
+	void RayCast::IntersectWithWAPlaneZY_IMPL(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& pos)
 	{
-		intersection_OUT.x = 0.f;
-		intersection_OUT.z = ((-pos.x * ray.z) / ray.x) + pos.z;
-		intersection_OUT.y = ((-pos.x * ray.y) / ray.x) + pos.y;
+		intersect_OUT.x = 0.f;
+		intersect_OUT.z = ((-pos.x * ray.z) / ray.x) + pos.z;
+		intersect_OUT.y = ((-pos.x * ray.y) / ray.x) + pos.y;
 	}
 }

@@ -40,7 +40,7 @@ namespace Engine {
 	public:
 		// TODO: should be 'grid extent and grid resolution', instead of 'gridSpacid and gridSize'
 		static void CreateGrid();
-		static void CreateGridAtLocation(glm::vec3 location, float gridSpacing, int gridSize);
+		static void CreateGridAtLocation(glm::vec3 location, glm::vec3 extent, int resolution);
 		static std::shared_ptr<NodeGrid> GetGridAtIndex(uint32_t index);
 		//static std::shared_ptr<NodeGrid> GetGridAtLocation(const glm::vec3& location);
 
