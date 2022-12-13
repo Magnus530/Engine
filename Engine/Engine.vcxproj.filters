@@ -25,11 +25,17 @@
     <Filter Include="src\Engine\Pathfinding">
       <UniqueIdentifier>{0D4C45E0-F945-6E32-E2B2-0443CE4BD49E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\RayCast">
+      <UniqueIdentifier>{78813987-6465-FADC-CDC5-F42FB9C8E45E}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Scene">
       <UniqueIdentifier>{AF1338A9-9B0C-57FB-C43E-3C80B0963607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\Scene\Splines">
+      <UniqueIdentifier>{9CAC03A1-88D1-5221-B11C-38B19DA0513F}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Scene\Systems">
       <UniqueIdentifier>{B6A886B6-A2CD-D536-CB18-BBC6B79CD454}</UniqueIdentifier>
@@ -135,6 +141,12 @@
     <ClInclude Include="src\Engine\Pathfinding\PNode.h">
       <Filter>src\Engine\Pathfinding</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Pathfinding\PathObstructionVolumes.h">
+      <Filter>src\Engine\Pathfinding</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\RayCast\RayCast.h">
+      <Filter>src\Engine\RayCast</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
@@ -188,6 +200,12 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Scene.h">
       <Filter>src\Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Splines\BSpline.h">
+      <Filter>src\Engine\Scene\Splines</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Systems\PathfindingSystem.h">
+      <Filter>src\Engine\Scene\Systems</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Systems\TransformSystem.h">
       <Filter>src\Engine\Scene\Systems</Filter>
@@ -1499,6 +1517,9 @@
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
       <Filter>src\Engine\Pathfinding</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\RayCast\RayCast.cpp">
+      <Filter>src\Engine\RayCast</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
@@ -1543,6 +1564,12 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Scene.cpp">
       <Filter>src\Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Splines\BSpline.cpp">
+      <Filter>src\Engine\Scene\Splines</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Systems\PathfindingSystem.cpp">
+      <Filter>src\Engine\Scene\Systems</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp">
       <Filter>src\Engine\Scene\Systems</Filter>

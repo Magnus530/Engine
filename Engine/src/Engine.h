@@ -11,7 +11,7 @@
 #include "Engine/Core/KeyCodes.h"
 #include "Engine/Core/MouseButtonCodes.h"
 
-
+#include "Engine/RayCast/RayCast.h"
 
 #include "Engine/ImGui/ImGuiLayer.h"
 
@@ -19,6 +19,7 @@
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Systems/TransformSystem.h"
+#include "Engine/Scene/Systems/PathfindingSystem.h"
 #include "Engine/Scene/EntityInitializer.h"
 
 // ---------------Renderer---------------
@@ -38,6 +39,7 @@
 
 // --------------Pathfinding---------------
 #include "Engine/Pathfinding/PNode.h"
+#include "Engine/Pathfinding/PathObstructionVolumes.h"
 
 // --------------Mesh Objects---------------
 #include "Engine/AssetInit/ObjLoader.h"

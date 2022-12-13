@@ -6,6 +6,8 @@
 
 namespace Engine
 {
+
+
 	class Renderer
 	{
 	public:
@@ -19,6 +21,7 @@ namespace Engine
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
+		inline static glm::vec2 GetWindowSize();
 	private:
 		struct SceneData
 		{
@@ -27,5 +30,13 @@ namespace Engine
 		};
 
 		static SceneData* m_SceneData;
+
+		struct WindowSize
+		{
+			unsigned int X = 1280;
+			unsigned int Y = 720;
+		};
+
+		static WindowSize* m_WindowSize;
 	};
 }
