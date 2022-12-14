@@ -52,8 +52,6 @@ public:
 	PathfindingLayer()
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		//E_TRACE("PathBlocking Sphere : {0}", sizeof(Engine::PathObstructionSphere));
-
 		/* Pathfinding */
 		Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), glm::vec3((int)21, 0, (int)17), 1);
 
@@ -79,22 +77,21 @@ public:
 		std::shared_ptr<Engine::PNode> startNode = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, 0);
 		glm::vec3 startPosition = startNode->m_Data->m_Position;
 		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition + glm::vec3(0, 0.5f, 0)); //Manually adding extra height
+		Engine::TransformSystem::RotateToVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(-1, 0, 1)));
+		//Engine::TransformSystem::AddLocalRotation(m_Entity.GetComponent<Engine::TransformComponent>(), (3.14 * 0.5) / 4, glm::vec3(0, 1, 0));
+		//Engine::TransformSystem::UpdateMatrix(m_Entity.GetComponent<Engine::TransformComponent>());
+
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode = startNode;
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_Grid = Engine::NodeGridSystem::GetGridAtIndex(0);
 
+		// Planes
 		m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
 		m_Plane.AddComponent<Engine::RendererComponent>();
 
-		//m_BeveledCube = Engine::EntityInitializer::GetInstance().EntityInit("BeveledCube", m_Scene);
-		//Engine::TransformSystem::SetWorldPosition(m_BeveledCube.GetComponent<Engine::TransformComponent>(), glm::vec3(0.f));
-
-		// Creating Pathfinding Obstructions 
+		// Vertex Array Pathfinding Obstructions
 		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, så Initialiserer den for seg selv her
-
-		//CreateObstructor(glm::vec3(  5.f,  0.f,   5.f), 2.f);
 	}
 
-	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
 	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
 	void OnUpdate(Engine::Timestep ts) override
 	{
@@ -144,12 +141,9 @@ public:
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
 
-		Engine::TransformSystem::UpdateMatrix(transform);
 		Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
 		
-		//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, m_BeveledCube.GetComponent<Engine::TransformComponent>().m_Transform);		// Render m_BeveledCube
 		
-
 		/*-----------RENDER OBSTRUCTIONS---------------*/
 		for (uint32_t i{}; i < m_Obstructors.size(); i++)
 		{
@@ -201,12 +195,30 @@ public:
 	}
 
 	//----------------------------------------------------------------IMGUI-------------------------------------------------------------------------------------------------------------------------
-	//----------------------------------------------------------------IMGUI-------------------------------------------------------------------------------------------------------------------------
 	virtual void OnImGuiRender() override
 	{
 		ImGui::ShowDemoWindow();
 
 		ImGui::Begin("Pathfinder");
+		
+		// TransformTesting -  Rotate to vector
+		// 
+		//static float z{ -1 };
+		//static float x{  1 };
+		//ImGui::PushItemWidth(100.f);
+		//for (size_t i{}; i < 2; i++)
+		//{
+		//	ImGui::PushID(i);
+		//	
+		//	if (ImGui::SliderFloat(i == 0 ? "z" : "x", i == 0 ? &z : &x, -1.f, 1.f, "%.1f")) 
+		//	{
+		//		ImGui::GetActiveID();
+		//		Engine::TransformSystem::RotateToVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(x, 0, z)));
+		//	}
+		//	if (!i)
+		//		ImGui::SameLine();
+		//	ImGui::PopID();
+		//}
 
 
 		ImGui::TextDisabled("(?)");
@@ -265,7 +277,6 @@ public:
 				ID = ImGui::GetActiveID();
 				
 				Engine::TransformSystem::SetWorldPosition(transform, pos);
-				Engine::TransformSystem::UpdateMatrix(transform);
 				Engine::NodeGridSystem::UpdateObstructionSphere(0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
 			}
 			ImGui::PopID();

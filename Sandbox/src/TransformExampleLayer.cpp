@@ -25,7 +25,8 @@ TransformExampleLayer::TransformExampleLayer()
 	m_Entity.AddComponent<Engine::RendererComponent>(glm::vec4(0.5f, 0.2f, 0.6f, 1.f));
 
 	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-	Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-2, -1, 0));
+	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
+	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
@@ -50,29 +51,7 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 
 	// ---- TRANSFORMATION TESTING ---------------------
 	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-		// Position
-	//if (bSetWorldPosition)
-	//m_Obj->SetWorldPosition(m_Position);
-	//if (bAddWorldPosition)
-		//m_Obj->AddWorldPosition(glm::vec3(0, ts * m_PositionStrength, 0));
-	//if (bAddLocalPosition)
-		//m_Obj->AddLocalPosition(glm::vec3(0, ts * m_PositionStrength, 0));
-
-		// Rotation
-	//if (bAddWorldRotation)
-	//	m_Obj->AddWorldRotation(ts * m_RotationStrength, glm::vec3(0, 1.f, 0));
-	//if (bAddLocalRotation)
-	//	m_Obj->AddLocalRotation(ts * m_RotationStrength, glm::vec3(1.f, 0, 0));
-
-		// Scale
-	//if (bAddScale)
-	//	m_Obj->AddLocalScale(ts * m_ScaleStrength, glm::vec3(0, 1.f, 0));
-	//if (bSetScale)
-		//m_Obj->SetScale(glm::vec3(m_SetScale));
-
-	//m_Obj->UpdateMatrix();
-
-	Engine::TransformSystem::SetWorldPosition(transform, m_Position);
+	//Engine::TransformSystem::SetWorldPosition(transform, m_Position);
 
 		// Rotation
 	if (bAddWorldRotation) {
@@ -83,14 +62,12 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	}
 	
 	// Updating TransformComponent
-	Engine::TransformSystem::UpdateMatrix(transform);
 
 	// Draw Call for m_Obj
 	auto shader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader);
 	shader->UploadUniformFloat3("u_Color", m_ObjColor);
-	shader->UploadUniformInt("u_ShowCustomColor", bShowCustomColor);
+	shader->UploadUniformInt("u_ShowNormals", bShowNormals);
 
-	//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix()); // Render m_Obj
 
 	Engine::Renderer::Submit(m_Shader, m_CubeVA, transform.m_Transform);
 
@@ -108,22 +85,25 @@ void TransformExampleLayer::OnImGuiRender()
 	}
 	ImGui::Separator();
 
+	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+
+	ImGui::PushID(0);
 	ImGui::Text("Position");
 	ImGui::PushItemWidth(75.f);
 	const char* format = "%.1f";
-	//ImGui::Checkbox("Set World Position", &bSetWorldPosition);
-	ImGui::SliderFloat("X", &m_Position.x, -10.f, 10.f, format);
-	ImGui::SameLine();
-	ImGui::SliderFloat("Y", &m_Position.y, -10.f, 10.f, format);
-	ImGui::SameLine();
-	ImGui::SliderFloat("Z", &m_Position.z, -10.f, 10.f, format);
 
+	if (ImGui::SliderFloat("X", &m_Position.x, -10.f, 10.f, format))
+		Engine::TransformSystem::SetWorldPosition(transform, m_Position);
+	ImGui::SameLine();
+	if (ImGui::SliderFloat("Y", &m_Position.y, -10.f, 10.f, format))
+		Engine::TransformSystem::SetWorldPosition(transform, m_Position);
+	ImGui::SameLine();
+	if (ImGui::SliderFloat("Z", &m_Position.z, -10.f, 10.f, format))
+		Engine::TransformSystem::SetWorldPosition(transform, m_Position);
+	ImGui::PopID();
 	ImGui::Separator();
 
 	ImGui::PushItemWidth(100.f);
-	//ImGui::Checkbox("Add World Position", &bAddWorldPosition);
-	//ImGui::Checkbox("Add Local Position", &bAddLocalPosition);
-	//ImGui::SliderFloat("Position Strength", &m_PositionStrength, -1.f, 1.f);
 
 	ImGui::Text("Rotation");
 	ImGui::Checkbox("Add World Rotation", &bAddWorldRotation);
@@ -131,17 +111,29 @@ void TransformExampleLayer::OnImGuiRender()
 	ImGui::SliderFloat("Rotation Strength", &m_RotationStrength, -1.f, 1.f);
 	ImGui::Separator();
 
+
+	ImGui::PushID(1);
+	if (ImGui::SliderFloat("Scale", &m_SetScale, 0.f, 5.f))
+	{
+		Engine::TransformSystem::SetScale(m_Entity.GetComponent<Engine::TransformComponent>(), m_SetScale);
+	}
 	ImGui::Text("Scale");
-	ImGui::Checkbox("Add Scale", &bAddScale);
-	ImGui::SliderFloat("Scale Strength", &m_ScaleStrength, -1.f, 1.f);
-	//ImGui::Checkbox("Set Scale", &bSetScale);
-	//ImGui::SliderFloat("Set Scale", &m_SetScale, 0.f, 3.f);
+	static glm::vec3 Scale(1.f);
+	if (ImGui::SliderFloat("X", &Scale.x, 0, 10.f, format))
+		Engine::TransformSystem::SetScale(m_Entity.GetComponent<Engine::TransformComponent>(), Scale);
+	ImGui::SameLine();
+	if (ImGui::SliderFloat("Y", &Scale.y, 0, 10.f, format))
+		Engine::TransformSystem::SetScale(m_Entity.GetComponent<Engine::TransformComponent>(), Scale);
+	ImGui::SameLine();
+	if (ImGui::SliderFloat("Z", &Scale.z, 0, 10.f, format))
+		Engine::TransformSystem::SetScale(m_Entity.GetComponent<Engine::TransformComponent>(), Scale);
+	ImGui::PopID();
 	ImGui::Separator();
 
 	ImGui::Separator();
 	ImGui::PushItemWidth(200.f);
 	ImGui::ColorEdit3("Object color", glm::value_ptr(m_ObjColor));
-	ImGui::Checkbox("Set custom color", &bShowCustomColor);
+	ImGui::Checkbox("Set custom color", &bShowNormals);
 	ImGui::Separator();
 
 	ImGui::End();
