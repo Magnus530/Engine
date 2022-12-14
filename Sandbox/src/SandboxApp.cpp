@@ -28,6 +28,7 @@ public:
 	{
 		auto flatShader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
 		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+		auto phongShader = m_ShaderLibrary.Load("assets/shaders/Phong.glsl");
 
 		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
 		m_WolfLogoTexture = Engine::Texture2D::Create("assets/textures/wolf.png");
@@ -42,19 +43,21 @@ public:
 
 		//Create entities here
 
-		m_ObjEntity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_ObjVA, m_ActiveScene);
+		m_ObjEntity = Engine::EntityInitializer::GetInstance().EntityInit("Pillar", m_ObjVA, m_ActiveScene);
 		m_ObjEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+		Engine::TransformSystem::SetWorldPosition(m_ObjEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 2.0f, 1.0f, 1.0f });
 
-		m_SquareEntity = Engine::EntityInitializer::GetInstance().EntityInit(PrimitiveType, m_PrimitiveVA, m_ActiveScene);
-		m_SquareEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f });
+		m_PrimitiveShapeEntity = Engine::EntityInitializer::GetInstance().EntityInit(1, m_PrimitiveVA, m_ActiveScene);
+		m_PrimitiveShapeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 0.0f, 1.0f, 1.0f });
+
+		//m_PrimitiveCubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(2, m_PrimitiveVA, m_ActiveScene);
+		//m_PrimitiveCubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
 	{
-		// Update
 		m_PCameraController.OnUpdate(ts);
 
-		// Render
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
@@ -64,29 +67,27 @@ public:
 
 		auto flatShader = m_ShaderLibrary.Get("Flat");
 		auto textureShader = m_ShaderLibrary.Get("Texture");
-
-		//Engine::Renderer::Submit(flatShader, m_SquareVA, glm::mat4(1.0f));
+		auto phongShader = m_ShaderLibrary.Get("Phong");
 
 		/* Test posisjonering */	
-		static float sin{};
-		sin += ts;
-		float testmovement = sinf(sin);
-		m_Texture->Bind();
+		//static float sin{};
+		//sin += ts;
+		//float testmovement = sinf(sin);
+		//m_Texture->Bind();
 
 		//m_WolfLogoTexture->Bind();
-		//Engine::Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
-
 		auto flat = std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader);
-		flat->Bind();
-		flat->UploadUniformInt("u_ShowCustomColor", bShowCustomColor);
+
+		flat->UploadUniformInt("u_CustomColor", bCustomColor);
 		flat->UploadUniformFloat3("u_Color", glm::vec3(m_ObjEntity.GetComponent<Engine::RendererComponent>().Color));
-		Engine::Renderer::Submit(flatShader, m_PrimitiveVA, glm::scale(glm::mat4(1.0f), 
-			glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement,0)));
+		Engine::Renderer::Submit(flatShader, m_ObjVA, m_ObjEntity.GetComponent<Engine::TransformComponent>().m_Transform);
+		//Engine::Renderer::Submit(flatShader, m_ObjVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.5f)));
 
-		auto objTComp = m_ObjEntity.GetComponent<Engine::TransformComponent>();
-		Engine::TransformSystem::SetWorldPosition(objTComp, glm::vec3(0, testmovement, 0));
+		flat->UploadUniformInt("u_CustomColor", bCustomColor);
+		flat->UploadUniformFloat3("u_Color", glm::vec3(m_PrimitiveShapeEntity.GetComponent<Engine::RendererComponent>().Color));
+		Engine::Renderer::Submit(flatShader, m_PrimitiveVA, m_PrimitiveShapeEntity.GetComponent<Engine::TransformComponent>().m_Transform);
 
-		//Engine::Renderer::Submit(flatShader, m_ObjVA, objTComp.m_Transform);
+		//	glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement, 0)));
 		
 		Engine::Renderer::EndScene();
 	}
@@ -102,7 +103,7 @@ public:
 			auto& squareColor = m_ObjEntity.GetComponent<Engine::RendererComponent>().Color;
 			ImGui::ColorEdit4("Obj Color", glm::value_ptr(m_ObjEntity.GetComponent<Engine::RendererComponent>().Color));
 			ImGui::Separator();
-			ImGui::Checkbox("Show Custom Color", &bShowCustomColor);
+			ImGui::Checkbox("Show Custom Color", &bCustomColor);
 			ImGui::Separator();
 		}
 		ImGui::End();
@@ -122,18 +123,18 @@ private:
 
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
 
-	std::shared_ptr<Engine::Scene> m_ActiveScene; // Entities
-	Engine::Entity m_SquareEntity;
-	Engine::Entity m_ObjEntity;
-
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 
-	bool bShowCustomColor{};
-	int PrimitiveType = 3;
+	bool bCustomColor = false;
+
+	std::shared_ptr<Engine::Scene> m_ActiveScene;
+
+	// Entities
+	Engine::Entity m_PrimitiveCubeEntity;
+	Engine::Entity m_PrimitiveShapeEntity;
+	Engine::Entity m_ObjEntity;
 };
-
-
 
 class Sandbox : public Engine::Application
 {
@@ -150,7 +151,6 @@ public:
 
 	~Sandbox()
 	{}
-
 
 private:
 	std::shared_ptr<Engine::Layer> m_CurrentLayer;
