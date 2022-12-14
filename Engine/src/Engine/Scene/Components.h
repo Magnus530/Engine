@@ -21,9 +21,6 @@ namespace Engine
 	struct TransformComponent
 	{
 		glm::mat4 m_Transform	{ 1.f };
-		glm::mat4 m_Position	{ 1.f };
-		glm::mat4 m_Rotation	{ 1.f };
-		glm::mat4 m_Scale		{ 1.f };
 		float m_Speed{ 2.f };
 
 		glm::vec3 GetPosition() const { return m_Transform[3]; }
