@@ -2,6 +2,7 @@
 
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/VertexArray.h"
+#include "Engine/Renderer/Texture.h"
 
 #include <glm/glm.hpp>
 
@@ -36,16 +37,20 @@ namespace Engine
 
 	struct RendererComponent
 	{
-		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 
 		std::shared_ptr<VertexArray> m_VA;
 		std::shared_ptr<VertexBuffer> m_VB;
 		std::shared_ptr<IndexBuffer> m_IB;
 
+		std::shared_ptr<Texture2D> m_Tex = nullptr;
+
+		bool m_bCustomColor = false;
+
 		RendererComponent() = default;
 		RendererComponent(const RendererComponent&) = default;
 		RendererComponent(const glm::vec4& color)
-			: Color(color) {}
+			: m_Color(color) {}
 	};
 
 	struct PathfindingComponent

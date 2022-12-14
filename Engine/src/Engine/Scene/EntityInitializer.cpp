@@ -43,27 +43,14 @@ namespace Engine
 		vertexarr.reset(Engine::VertexArray::Create()); // OpenGLVertexArray*
 
 		std::shared_ptr<Engine::VertexBuffer> PrimitiveVB;
-		if (shapenum != 4)
-		{
-			std::vector<float> fVertices = Engine::PrimitiveShapeFactory::CreatePrimitiveShape(shapenum)->GetVertices();
-			PrimitiveVB.reset(Engine::VertexBuffer::Create(fVertices.data(), fVertices.size() * sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
-			PrimitiveVB->SetLayout
-			({
-				{ Engine::ShaderDataType::Float3, "a_Position" },
-				{ Engine::ShaderDataType::Float2, "a_TexCoord" }
-			});
-		}
-		else
-		{
-			std::vector<Engine::Vertex> vVertices = Engine::PrimitiveShapeFactory::CreatePrimitiveShape(shapenum)->GetVVertices();
-			PrimitiveVB.reset(Engine::VertexBuffer::Create(vVertices.data(), vVertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
-			PrimitiveVB->SetLayout
-			({
-				{ Engine::ShaderDataType::Float3, "a_Position" },
-				{ Engine::ShaderDataType::Float3, "a_Normal" },
-				{ Engine::ShaderDataType::Float2, "a_TexCoord" }
-			});
-		}
+		std::vector<float> fVertices = Engine::PrimitiveShapeFactory::CreatePrimitiveShape(shapenum)->GetVertices();
+		PrimitiveVB.reset(Engine::VertexBuffer::Create(fVertices.data(), fVertices.size() * sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
+		PrimitiveVB->SetLayout
+		({
+			{ Engine::ShaderDataType::Float3, "a_Position" },
+			{ Engine::ShaderDataType::Float3, "a_Normal" },
+			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
+		});
 		vertexarr->AddVertexBuffer(PrimitiveVB);
 
 		std::vector<uint32_t> indices = Engine::PrimitiveShapeFactory::CreatePrimitiveShape(shapenum)->GetIndices();

@@ -144,8 +144,8 @@ public:
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
 
-		Engine::TransformSystem::UpdateMatrix(transform);
-		Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
+		//Engine::TransformSystem::UpdateMatrix(transform);
+		//Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
 		
 		//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, m_BeveledCube.GetComponent<Engine::TransformComponent>().m_Transform);		// Render m_BeveledCube
 		
@@ -153,8 +153,8 @@ public:
 		/*-----------RENDER OBSTRUCTIONS---------------*/
 		for (uint32_t i{}; i < m_Obstructors.size(); i++)
 		{
-			auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
-			Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
+			//auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
+			//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
 		}
 
 
@@ -181,7 +181,7 @@ public:
 					alteredColor = true;
 				}
 
-				Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
+				//Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
 				if (alteredColor) {
 					std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
 					alteredColor = false;
@@ -193,7 +193,7 @@ public:
 			scale /= 2.f;
 			for (auto& it : pathfinder.m_SplinePath->m_Controlpoints)
 			{
-				Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0)));
+				//Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0)));
 			}
 		}
 		// End Render Scene

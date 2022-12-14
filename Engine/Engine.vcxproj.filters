@@ -1488,6 +1488,9 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\RenderStrategy.h" />
+    <ClInclude Include="src\Engine\Renderer\RenderContext.h" />
+    <ClInclude Include="src\Engine\Renderer\StrategyFlatShader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">

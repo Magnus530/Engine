@@ -92,7 +92,7 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 
 	//Engine::Renderer::Submit(m_Shader, m_Obj->GetVertexArray(), m_Obj->GetMatrix()); // Render m_Obj
 
-	Engine::Renderer::Submit(m_Shader, m_CubeVA, transform.m_Transform);
+	//Engine::Renderer::Submit(m_Shader, m_CubeVA, transform.m_Transform);
 
 	// End Scene
 	Engine::Renderer::EndScene();
