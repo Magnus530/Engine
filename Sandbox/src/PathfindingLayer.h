@@ -77,9 +77,7 @@ public:
 		std::shared_ptr<Engine::PNode> startNode = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, 0);
 		glm::vec3 startPosition = startNode->m_Data->m_Position;
 		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition + glm::vec3(0, 0.5f, 0)); //Manually adding extra height
-		Engine::TransformSystem::RotateToVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(-1, 0, 1)));
-		//Engine::TransformSystem::AddLocalRotation(m_Entity.GetComponent<Engine::TransformComponent>(), (3.14 * 0.5) / 4, glm::vec3(0, 1, 0));
-		//Engine::TransformSystem::UpdateMatrix(m_Entity.GetComponent<Engine::TransformComponent>());
+		Engine::TransformSystem::RotateToDirectionVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(-1, 0, 1)));
 
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode = startNode;
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_Grid = Engine::NodeGridSystem::GetGridAtIndex(0);
@@ -143,6 +141,7 @@ public:
 
 		//Engine::TransformSystem::UpdateMatrix(transform);
 		//Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
+		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_VA, m_Entity);	
 		
 		
 		/*-----------RENDER OBSTRUCTIONS---------------*/
@@ -150,6 +149,7 @@ public:
 		{
 			//auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
 			//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
+			Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_BeveledCubeVA, m_Obstructors[i]);
 		}
 
 
@@ -202,6 +202,28 @@ public:
 
 		ImGui::Begin("Pathfinder");
 		
+		ImGui::Separator();
+		ImGui::PushID(0);
+		ImGui::PushItemWidth(200.f);
+		ImGui::Text("Monkey");
+		ImGui::ColorEdit3("", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
+		ImGui::Checkbox("Show Normals", &m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
+		ImGui::PopID();
+
+		ImGui::Separator();
+		ImGui::Text("Obstructors");
+		ImGui::PushID(1);
+		static glm::vec3 color{ 0.5,0.5,0.5 };
+		static bool bObstructor_ShowNormal{};
+		ImGui::ColorEdit3("", glm::value_ptr(color));
+		if (ImGui::Checkbox("Show Normals", &bObstructor_ShowNormal))
+			for (auto& it : m_Obstructors)
+				it.GetComponent<Engine::RendererComponent>().m_bCustomColor = bObstructor_ShowNormal;
+		if (bObstructor_ShowNormal)
+			for (auto& it : m_Obstructors)
+				it.GetComponent<Engine::RendererComponent>().m_Color = glm::vec4(color, 1.f);
+		ImGui::PopID();
+
 		// TransformTesting -  Rotate to vector
 		// 
 		//static float z{ -1 };
@@ -317,9 +339,6 @@ public:
 				pathfinder.m_TargetNode = m_TargetNode;
 				Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0, 0.5f, 0));
 			}
-
-			//E_TRACE("Intersection: {0}, {1}, {2}", Intersection.x, Intersection.y, Intersection.z);
-			//E_INFO("Radius: {0}", glm::length(m_BeveledCube.GetComponent<Engine::TransformComponent>().GetPosition() - glm::vec3(0)));
 		}
 	}
 

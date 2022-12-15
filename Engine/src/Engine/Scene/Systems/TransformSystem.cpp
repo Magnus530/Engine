@@ -27,13 +27,19 @@ namespace Engine {
 		comp.m_Transform= glm::rotate(comp.m_Transform, radians, rotationAxis);
 		SetScale(comp, scale);
 	}
-	void TransformSystem::RotateToVector(TransformComponent& comp, glm::vec3 vector)
+	void TransformSystem::RotateToPosition(TransformComponent& comp, glm::vec3 position)
 	{
+		glm::vec3 direction = position - comp.GetPosition();
+		RotateToDirectionVector(comp, direction);
+	}
+	void TransformSystem::RotateToDirectionVector(TransformComponent& comp, glm::vec3 direction)
+	{
+		glm::vec3 v = glm::normalize(direction);
 		glm::vec3 forward( 0,  0,  1);
 		glm::vec3 right  ( 1,  0,  0);
 
-		float dotForward = glm::dot(vector, forward);
-		float dotRight = glm::dot(vector, right);
+		float dotForward = glm::dot(v, forward);
+		float dotRight = glm::dot(v, right);
 
 		float angle = acosf(dotForward);
 		if (dotRight < 0.f) 

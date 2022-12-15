@@ -68,7 +68,7 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	shader->UploadUniformFloat3("u_Color", m_ObjColor);
 	shader->UploadUniformInt("u_ShowNormals", bShowNormals);
 
-
+	Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_CubeVA, m_Entity);
 	//Engine::Renderer::Submit(m_Shader, m_CubeVA, transform.m_Transform);
 
 	// End Scene
@@ -132,8 +132,8 @@ void TransformExampleLayer::OnImGuiRender()
 
 	ImGui::Separator();
 	ImGui::PushItemWidth(200.f);
-	ImGui::ColorEdit3("Object color", glm::value_ptr(m_ObjColor));
-	ImGui::Checkbox("Set custom color", &bShowNormals);
+	ImGui::ColorEdit3("Object color", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
+	ImGui::Checkbox("Show Normals", &m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 	ImGui::Separator();
 
 	ImGui::End();

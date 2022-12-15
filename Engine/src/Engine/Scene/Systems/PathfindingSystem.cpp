@@ -68,7 +68,7 @@ namespace Engine {
             // tmp method
             // Transforming the Entity should NOT be done here. This function should instead just give a intended position along the path
             TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0,0.5f,0));   // Manually adding extra height
-            TransformSystem::RotateToVector(transform, glm::normalize(direction));
+            TransformSystem::RotateToDirectionVector(transform, glm::normalize(direction));
         }
     }
 

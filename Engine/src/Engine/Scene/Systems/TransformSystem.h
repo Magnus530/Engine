@@ -14,7 +14,8 @@ namespace Engine {
 		static void AddWorldRotation(TransformComponent& comp, float radians, glm::vec3& rotationAxis);
 		static void AddLocalRotation(TransformComponent& comp, float radians, glm::vec3& rotationAxis);
 
-		static void RotateToVector(TransformComponent& comp, glm::vec3 vector);
+		static void RotateToPosition(TransformComponent& comp, glm::vec3 position);
+		static void RotateToDirectionVector(TransformComponent& comp, glm::vec3 direction);
 
 		static glm::vec3 GetScale(const TransformComponent& comp);
 		static void SetScale(TransformComponent& comp, float scale);
