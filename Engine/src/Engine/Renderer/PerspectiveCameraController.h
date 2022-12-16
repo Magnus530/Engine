@@ -19,6 +19,8 @@ namespace Engine
 		PerspectiveCamera& GetCamera() { return *m_Camera; }
 		const PerspectiveCamera& GetCamera() const { return *m_Camera; }
 
+		glm::vec3 GetPos() { return m_CameraPosition; }
+
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& e);
 		bool OnWindowResized(WindowResizeEvent& e);

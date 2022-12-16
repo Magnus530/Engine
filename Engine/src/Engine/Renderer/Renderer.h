@@ -3,6 +3,7 @@
 #include "RenderCommand.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "Engine/Renderer/PerspectiveCameraController.h"
 #include "Engine/Scene/Entity.h"
 
 namespace Engine
@@ -19,10 +20,13 @@ namespace Engine
 		//static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4 transform = glm::mat4(1.0f));
 		static void Submit(const ShaderType& shaderType, const std::shared_ptr<Shader>& shader,
 			const std::shared_ptr<VertexArray>& vertexArray, Entity& entity);
+		static void Submit(PerspectiveCameraController& camController, const ShaderType& shaderType,
+			const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
 		inline static glm::vec2 GetWindowSize();
+
 	private:
 		struct SceneData
 		{

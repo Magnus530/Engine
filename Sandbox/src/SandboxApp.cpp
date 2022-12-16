@@ -32,6 +32,7 @@ public:
 
 		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
 		m_WolfLogoTexture = Engine::Texture2D::Create("assets/textures/wolf.png");
+		m_WhiteTexture = Engine::Texture2D::Create("assets/textures/white.png");
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
@@ -41,16 +42,20 @@ public:
 		//Create entities here
 
 		m_ObjEntity = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_ActiveScene);
-		m_ObjEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
-		Engine::TransformSystem::SetWorldPosition(m_ObjEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 2.0f, 1.0f, 1.0f });
-
+		m_ObjEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.2f, 0.2f, 0.2f, 1.0f });
+		m_ObjEntity.AddComponent<Engine::TextureComponent>(m_WhiteTexture);
+		Engine::TransformSystem::SetScale(m_ObjEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
 
 		m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_ActiveScene);
-		m_CubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 0.0f, 1.0f, 1.0f });
-		m_CubeEntity.GetComponent<Engine::RendererComponent>().m_Tex = m_Texture;
+		m_CubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.5f, 0.5f, 0.5f, 1.0f });
+		Engine::TransformSystem::SetWorldPosition(m_CubeEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_CubeEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		//m_PrimitiveCubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(2, m_PrimitiveVA, m_ActiveScene);
-		//m_PrimitiveCubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sphere", m_SphereVA, m_ActiveScene);
+		m_LightEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f });
+		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 1 });
+		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -74,9 +79,9 @@ public:
 		//float testmovement = sinf(sin);
 		//	glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement, 0)));
 
-		Engine::Renderer::Submit(Engine::ShaderType::Flat, flatShader, m_PlaneVA, m_ObjEntity);
-		Engine::Renderer::Submit(Engine::ShaderType::Texture, textureShader, m_CubeVA, m_CubeEntity);
-		//Engine::Renderer::Submit(Engine::ShaderType::Texture, textureShader, m_PrimitiveVA, m_PrimitiveCubeEntity);
+		Engine::Renderer::Submit(m_PCameraController, Engine::ShaderType::Flat, phongShader, m_PlaneVA, m_ObjEntity, m_LightEntity);
+		Engine::Renderer::Submit(Engine::ShaderType::Flat, flatShader, m_CubeVA, m_CubeEntity);
+		Engine::Renderer::Submit(Engine::ShaderType::Flat, flatShader, m_SphereVA, m_LightEntity);
 		
 		Engine::Renderer::EndScene();
 	}
@@ -90,7 +95,7 @@ public:
 			auto& tag = m_ObjEntity.GetComponent<Engine::TagComponent>().Tag;
 			ImGui::Text("%s", tag.c_str());
 			auto& objColor = m_ObjEntity.GetComponent<Engine::RendererComponent>().m_Color;
-			ImGui::ColorEdit4("Obj Color", glm::value_ptr(m_ObjEntity.GetComponent<Engine::RendererComponent>().m_Color));
+			ImGui::ColorEdit4("Plane Color", glm::value_ptr(m_ObjEntity.GetComponent<Engine::RendererComponent>().m_Color));
 			ImGui::Separator();
 			ImGui::Checkbox("Show Custom Color", &m_ObjEntity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 			ImGui::Separator();
@@ -102,7 +107,7 @@ public:
 			auto& tag = m_CubeEntity.GetComponent<Engine::TagComponent>().Tag;
 			ImGui::Text("%s", tag.c_str());
 			auto& objColor = m_CubeEntity.GetComponent<Engine::RendererComponent>().m_Color;
-			ImGui::ColorEdit4("Plane Color", glm::value_ptr(m_CubeEntity.GetComponent<Engine::RendererComponent>().m_Color));
+			ImGui::ColorEdit4("Cube Color", glm::value_ptr(m_CubeEntity.GetComponent<Engine::RendererComponent>().m_Color));
 			ImGui::Separator();
 			ImGui::Checkbox("Show Custom Color", &m_CubeEntity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 			ImGui::Separator();
@@ -121,9 +126,9 @@ private:
 	std::shared_ptr<Engine::Shader> m_Shader;
 
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
-	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA;
+	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA;
 
-	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture;
+	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture, m_WhiteTexture;
 
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
@@ -133,6 +138,7 @@ private:
 	// Entities
 	Engine::Entity m_CubeEntity;
 	Engine::Entity m_ObjEntity;
+	Engine::Entity m_LightEntity;
 };
 
 class Sandbox : public Engine::Application

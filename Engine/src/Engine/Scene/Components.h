@@ -40,8 +40,6 @@ namespace Engine
 		std::shared_ptr<VertexBuffer> m_VB;
 		std::shared_ptr<IndexBuffer> m_IB;
 
-		std::shared_ptr<Texture2D> m_Tex = nullptr;
-
 		bool m_bCustomColor = false;
 
 		RendererComponent() = default;
@@ -74,11 +72,29 @@ namespace Engine
 		uint32_t m_ID{};
 	};
 
-	//class TestComponent
-	//{
-	//public:
-	//	TestComponent();
-	//	~TestComponent();
-	//	int data{};
-	//};
+	struct TextureComponent
+	{
+		std::shared_ptr<Texture2D> m_Tex = nullptr;
+
+		TextureComponent() = default;
+		TextureComponent(const TextureComponent&) = default;
+		TextureComponent(std::shared_ptr<Texture2D> tex)
+			: m_Tex(tex) {}
+	};
+
+	struct LightComponent
+	{
+		float m_AmbientStrength{ 10.f };
+		glm::vec3 m_AmbientColor{ 0.6, 0.6, 0.6 };
+		float m_LightStrength{ 1.f };
+		glm::vec3 m_LightColor{0.9f, 0.9f, 0.3f};
+		float m_SpecularStrength{ 3.f };
+		int m_SpecularExponent{ 4 };
+		glm::vec3 m_ObjectColor{ 1.f, 1.f, 1.f };
+
+		LightComponent() = default;
+		LightComponent(const LightComponent&) = default;
+		LightComponent(const float lightStrength)
+			: m_LightStrength(lightStrength) {}
+	};
 }
