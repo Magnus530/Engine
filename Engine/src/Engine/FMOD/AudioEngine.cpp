@@ -120,16 +120,21 @@ namespace Engine
 			sgpImplementation->mpSystem->createReverb3D(&sgpImplementation->mpReverb);
 			//FMOD_REVERB_PROPERTIES propHanger = FMOD_PRESET_HANGAR;
 
-			AE->setEnvironmentReverb(FMOD_PRESET_HANGAR, glm::vec3(), 0.f, 10.f);
-			AE->playSound(musicPath1, glm::vec3(), -6.f);
+			AE->setEnvironmentReverb(FMOD_PRESET_CONCERTHALL, glm::vec3(), 0.f, 10.f);
+			AE->playSound(musicPath1, glm::vec3(), -1.f);
 
 			//AE->setChannelVolume(musicPath1, 12.f);
+		}
+		if (Input::IsKeyPressed(E_KEY_Q))
+		{
+			AE->playSound(oneShot1, glm::vec3());
+			//AE->setChannelVolume(musicPath1, -12.f);
+
 		}
 		if (Input::IsKeyPressed(E_KEY_SPACE))
 		{
 			AE->stopAllChannels();
 		}
-
 	}
 
 	void AudioEngine::shutdown()

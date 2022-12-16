@@ -27,6 +27,7 @@ TransformExampleLayer::TransformExampleLayer()
 	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
 	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
+	m_Audio = std::make_shared<Engine::AudioEngine>();
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
