@@ -58,6 +58,9 @@
     <Filter Include="src\Engine\AssetLoaders">
       <UniqueIdentifier>{efe659d9-b903-46ec-b118-7c08ca43c9cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Particles">
+      <UniqueIdentifier>{50bc9afc-153e-4e5f-862a-545e21163541}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
