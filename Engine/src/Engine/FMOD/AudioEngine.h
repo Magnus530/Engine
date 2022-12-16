@@ -67,7 +67,6 @@ namespace Engine {
     static const ReverbProperties ENVIRONMENT_CONCERTHALL =      {  3900,   20,  29, 5000,  70, 100, 100, 250, 0,  5650,  80,  -9.8f };
     static const ReverbProperties ENVIRONMENT_CAVE =             {  2900,   15,  22, 5000, 100, 100, 100, 250, 0, 20000,  59, -11.3f };
     static const ReverbProperties ENVIRONMENT_ARENA =            {  7200,   20,  30, 5000,  33, 100, 100, 250, 0,  4500,  80,  -9.6f };
-    static const ReverbProperties ENVIRONMENT_HANGER =           { 10000,   20,  30, 5000,  23, 100, 100, 250, 0,  3400,  72,  -7.4f };
     static const ReverbProperties ENVIRONMENT_CARPETTEDHALLWAY = {   300,    2,  30, 5000,  10, 100, 100, 250, 0,   500,  56, -24.0f };
     static const ReverbProperties ENVIRONMENT_HALLWAY =          {  1500,    7,  11, 5000,  59, 100, 100, 250, 0,  7800,  87,  -5.5f };
     static const ReverbProperties ENVIRONMENT_STONECORRIDOR =    {   270,   13,  20, 5000,  79, 100, 100, 250, 0,  9000,  86,  -6.0f };
@@ -211,7 +210,7 @@ namespace Engine {
             return 20.f * log10f(volume);
         }
         static FMOD_VECTOR vectorToFmod(const glm::vec3& vPosition) {
-            FMOD_VECTOR fVec;
+            FMOD_VECTOR fVec{};
             fVec.x = vPosition.x;
             fVec.y = vPosition.y;
             fVec.z = vPosition.z;
@@ -221,7 +220,7 @@ namespace Engine {
 
         FMOD_VECTOR velocityToFmod(float _x, float _y, float _z)
         {
-            FMOD_VECTOR fVel;
+            FMOD_VECTOR fVel{};
             fVel.x = _x;
             fVel.y = _y;
             fVel.z = _z;
@@ -247,4 +246,5 @@ namespace Engine {
         //int registerSound(const SoundDefinition& tSoundDef, bool bLoad = true);
         //void unregisterSound(int nSoundId);
     };
+    //std::shared_ptr<AudioEngine> AE{ nullptr };
 }

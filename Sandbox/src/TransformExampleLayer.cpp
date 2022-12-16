@@ -43,6 +43,8 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
 	glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
+
+	m_Audio->update(ts);
 	// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
 	static float sin{};
 	sin += ts;

@@ -51,12 +51,13 @@ public:
 
 		//m_PrimitiveCubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(2, m_PrimitiveVA, m_ActiveScene);
 		//m_PrimitiveCubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+
+		m_Audio = std::make_shared<Engine::AudioEngine>();
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
 	{
 		m_PCameraController.OnUpdate(ts);
-
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
@@ -68,6 +69,7 @@ public:
 		auto textureShader = m_ShaderLibrary.Get("Texture");
 		auto phongShader = m_ShaderLibrary.Get("Phong");
 
+		m_Audio->update(ts);
 		/* Test posisjonering */	
 		//static float sin{};
 		//sin += ts;

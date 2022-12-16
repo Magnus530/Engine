@@ -1,6 +1,11 @@
 #include "epch.h"
 #include "AudioEngine.h"
+
+#include "Engine/Core/Input.h"
+#include "Engine/Core/KeyCodes.h"
+
 #include <combaseapi.h>
+
 namespace Engine 
 {
 	//*********************** IMPLEMENTATION CODE*********************//
@@ -9,7 +14,7 @@ namespace Engine
 	//--------------------------------------------------------------
 	Implementation::Implementation()
 	{
-		//CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 		// Create a System studio object and initialize.
 		AudioEngine::errorCheck(FMOD::Studio::System::create(&mpStudioSystem));
 		AudioEngine::errorCheck(mpStudioSystem->initialize(
@@ -71,12 +76,13 @@ namespace Engine
 	// neither do we ovverride the copy constructor and the assingment operator ( to communicate with the impl class)
 	
 	Implementation* sgpImplementation = nullptr;
-
+	std::shared_ptr<AudioEngine> AE{ nullptr };
 
 
 	AudioEngine::AudioEngine()
 	{
 		init();
+		AE->loadSound("assets/audio/Cartoon_song.wav", false, true, true);
 	}
 
 	AudioEngine::~AudioEngine()
@@ -97,20 +103,38 @@ namespace Engine
 	//std::string	oneShot1 = "assets/audio/sfx_sound.wav";
 	//if (Input::IsKeyPressed(E_KEY_Q))
 	//{
-	//	playSound(oneShot1, glm::vec3(), -6.f);
-	//	setChannelVolume(musicPath1, 12.f);
+	//	playSound("assets/audio/sfx_sound.wav", glm::vec3(), -6.f);
+	//	setChannelVolume("assets/audio/Cartoon_song.wav", 12.f);
 	//}
 	//------------------------------
 	// Update the engine properties
 	//------------------------------
 	void AudioEngine::update(float fTimeDeltaSeconds)
 	{
+		std::string musicPath1 = "assets/audio/Cartoon_song.wav";
+		std::string	oneShot1 = "assets/audio/sfx_sound.wav";
 		sgpImplementation->update(fTimeDeltaSeconds);
+		if (Input::IsKeyPressed(E_KEY_L))
+		{
+			
+			sgpImplementation->mpSystem->createReverb3D(&sgpImplementation->mpReverb);
+			//FMOD_REVERB_PROPERTIES propHanger = FMOD_PRESET_HANGAR;
+
+			AE->setEnvironmentReverb(FMOD_PRESET_HANGAR, glm::vec3(), 0.f, 10.f);
+			AE->playSound(musicPath1, glm::vec3(), -6.f);
+
+			//AE->setChannelVolume(musicPath1, 12.f);
+		}
+		if (Input::IsKeyPressed(E_KEY_SPACE))
+		{
+			AE->stopAllChannels();
+		}
+
 	}
 
 	void AudioEngine::shutdown()
 	{
-		CoUninitialize();
+		//CoUninitialize();
 		delete sgpImplementation;
 	}
 
