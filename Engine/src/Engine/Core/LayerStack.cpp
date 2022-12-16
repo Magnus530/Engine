@@ -48,4 +48,19 @@ namespace Engine
 			m_Layers.erase(it);
 		}
 	}
+	std::vector<std::string> LayerStack::GetLayerNames() const
+	{
+		std::vector<std::string> names;
+		for (const auto& it : m_Layers)
+		{
+			names.push_back(it->GetName());
+		}
+		return names;
+	}
+	Layer* LayerStack::GetLayerAtIndex(uint32_t index)
+	{
+		if (index > m_Layers.size() + 1)
+			return nullptr;
+		return m_Layers[index];
+	}
 }

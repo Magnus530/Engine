@@ -1,90 +1,75 @@
 #pragma once
-//#include "Engine/Core.h"
-#include "Engine/Core/Core.h"
-#include "Engine.h"
 #include "glm/glm.hpp"
 
 namespace Engine {
-	inline int floatConvert{ 10 };
+	inline float floatConvert{ 1000.f };
 
-	enum class ENodeType
+	struct PathNodeNeighbors
 	{
-		NT_None,
-		NT_Start,
-		NT_Path,
-		NT_Target,
-		NT_Checked,
-		NT_Processed,
-		NT_Block
+		std::vector<std::shared_ptr<class PNode>> neighbors;
 	};
 
-	class ENGINE_API PNode
+	struct PathNodeDistanceValues
 	{
-	public:
-
-		PNode();
-		PNode(glm::vec3 position);
-		~PNode();
-
-		ENodeType NodeType = ENodeType::NT_None;
-
-		glm::vec3 m_Position;
-		std::vector<PNode*> mConnectedNodes;
-		void AddConnectedNode(PNode* node) { mConnectedNodes.push_back(node); }
-		/* Direct connection to next node when moving through the path from the end node */
-		PNode* m_Connection{ nullptr };
-
 		int F;	// Total DistanceValue
 		int G;	// DistanceValue from StartNode to this
 		int H;	// DistanceValue from EndNode to this
-
-
-		int GetDistanceToNode(PNode* target);
-		void InitValues(PNode* start, PNode* target);
-
-		void SetG(int g) { G = g; F = G + H; }
-		void SetH(PNode* target) { H = GetDistanceToNode(target); }
-
-		bool IsBlock() const { return NodeType == ENodeType::NT_Block; }
-
 	};
 
-	std::vector<PNode*> FindPath(PNode* start, PNode* end);
-	
-
-	// Spawner noder for testing 
-	int GridSize{ 1000 };
-	float GridSpacing{ 100.f };
-	glm::vec3 Center(0, 0, 0);
-	std::vector<std::shared_ptr<PNode>> mNodes;
-	void SpawnGrid()
+	struct PathNodeData
 	{
-		std::shared_ptr<PNode> a;
-		std::shared_ptr<PNode> b;
+		std::string m_Name;
+		glm::vec3 m_Position{};
+		bool bIsObstruction{};
+	};
 
-		for (size_t x{}; x < 10; x++)
+	class PNode
+	{
+	public:
+		PNode(glm::vec3 position)
 		{
-			for (size_t y{}; y < 10; y++)
-			{
-				glm::vec3 location = glm::vec3(Center.x + (GridSpacing * x) - (float)GridSize / 2, Center.y + (GridSpacing * y) - (float)GridSize / 2, Center.z);
-				mNodes.emplace_back(std::make_shared<PNode>(location));
-			}
+			m_Data			  = std::make_unique<PathNodeData>();
+			m_Neighbors		  = std::make_unique<PathNodeNeighbors>();
+			m_DistanceValues  = std::make_unique<PathNodeDistanceValues>();
+
+			m_Data->m_Position = position;
 		}
-		for (size_t i{ 1 }; i < mNodes.size(); i++)
+		PNode(std::string name, glm::vec3 position) 
+			: PNode(position)
 		{
-			if (mNodes.size() < i + 1) break;
-
-			a = mNodes[i - 1];
-			b = mNodes[i];
-			if (i % 10 != 0 || i == 0) {
-				a->AddConnectedNode(b.get());
-				b->AddConnectedNode(a.get());
-			}
-
-			if (mNodes.size() < i + 10) continue;
-			b = mNodes[i - 1 + 10];
-			a->AddConnectedNode(b.get());
-			b->AddConnectedNode(a.get());
+			m_Data->m_Name = name;
 		}
-	}
+		~PNode()
+		{
+		}
+
+		std::unique_ptr<PathNodeData> m_Data;
+		std::unique_ptr<PathNodeDistanceValues> m_DistanceValues;
+		std::unique_ptr<PathNodeNeighbors> m_Neighbors;
+		std::shared_ptr<PNode> m_Connection;
+
+
+		void AddConnectedNode(std::shared_ptr<PNode> node) { 
+			m_Neighbors->neighbors.push_back(node);
+		}
+		int GetDistanceToNode(PNode* target)
+		{
+			return (int)(glm::length(m_Data->m_Position - target->m_Data->m_Position) * floatConvert);
+		}
+		void InitValues(PNode* target)
+		{
+			m_DistanceValues->H = GetDistanceToNode(target);
+			m_DistanceValues->F = m_DistanceValues->G + m_DistanceValues->H;
+		}
+		void SetG(int g) { m_DistanceValues->G = g;  m_DistanceValues->F = m_DistanceValues->G + m_DistanceValues->H; }
+		void SetH(PNode* target) { m_DistanceValues->H = GetDistanceToNode(target); }
+
+		bool IsObstruction() const { 
+			return m_Data->bIsObstruction;
+		}
+		void SetObstructionStatus(bool b)
+		{
+			m_Data->bIsObstruction = b;
+		}
+	};
 }

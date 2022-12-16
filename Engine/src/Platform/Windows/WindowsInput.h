@@ -14,5 +14,6 @@ namespace Engine
 		virtual float GetMouseXImpl() override;
 		virtual float GetMouseYImpl() override;
 
+		virtual void SetMousePosImpl(const float& x, const float& y) override;
 	};
 }

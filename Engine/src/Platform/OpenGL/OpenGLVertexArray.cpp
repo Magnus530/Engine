@@ -28,17 +28,17 @@ namespace Engine
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
-		glCreateVertexArrays(1, &m_RendererID);
+		glGenVertexArrays(1, &m_VAO);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
-		glDeleteVertexArrays(1, &m_RendererID);
+		glDeleteVertexArrays(1, &m_VAO);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
-		glBindVertexArray(m_RendererID);
+		glBindVertexArray(m_VAO);
 	}
 
 	void OpenGLVertexArray::Unbind() const
@@ -50,7 +50,7 @@ namespace Engine
 	{
 		E_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer is missing a layout.");
 
-		glBindVertexArray(m_RendererID);
+		glBindVertexArray(m_VAO);
 		vertexBuffer->Bind();
 
 		uint32_t index = 0;
@@ -58,7 +58,8 @@ namespace Engine
 		for (const auto& element : layout)
 		{
 			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index,
+			glVertexAttribPointer(
+				index,
 				element.GetComponentCount(),
 				ShaderDataTypeToOpenGLBaseType(element.Type),
 				element.Normalized ? GL_TRUE : GL_FALSE,
@@ -70,9 +71,22 @@ namespace Engine
 		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
+	void OpenGLVertexArray::AddVertexBuffer(const uint32_t& vertexBuffer, uint64_t& data)
+	{
+		glBindVertexArray(m_VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, data, reinterpret_cast<void*>(0));// array buffer offset
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, data, reinterpret_cast<void*>(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, data, reinterpret_cast<void*>(6 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+	}
+
 	void OpenGLVertexArray::SetIndexBuffer(const std::shared_ptr<IndexBuffer>& indexBuffer)
 	{
-		glBindVertexArray(m_RendererID);
+		glBindVertexArray(m_VAO);
 		indexBuffer->Bind();
 
 		m_IndexBuffer = indexBuffer;

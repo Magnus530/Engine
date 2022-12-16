@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Engine/Core/Core.h"
+#include "Engine/Core/Application.h"
+
 #ifdef E_PLATFORM_WINDOWS
 
 extern Engine::Application* Engine::CreateApplication();

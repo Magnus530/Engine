@@ -2,6 +2,7 @@
 
 #include "RendererAPI.h"
 
+
 namespace Engine
 {
 	class RenderCommand
@@ -27,13 +28,10 @@ namespace Engine
 			s_RendererAPI->Clear();
 		}
 
-
 		inline static void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray)
 		{
 			s_RendererAPI->DrawIndexed(vertexArray);
 		}
-
-
 
 	private:
 		static RendererAPI* s_RendererAPI;

@@ -5,6 +5,11 @@
 
 namespace Engine
 {
+	enum class ShaderType
+	{
+		Flat = 0, Texture = 1, Phong = 2
+	};
+
 	class Shader
 	{
 	public:
