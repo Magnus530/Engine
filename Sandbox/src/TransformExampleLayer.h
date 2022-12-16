@@ -42,5 +42,5 @@ private: // Transform testing
 	float m_SetScale{ 1.f };
 
 	glm::vec3 m_ObjColor{ 0.5f, 0.5f, 0.5f };
-	bool bShowCustomColor{};
+	bool bShowNormals{};
 };

@@ -59,11 +59,16 @@ namespace Engine {
         }
         
         if (!pathfinder.bReachedTarget) {
+            glm::vec3 previousPosition = transform.GetPosition();
             glm::vec3 pos = BSplineCreator::GetPositionAlongSpline(*pathfinder.m_SplinePath, t);
+
+            glm::vec3 direction = pos - previousPosition;
+            direction.y = 0.f;
 
             // tmp method
             // Transforming the Entity should NOT be done here. This function should instead just give a intended position along the path
             TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0,0.5f,0));   // Manually adding extra height
+            TransformSystem::RotateToDirectionVector(transform, glm::normalize(direction));
         }
     }
 

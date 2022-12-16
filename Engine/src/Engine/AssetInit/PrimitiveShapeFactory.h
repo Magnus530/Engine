@@ -29,11 +29,6 @@ namespace Engine
 					pShape = std::make_shared<Engine::Icosahedron>();
 					break;
 				}
-				case 4:
-				{
-					pShape = std::make_shared<Engine::Sphere>();
-					break;
-				}
 				default:
 				{
 					E_CORE_INFO("Please enter another number for PrimitiveShape type.");

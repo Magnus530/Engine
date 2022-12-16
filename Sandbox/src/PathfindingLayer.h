@@ -52,8 +52,6 @@ public:
 	PathfindingLayer()
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		//E_TRACE("PathBlocking Sphere : {0}", sizeof(Engine::PathObstructionSphere));
-
 		/* Pathfinding */
 		Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), glm::vec3((int)21, 0, (int)17), 1);
 
@@ -79,22 +77,19 @@ public:
 		std::shared_ptr<Engine::PNode> startNode = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, 0);
 		glm::vec3 startPosition = startNode->m_Data->m_Position;
 		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition + glm::vec3(0, 0.5f, 0)); //Manually adding extra height
+		Engine::TransformSystem::RotateToDirectionVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(-1, 0, 1)));
+
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode = startNode;
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_Grid = Engine::NodeGridSystem::GetGridAtIndex(0);
 
+		// Planes
 		m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
 		m_Plane.AddComponent<Engine::RendererComponent>();
 
-		//m_BeveledCube = Engine::EntityInitializer::GetInstance().EntityInit("BeveledCube", m_Scene);
-		//Engine::TransformSystem::SetWorldPosition(m_BeveledCube.GetComponent<Engine::TransformComponent>(), glm::vec3(0.f));
-
-		// Creating Pathfinding Obstructions 
+		// Vertex Array Pathfinding Obstructions
 		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, så Initialiserer den for seg selv her
-
-		//CreateObstructor(glm::vec3(  5.f,  0.f,   5.f), 2.f);
 	}
 
-	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
 	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
 	void OnUpdate(Engine::Timestep ts) override
 	{
@@ -144,17 +139,17 @@ public:
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
 
-		Engine::TransformSystem::UpdateMatrix(transform);
-		Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
+		//Engine::TransformSystem::UpdateMatrix(transform);
+		//Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
+		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_VA, m_Entity);	
 		
-		//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, m_BeveledCube.GetComponent<Engine::TransformComponent>().m_Transform);		// Render m_BeveledCube
 		
-
 		/*-----------RENDER OBSTRUCTIONS---------------*/
 		for (uint32_t i{}; i < m_Obstructors.size(); i++)
 		{
-			auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
-			Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
+			//auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
+			//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
+			Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_BeveledCubeVA, m_Obstructors[i]);
 		}
 
 
@@ -181,7 +176,7 @@ public:
 					alteredColor = true;
 				}
 
-				Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
+				//Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
 				if (alteredColor) {
 					std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
 					alteredColor = false;
@@ -193,7 +188,7 @@ public:
 			scale /= 2.f;
 			for (auto& it : pathfinder.m_SplinePath->m_Controlpoints)
 			{
-				Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0)));
+				//Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0)));
 			}
 		}
 		// End Render Scene
@@ -201,12 +196,52 @@ public:
 	}
 
 	//----------------------------------------------------------------IMGUI-------------------------------------------------------------------------------------------------------------------------
-	//----------------------------------------------------------------IMGUI-------------------------------------------------------------------------------------------------------------------------
 	virtual void OnImGuiRender() override
 	{
 		ImGui::ShowDemoWindow();
 
 		ImGui::Begin("Pathfinder");
+		
+		ImGui::Separator();
+		ImGui::PushID(0);
+		ImGui::PushItemWidth(200.f);
+		ImGui::Text("Monkey");
+		ImGui::ColorEdit3("", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
+		ImGui::Checkbox("Show Normals", &m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
+		ImGui::PopID();
+
+		ImGui::Separator();
+		ImGui::Text("Obstructors");
+		ImGui::PushID(1);
+		static glm::vec3 color{ 0.5,0.5,0.5 };
+		static bool bObstructor_ShowNormal{};
+		ImGui::ColorEdit3("", glm::value_ptr(color));
+		if (ImGui::Checkbox("Show Normals", &bObstructor_ShowNormal))
+			for (auto& it : m_Obstructors)
+				it.GetComponent<Engine::RendererComponent>().m_bCustomColor = bObstructor_ShowNormal;
+		if (bObstructor_ShowNormal)
+			for (auto& it : m_Obstructors)
+				it.GetComponent<Engine::RendererComponent>().m_Color = glm::vec4(color, 1.f);
+		ImGui::PopID();
+
+		// TransformTesting -  Rotate to vector
+		// 
+		//static float z{ -1 };
+		//static float x{  1 };
+		//ImGui::PushItemWidth(100.f);
+		//for (size_t i{}; i < 2; i++)
+		//{
+		//	ImGui::PushID(i);
+		//	
+		//	if (ImGui::SliderFloat(i == 0 ? "z" : "x", i == 0 ? &z : &x, -1.f, 1.f, "%.1f")) 
+		//	{
+		//		ImGui::GetActiveID();
+		//		Engine::TransformSystem::RotateToVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(x, 0, z)));
+		//	}
+		//	if (!i)
+		//		ImGui::SameLine();
+		//	ImGui::PopID();
+		//}
 
 
 		ImGui::TextDisabled("(?)");
@@ -265,7 +300,6 @@ public:
 				ID = ImGui::GetActiveID();
 				
 				Engine::TransformSystem::SetWorldPosition(transform, pos);
-				Engine::TransformSystem::UpdateMatrix(transform);
 				Engine::NodeGridSystem::UpdateObstructionSphere(0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
 			}
 			ImGui::PopID();
@@ -305,9 +339,6 @@ public:
 				pathfinder.m_TargetNode = m_TargetNode;
 				Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0, 0.5f, 0));
 			}
-
-			//E_TRACE("Intersection: {0}, {1}, {2}", Intersection.x, Intersection.y, Intersection.z);
-			//E_INFO("Radius: {0}", glm::length(m_BeveledCube.GetComponent<Engine::TransformComponent>().GetPosition() - glm::vec3(0)));
 		}
 	}
 
