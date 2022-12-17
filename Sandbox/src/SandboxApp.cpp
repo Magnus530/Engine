@@ -26,16 +26,11 @@ public:
 	ExampleLayer()
 		: Layer("Example"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		auto flatShader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
-		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
-		auto phongShader = m_ShaderLibrary.Load("assets/shaders/Phong.glsl");
+		Engine::Renderer::RenderInit();
 
 		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
 		m_WolfLogoTexture = Engine::Texture2D::Create("assets/textures/wolf.png");
 		m_WhiteTexture = Engine::Texture2D::Create("assets/textures/white.png");
-
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 		
 		m_ActiveScene = std::make_shared<Engine::Scene>();
 
@@ -46,10 +41,14 @@ public:
 		m_ObjEntity.AddComponent<Engine::TextureComponent>(m_WhiteTexture);
 		Engine::TransformSystem::SetScale(m_ObjEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
 
-		m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_ActiveScene);
-		m_CubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.5f, 0.5f, 0.5f, 1.0f });
-		Engine::TransformSystem::SetWorldPosition(m_CubeEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 1.0f });
-		Engine::TransformSystem::SetScale(m_CubeEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
+		//m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(2, m_CubeVA, m_ActiveScene);
+		//m_CubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.5f, 0.5f, 0.5f, 1.0f });
+		//m_CubeEntity.AddComponent<Engine::TextureComponent>(m_Texture);
+
+		//m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_ActiveScene);
+		//m_CubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.5f, 0.5f, 0.5f, 1.0f });
+		//Engine::TransformSystem::SetWorldPosition(m_CubeEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 1.0f });
+		//Engine::TransformSystem::SetScale(m_CubeEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
 		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sphere", m_SphereVA, m_ActiveScene);
 		m_LightEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f });
@@ -69,19 +68,9 @@ public:
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-		auto flatShader = m_ShaderLibrary.Get("Flat");
-		auto textureShader = m_ShaderLibrary.Get("Texture");
-		auto phongShader = m_ShaderLibrary.Get("Phong");
-
-		/* Test posisjonering */	
-		//static float sin{};
-		//sin += ts;
-		//float testmovement = sinf(sin);
-		//	glm::vec3(1.5f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0, testmovement, 0)));
-
-		Engine::Renderer::Submit(m_PCameraController, Engine::ShaderType::Flat, phongShader, m_PlaneVA, m_ObjEntity, m_LightEntity);
-		Engine::Renderer::Submit(Engine::ShaderType::Flat, flatShader, m_CubeVA, m_CubeEntity);
-		Engine::Renderer::Submit(Engine::ShaderType::Flat, flatShader, m_SphereVA, m_LightEntity);
+		Engine::Renderer::Submit(Engine::ShaderType::Phong, m_PlaneVA, m_ObjEntity, m_LightEntity, m_PCameraController);
+		//Engine::Renderer::Submit(Engine::ShaderType::Texture, m_CubeVA, m_CubeEntity, m_LightEntity, m_PCameraController);
+		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_SphereVA, m_LightEntity, m_LightEntity, m_PCameraController);
 		
 		Engine::Renderer::EndScene();
 	}
@@ -122,7 +111,6 @@ public:
 	}
 
 private:
-	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
 
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;

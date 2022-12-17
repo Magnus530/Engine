@@ -1,6 +1,7 @@
 #include "epch.h"
 #include "EntityInitializer.h"
 #include "Engine/AssetInit/PrimitiveShapeFactory.h"
+#include "Engine/Scene/Components.h"
 
 namespace Engine
 {
@@ -43,8 +44,8 @@ namespace Engine
 		vertexarr.reset(Engine::VertexArray::Create()); // OpenGLVertexArray*
 
 		std::shared_ptr<Engine::VertexBuffer> PrimitiveVB;
-		std::vector<float> fVertices = Engine::PrimitiveShapeFactory::CreatePrimitiveShape(shapenum)->GetVertices();
-		PrimitiveVB.reset(Engine::VertexBuffer::Create(fVertices.data(), fVertices.size() * sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
+		std::vector<float> vertices = Engine::PrimitiveShapeFactory::CreatePrimitiveShape(shapenum)->GetVertices();
+		PrimitiveVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(float))); // OpenGLVertexBuffer*	// for en vector av floats
 		PrimitiveVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },

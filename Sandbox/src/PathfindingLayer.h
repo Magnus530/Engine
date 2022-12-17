@@ -141,7 +141,7 @@ public:
 
 		//Engine::TransformSystem::UpdateMatrix(transform);
 		//Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
-		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_VA, m_Entity);	
+		//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_VA, m_Entity);	
 		
 		
 		/*-----------RENDER OBSTRUCTIONS---------------*/
@@ -149,7 +149,7 @@ public:
 		{
 			//auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
 			//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
-			Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_BeveledCubeVA, m_Obstructors[i]);
+			//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_BeveledCubeVA, m_Obstructors[i]);
 		}
 
 

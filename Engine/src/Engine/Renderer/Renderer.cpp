@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
+#include "Engine/Renderer/RenderFactory.h"
 
 namespace Engine
 {
@@ -29,58 +30,22 @@ namespace Engine
 	void Renderer::EndScene()
 	{}
 
-	void Renderer::Submit(const ShaderType& shaderType, const std::shared_ptr<Shader>& shader,
-		const std::shared_ptr<VertexArray>& vertexArray, Entity& entity)
+	void Renderer::RenderInit()
 	{
-		shader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ProjectionView", m_SceneData->ProjectionMatrix);
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewMatrix", m_SceneData->ViewMatrix);
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Transform", 
-			entity.GetComponent<Engine::TransformComponent>().m_Transform);
+		m_ShaderLibrary = std::make_shared<Engine::ShaderLibrary>();
 
-		switch (shaderType)
-		{
-			case ShaderType::Flat:
-			{
-				auto flatOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(shader);
-				flatOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-				flatOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::RendererComponent>().m_Color));
-				break;
-			}
-			case ShaderType::Texture:
-			{
-				entity.GetComponent<TextureComponent>().m_Tex->Bind();
-				break;
-			}
-		}
+		std::shared_ptr<Shader> flatShader = m_ShaderLibrary->Load("assets/shaders/Flat.glsl");
+		std::shared_ptr<Shader> textureShader = m_ShaderLibrary->Load("assets/shaders/Texture.glsl");
+		std::shared_ptr<Shader> phongShader = m_ShaderLibrary->Load("assets/shaders/Phong.glsl");
 
-		vertexArray->Bind();
-		RenderCommand::DrawIndexed(vertexArray);
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
-	void Renderer::Submit(PerspectiveCameraController& camController, const ShaderType& shaderType,
-		const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light)
+	void Renderer::Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam)
 	{
-		shader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ProjectionView", m_SceneData->ProjectionMatrix);
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewMatrix", m_SceneData->ViewMatrix);
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Transform",
-			entity.GetComponent<Engine::TransformComponent>().m_Transform);
+		Engine::RenderFactory::CreateShaderType(shaderType)->InitShaderUniforms(m_SceneData, entity, light, pCam, m_ShaderLibrary);
 
-		auto flatOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(shader);
-		flatOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-		flatOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::RendererComponent>().m_Color));
-		entity.GetComponent<TextureComponent>().m_Tex->Bind();
-
-		auto lightPos = light.GetComponent<Engine::TransformComponent>().m_Transform[3];
-		auto tempLight = light.GetComponent<Engine::LightComponent>();
-
-		auto phongOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(shader);
-		phongOpenGLShader->UploadUniformFloat3("u_LightPosition", glm::vec3{lightPos.x, lightPos.y, lightPos.z});
-		phongOpenGLShader->UploadUniformFloat3("u_CameraPosition", camController.GetPos());
-		phongOpenGLShader->UploadUniformFloat3("u_LightColor", glm::vec3(tempLight.m_LightColor.x,
-			tempLight.m_LightColor.y, tempLight.m_LightColor.z));
-		phongOpenGLShader->UploadUniformFloat("u_SpecularStrength", tempLight.m_SpecularStrength);
 
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);

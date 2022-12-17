@@ -17,17 +17,15 @@ namespace Engine
 		static void BeginScene(Camera& camera);
 		static void EndScene();
 
+		static void RenderInit();
+
 		//static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4 transform = glm::mat4(1.0f));
-		static void Submit(const ShaderType& shaderType, const std::shared_ptr<Shader>& shader,
-			const std::shared_ptr<VertexArray>& vertexArray, Entity& entity);
-		static void Submit(PerspectiveCameraController& camController, const ShaderType& shaderType,
-			const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light);
+		static void Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 
 		inline static glm::vec2 GetWindowSize();
 
-	private:
 		struct SceneData
 		{
 			glm::mat4 ProjectionMatrix;
@@ -35,6 +33,7 @@ namespace Engine
 		};
 
 		static SceneData* m_SceneData;
+	private:
 
 		struct WindowSize
 		{
@@ -43,5 +42,7 @@ namespace Engine
 		};
 
 		static WindowSize* m_WindowSize;
+
+		inline static std::shared_ptr<Engine::ShaderLibrary> m_ShaderLibrary;
 	};
 }

@@ -68,7 +68,7 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	shader->UploadUniformFloat3("u_Color", m_ObjColor);
 	shader->UploadUniformInt("u_ShowNormals", bShowNormals);
 
-	Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_CubeVA, m_Entity);
+	//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_CubeVA, m_Entity);
 	//Engine::Renderer::Submit(m_Shader, m_CubeVA, transform.m_Transform);
 
 	// End Scene

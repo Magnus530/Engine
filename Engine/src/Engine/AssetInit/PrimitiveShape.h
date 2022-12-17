@@ -5,7 +5,7 @@ a sphere http://www.songho.ca/opengl/gl_sphere.html */
 
 #pragma once
 
-#include <vector>
+#include "epch.h"
 #include "glm/gtc/constants.hpp"
 #include "Engine/Renderer/vertex.h"
 
@@ -16,12 +16,11 @@ namespace Engine
 	public:
 		virtual ~PrimitiveShape() = 0;
 
-		virtual std::vector<float> GetVertices() { return fVertices; }
+		virtual std::vector<float> GetVertices() { return vertices; }
 		virtual std::vector<uint32_t> GetIndices() { return indices; }
 
 	private:
-		std::vector<float> fVertices;
-		std::vector<Vertex> vVertices;
+		std::vector<float> vertices;
 		std::vector<uint32_t> indices;
 	};
 
