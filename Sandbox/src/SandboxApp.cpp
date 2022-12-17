@@ -55,12 +55,16 @@ public:
 		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 1 });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
+
+		//m_PrimitiveCubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(2, m_PrimitiveVA, m_ActiveScene);
+		//m_PrimitiveCubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+
+		m_Audio = std::make_shared<Engine::AudioEngine>();
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
 	{
 		m_PCameraController.OnUpdate(ts);
-
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
@@ -71,6 +75,16 @@ public:
 		Engine::Renderer::Submit(Engine::ShaderType::Phong, m_PlaneVA, m_ObjEntity, m_LightEntity, m_PCameraController);
 		//Engine::Renderer::Submit(Engine::ShaderType::Texture, m_CubeVA, m_CubeEntity, m_LightEntity, m_PCameraController);
 		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_SphereVA, m_LightEntity, m_LightEntity, m_PCameraController);
+		
+		auto flatShader = m_ShaderLibrary.Get("Flat");
+		auto textureShader = m_ShaderLibrary.Get("Texture");
+		auto phongShader = m_ShaderLibrary.Get("Phong");
+
+		m_Audio->update(ts);
+
+		Engine::Renderer::Submit(Engine::ShaderType::Flat, flatShader, m_PlaneVA, m_ObjEntity);
+		Engine::Renderer::Submit(Engine::ShaderType::Texture, textureShader, m_CubeVA, m_CubeEntity);
+		//Engine::Renderer::Submit(Engine::ShaderType::Texture, textureShader, m_PrimitiveVA, m_PrimitiveCubeEntity);
 		
 		Engine::Renderer::EndScene();
 	}
@@ -113,6 +127,7 @@ public:
 private:
 	std::shared_ptr<Engine::Shader> m_Shader;
 
+	std::shared_ptr<Engine::AudioEngine> m_Audio;
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA;
 

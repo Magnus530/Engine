@@ -27,6 +27,7 @@ TransformExampleLayer::TransformExampleLayer()
 	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
 	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
+	m_Audio = std::make_shared<Engine::AudioEngine>();
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
@@ -43,6 +44,8 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
 	glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
+
+	m_Audio->update(ts);
 	// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
 	static float sin{};
 	sin += ts;

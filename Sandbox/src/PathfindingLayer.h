@@ -17,7 +17,7 @@ private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader, m_Textureshader;
 	std::shared_ptr<Engine::Texture2D> m_Texture;
-
+	std::shared_ptr<Engine::AudioEngine> m_Audio;
 	Engine::PerspectiveCameraController m_PCameraController;
 
 private:
@@ -73,6 +73,7 @@ public:
 		m_Entity.AddComponent<Engine::RendererComponent>();
 		m_Entity.AddComponent<Engine::PathfindingComponent>();
 
+		m_Audio = std::make_shared<Engine::AudioEngine>();
 		/* Set m_Entity location to Pathfinding Node 1 */
 		std::shared_ptr<Engine::PNode> startNode = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, 0);
 		glm::vec3 startPosition = startNode->m_Data->m_Position;
@@ -103,6 +104,7 @@ public:
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
+		m_Audio->update(ts);
 
 		// Render Objects
 		glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();

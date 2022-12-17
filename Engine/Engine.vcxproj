@@ -95,8 +95,8 @@
       <AdditionalLibraryDirectories>vendor\FMOD\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmod.dll $(TargetDir)
-copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Command>
+      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,8 +126,8 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
       <AdditionalLibraryDirectories>vendor\FMOD\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmod.dll $(TargetDir)
-copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Command>
+      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
@@ -157,8 +157,8 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
       <AdditionalLibraryDirectories>vendor\FMOD\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
-      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmod.dll $(TargetDir)
-copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Command>
+      <Command>copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodL.dll $(TargetDir)
+copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
