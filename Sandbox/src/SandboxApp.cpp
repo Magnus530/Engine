@@ -72,19 +72,10 @@ public:
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
+		m_Audio->update(ts);
 		Engine::Renderer::Submit(Engine::ShaderType::Phong, m_PlaneVA, m_ObjEntity, m_LightEntity, m_PCameraController);
 		//Engine::Renderer::Submit(Engine::ShaderType::Texture, m_CubeVA, m_CubeEntity, m_LightEntity, m_PCameraController);
 		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_SphereVA, m_LightEntity, m_LightEntity, m_PCameraController);
-		
-		auto flatShader = m_ShaderLibrary.Get("Flat");
-		auto textureShader = m_ShaderLibrary.Get("Texture");
-		auto phongShader = m_ShaderLibrary.Get("Phong");
-
-		m_Audio->update(ts);
-
-		Engine::Renderer::Submit(Engine::ShaderType::Flat, flatShader, m_PlaneVA, m_ObjEntity);
-		Engine::Renderer::Submit(Engine::ShaderType::Texture, textureShader, m_CubeVA, m_CubeEntity);
-		//Engine::Renderer::Submit(Engine::ShaderType::Texture, textureShader, m_PrimitiveVA, m_PrimitiveCubeEntity);
 		
 		Engine::Renderer::EndScene();
 	}
