@@ -68,6 +68,7 @@ namespace Engine {
             // tmp method
             // Transforming the Entity should NOT be done here. This function should instead just give a intended position along the path
             TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0,0.5f,0));   // Manually adding extra height
+            //TransformSystem::RotateToDirectionVector2D(transform, glm::normalize(direction));
             TransformSystem::RotateToDirectionVector(transform, glm::normalize(direction));
         }
     }
@@ -287,6 +288,7 @@ namespace Engine {
     {
         std::vector<std::shared_ptr<PNode>> nodes;
         std::shared_ptr<PNode> node;
+        
 
         int extent_X = (int)(extent.x);
         int extent_Z = (int)(extent.z);

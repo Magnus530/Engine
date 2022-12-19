@@ -132,25 +132,19 @@ public:
 		glm::vec4 blockColor(0, 0, 0, 1);
 
 		/* --------------------- RENDERING ------------------------ */
-		m_Texture->Bind();
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->Bind();
+		//m_Texture->Bind();
+		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->Bind();
+		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", glm::vec4(.7, .1, .6, 1));
+		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
+		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
 
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", glm::vec4(.7, .1, .6, 1));
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
-
-		//Engine::TransformSystem::UpdateMatrix(transform);
-		//Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
+		
 		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_VA, m_Entity);	
 		
 		
 		/*-----------RENDER OBSTRUCTIONS---------------*/
 		for (uint32_t i{}; i < m_Obstructors.size(); i++)
-		{
-			//auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
-			//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
 			Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_BeveledCubeVA, m_Obstructors[i]);
-		}
 
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", bShowShaderColor);
@@ -210,6 +204,44 @@ public:
 		ImGui::Checkbox("Show Normals", &m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 		ImGui::PopID();
 
+		// TransformTesting -  Rotate to vector
+		// 
+		static float x{ 1 };
+		static float y{ 1 };
+		static float z{ -1 };
+		ImGui::PushItemWidth(100.f);
+		for (size_t i{}; i < 3; i++)
+		{
+			ImGui::PushID(i);
+			std::string c;
+			float* v = nullptr;
+			switch (i)
+			{
+			case 0:
+				c = 'x';
+				v = &x;
+				break;
+			case 1:
+				c = 'y';
+				v = &y;
+				ImGui::SameLine();
+				break;
+			case 2:
+				c = 'z';
+				v = &z;
+				ImGui::SameLine();
+				break;
+			default:
+				break;
+			}
+			if (ImGui::SliderFloat(c.c_str(), v, -1.f, 1.f, "%.1f"))
+			{
+				ImGui::GetActiveID();
+				Engine::TransformSystem::RotateToDirectionVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::vec3(x, y, z));
+			}
+			ImGui::PopID();
+		}
+
 		ImGui::Separator();
 		ImGui::Text("Obstructors");
 		ImGui::PushID(1);
@@ -219,29 +251,11 @@ public:
 		if (ImGui::Checkbox("Show Normals", &bObstructor_ShowNormal))
 			for (auto& it : m_Obstructors)
 				it.GetComponent<Engine::RendererComponent>().m_bCustomColor = bObstructor_ShowNormal;
-		if (bObstructor_ShowNormal)
+		if (!bObstructor_ShowNormal)
 			for (auto& it : m_Obstructors)
 				it.GetComponent<Engine::RendererComponent>().m_Color = glm::vec4(color, 1.f);
 		ImGui::PopID();
 
-		// TransformTesting -  Rotate to vector
-		// 
-		//static float z{ -1 };
-		//static float x{  1 };
-		//ImGui::PushItemWidth(100.f);
-		//for (size_t i{}; i < 2; i++)
-		//{
-		//	ImGui::PushID(i);
-		//	
-		//	if (ImGui::SliderFloat(i == 0 ? "z" : "x", i == 0 ? &z : &x, -1.f, 1.f, "%.1f")) 
-		//	{
-		//		ImGui::GetActiveID();
-		//		Engine::TransformSystem::RotateToVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(x, 0, z)));
-		//	}
-		//	if (!i)
-		//		ImGui::SameLine();
-		//	ImGui::PopID();
-		//}
 
 
 		ImGui::TextDisabled("(?)");

@@ -2,6 +2,8 @@
 #include "glm/glm.hpp"
 
 namespace Engine {
+
+
 	inline float floatConvert{ 1000.f };
 
 	struct PathNodeNeighbors

@@ -21,6 +21,7 @@ namespace Engine {
 		class PathObstructionSphereCollection m_ObstructionSpheres;
 	};
 
+
 	// Given a Nodegrid, finds a path from A to B
 	class PathfindingSystem
 	{
@@ -34,15 +35,14 @@ namespace Engine {
 		static std::vector<std::shared_ptr<PNode>> FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked = nullptr);
 	};
 
+
 	// Creation of Nodegrids
 	class NodeGridSystem
 	{
 	public:
-		// TODO: should be 'grid extent and grid resolution', instead of 'gridSpacid and gridSize'
 		static void CreateGrid();
 		static void CreateGridAtLocation(glm::vec3 location, glm::vec3 extent, int resolution);
 		static std::shared_ptr<NodeGrid> GetGridAtIndex(uint32_t index);
-		//static std::shared_ptr<NodeGrid> GetGridAtLocation(const glm::vec3& location);
 
 		static std::shared_ptr<PNode> GetNodeAtIndexWithinGrid(uint32_t gridIndex, uint32_t nodeIndex);
 
