@@ -42,14 +42,18 @@ namespace Engine
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
-	void Renderer::Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam)
+	void Renderer::Submit(const ShaderType& shaderType, const Entity& entity)
 	{
-		Engine::RenderFactory::CreateShaderType(shaderType)->InitShaderUniforms(m_SceneData, entity, light, pCam, m_ShaderLibrary);
-
-
-		vertexArray->Bind();
-		RenderCommand::DrawIndexed(vertexArray);
 	}
+
+	//void Renderer::Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam)
+	//{
+	//	Engine::RenderFactory::CreateShaderType(shaderType)->InitShaderUniforms(m_SceneData, entity, light, pCam, m_ShaderLibrary);
+
+
+	//	vertexArray->Bind();
+	//	RenderCommand::DrawIndexed(vertexArray);
+	//}
 
 	inline glm::vec2 Renderer::GetWindowSize()
 	{

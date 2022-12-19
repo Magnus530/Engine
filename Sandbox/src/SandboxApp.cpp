@@ -15,6 +15,7 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 #include "Engine/AssetInit/ObjLoader.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 #include "Engine/Scene/EntityInitializer.h"
+#include "Engine/AssetInit/Material.h"
 
 // Layers
 #include "PathfindingLayer.h"
@@ -36,28 +37,17 @@ public:
 
 		//Create entities here
 
-		m_ObjEntity = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_ActiveScene);
-		m_ObjEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.2f, 0.2f, 0.2f, 1.0f });
-		m_ObjEntity.AddComponent<Engine::TextureComponent>(m_WhiteTexture);
-		Engine::TransformSystem::SetScale(m_ObjEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
-
-		//m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(2, m_CubeVA, m_ActiveScene);
-		//m_CubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.5f, 0.5f, 0.5f, 1.0f });
-		//m_CubeEntity.AddComponent<Engine::TextureComponent>(m_Texture);
-
-		//m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_ActiveScene);
-		//m_CubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.5f, 0.5f, 0.5f, 1.0f });
-		//Engine::TransformSystem::SetWorldPosition(m_CubeEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 1.0f });
-		//Engine::TransformSystem::SetScale(m_CubeEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
+		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_ActiveScene);
+		m_PlaneEntity.AddComponent<Engine::RendererComponent>(m_PlaneVA);
+		m_PlaneEntity.AddComponent<Engine::TextureComponent>(m_WhiteTexture);
+		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
+		m_PlaneEntity.AddComponent<Engine::FlatMaterialComponent>(glm::vec4{ 1.f, 1.f, 0.f, 1.f }, m_PlaneEntity.GetComponent<Engine::TransformComponent>().m_Transform);
 
 		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sphere", m_SphereVA, m_ActiveScene);
-		m_LightEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 1.0f, 1.0f, 0.0f, 1.0f });
+		m_LightEntity.AddComponent<Engine::RendererComponent>(m_SphereVA);
 		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 1 });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
-
-		//m_PrimitiveCubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(2, m_PrimitiveVA, m_ActiveScene);
-		//m_PrimitiveCubeEntity.AddComponent<Engine::RendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 
 		m_Audio = std::make_shared<Engine::AudioEngine>();
 	}
@@ -73,9 +63,11 @@ public:
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
 		m_Audio->update(ts);
-		Engine::Renderer::Submit(Engine::ShaderType::Phong, m_PlaneVA, m_ObjEntity, m_LightEntity, m_PCameraController);
+		//Engine::Renderer::Submit(Engine::ShaderType::Phong, m_PlaneVA, m_PlaneEntity, m_LightEntity, m_PCameraController);
 		//Engine::Renderer::Submit(Engine::ShaderType::Texture, m_CubeVA, m_CubeEntity, m_LightEntity, m_PCameraController);
-		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_SphereVA, m_LightEntity, m_LightEntity, m_PCameraController);
+		//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_SphereVA, m_LightEntity, m_LightEntity, m_PCameraController);
+
+		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_PlaneEntity);
 		
 		Engine::Renderer::EndScene();
 	}
@@ -83,28 +75,28 @@ public:
 	virtual void OnImGuiRender() override
 	{
 		ImGui::Begin("Settings");
-		if (m_ObjEntity)
+		if (m_PlaneEntity)
 		{
-			ImGui::Separator();
-			auto& tag = m_ObjEntity.GetComponent<Engine::TagComponent>().Tag;
-			ImGui::Text("%s", tag.c_str());
-			auto& objColor = m_ObjEntity.GetComponent<Engine::RendererComponent>().m_Color;
-			ImGui::ColorEdit4("Plane Color", glm::value_ptr(m_ObjEntity.GetComponent<Engine::RendererComponent>().m_Color));
-			ImGui::Separator();
-			ImGui::Checkbox("Show Custom Color", &m_ObjEntity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-			ImGui::Separator();
+			//ImGui::Separator();
+			//auto& tag = m_PlaneEntity.GetComponent<Engine::TagComponent>().Tag;
+			//ImGui::Text("%s", tag.c_str());
+			//auto& objColor = m_PlaneEntity.GetComponent<Engine::FlatMaterialComponent>().m_Color;
+			//ImGui::ColorEdit4("Plane Color", glm::value_ptr(m_PlaneEntity.GetComponent<Engine::FlatMaterialComponent>().m_Color));
+			//ImGui::Separator();
+			//ImGui::Checkbox("Show Custom Color", &m_PlaneEntity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
+			//ImGui::Separator();
 		}
 
 		if (m_CubeEntity)
 		{
-			ImGui::Separator();
-			auto& tag = m_CubeEntity.GetComponent<Engine::TagComponent>().Tag;
-			ImGui::Text("%s", tag.c_str());
-			auto& objColor = m_CubeEntity.GetComponent<Engine::RendererComponent>().m_Color;
-			ImGui::ColorEdit4("Cube Color", glm::value_ptr(m_CubeEntity.GetComponent<Engine::RendererComponent>().m_Color));
-			ImGui::Separator();
-			ImGui::Checkbox("Show Custom Color", &m_CubeEntity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-			ImGui::Separator();
+			//ImGui::Separator();
+			//auto& tag = m_CubeEntity.GetComponent<Engine::TagComponent>().Tag;
+			//ImGui::Text("%s", tag.c_str());
+			//auto& objColor = m_CubeEntity.GetComponent<Engine::FlatMaterialComponent>().m_Color;
+			//ImGui::ColorEdit4("Cube Color", glm::value_ptr(m_CubeEntity.GetComponent<Engine::FlatMaterialComponent>().m_Color));
+			//ImGui::Separator();
+			//ImGui::Checkbox("Show Custom Color", &m_CubeEntity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
+			//ImGui::Separator();
 		}
 
 		ImGui::End();
@@ -124,14 +116,17 @@ private:
 
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture, m_WhiteTexture;
 
+	std::shared_ptr<Engine::Material> FlatMaterial;
+
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
+
 
 	std::shared_ptr<Engine::Scene> m_ActiveScene;
 
 	// Entities
 	Engine::Entity m_CubeEntity;
-	Engine::Entity m_ObjEntity;
+	Engine::Entity m_PlaneEntity;
 	Engine::Entity m_LightEntity;
 };
 

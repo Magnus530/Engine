@@ -19,8 +19,8 @@ namespace Engine
 
 		static void RenderInit();
 
-		//static void Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4 transform = glm::mat4(1.0f));
-		static void Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam);
+		//static void Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam);
+		static void Submit(const ShaderType& shaderType, const Entity& entity);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 

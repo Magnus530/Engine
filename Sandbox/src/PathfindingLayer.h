@@ -208,7 +208,7 @@ public:
 		ImGui::PushID(0);
 		ImGui::PushItemWidth(200.f);
 		ImGui::Text("Monkey");
-		ImGui::ColorEdit3("", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
+		//ImGui::ColorEdit3("", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
 		ImGui::Checkbox("Show Normals", &m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 		ImGui::PopID();
 
@@ -223,7 +223,7 @@ public:
 				it.GetComponent<Engine::RendererComponent>().m_bCustomColor = bObstructor_ShowNormal;
 		if (bObstructor_ShowNormal)
 			for (auto& it : m_Obstructors)
-				it.GetComponent<Engine::RendererComponent>().m_Color = glm::vec4(color, 1.f);
+				//it.GetComponent<Engine::RendererComponent>().m_Color = glm::vec4(color, 1.f);
 		ImGui::PopID();
 
 		// TransformTesting -  Rotate to vector

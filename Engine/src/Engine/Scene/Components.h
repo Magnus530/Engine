@@ -34,8 +34,6 @@ namespace Engine
 
 	struct RendererComponent
 	{
-		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-
 		std::shared_ptr<VertexArray> m_VA;
 		std::shared_ptr<VertexBuffer> m_VB;
 		std::shared_ptr<IndexBuffer> m_IB;
@@ -44,8 +42,19 @@ namespace Engine
 
 		RendererComponent() = default;
 		RendererComponent(const RendererComponent&) = default;
-		RendererComponent(const glm::vec4& color)
-			: m_Color(color) {}
+		RendererComponent(std::shared_ptr<VertexArray> va)
+			: m_VA(va) {}
+	};
+
+	struct FlatMaterialComponent
+	{
+		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		glm::mat4 m_Transform{ 1.f };
+
+		FlatMaterialComponent() = default;
+		FlatMaterialComponent(const FlatMaterialComponent&) = default;
+		FlatMaterialComponent(const glm::vec4& color, const glm::mat4& transform)
+			: m_Color(color), m_Transform(transform) {}
 	};
 
 	struct PathfindingComponent

@@ -1490,6 +1490,7 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\RenderType.h" />
     <ClInclude Include="src\Engine\Renderer\RenderFactory.h" />
+    <ClInclude Include="src\Engine\AssetInit\Material.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1606,5 +1607,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\AssetInit\Material.cpp" />
   </ItemGroup>
 </Project>

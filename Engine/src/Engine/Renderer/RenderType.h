@@ -37,7 +37,7 @@ namespace Engine
 				entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
 			flatOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-			flatOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::RendererComponent>().m_Color));
+			flatOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::FlatMaterialComponent>().m_Color));
 		}
 	};
 
@@ -78,13 +78,12 @@ namespace Engine
 				entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
 			phongOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-			phongOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::RendererComponent>().m_Color));
+			phongOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::FlatMaterialComponent>().m_Color));
 			entity.GetComponent<TextureComponent>().m_Tex->Bind();
 
-			auto lightPos = light.GetComponent<Engine::TransformComponent>().m_Transform[3];
 			auto tempLight = light.GetComponent<Engine::LightComponent>();
 
-			phongOpenGLShader->UploadUniformFloat3("u_LightPosition", glm::vec3{ lightPos.x, lightPos.y, lightPos.z });
+			phongOpenGLShader->UploadUniformFloat3("u_LightPosition", light.GetComponent<Engine::TransformComponent>().GetPosition());
 			phongOpenGLShader->UploadUniformFloat3("u_CameraPosition", pCam.GetPos());
 			phongOpenGLShader->UploadUniformFloat3("u_LightColor", glm::vec3(tempLight.m_LightColor.x,
 				tempLight.m_LightColor.y, tempLight.m_LightColor.z));
