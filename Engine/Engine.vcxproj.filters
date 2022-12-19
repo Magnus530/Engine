@@ -1491,6 +1491,8 @@
     <ClInclude Include="src\Engine\Renderer\RenderType.h" />
     <ClInclude Include="src\Engine\Renderer\RenderFactory.h" />
     <ClInclude Include="src\Engine\AssetInit\Material.h" />
+    <ClInclude Include="src\Engine\Renderer\RenderState.h" />
+    <ClInclude Include="src\Engine\Renderer\RenderContext.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">

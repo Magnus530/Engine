@@ -3,6 +3,7 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Renderer/RenderFactory.h"
+#include "Engine/Renderer/RenderContext.h"
 
 namespace Engine
 {
@@ -42,8 +43,37 @@ namespace Engine
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
-	void Renderer::Submit(const ShaderType& shaderType, const Entity& entity)
+	void Renderer::Submit(const ShaderType& shaderType, Entity& entity)
 	{
+		std::shared_ptr<Engine::RenderContext> contextPtr;
+
+		switch (shaderType)
+		{
+			case Engine::ShaderType::Flat:
+			{
+				Engine::FlatShaderState* flatStatePtr = new Engine::FlatShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(flatStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
+				break;
+			}
+			case Engine::ShaderType::Texture:
+			{
+				Engine::FlatShaderState* textureStatePtr = new Engine::FlatShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(textureStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
+				break;
+			}
+			case Engine::ShaderType::Phong:
+			{
+				Engine::PhongShaderState* phongStatePtr = new Engine::PhongShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(phongStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
+				break;
+			}
+		}
+
+		entity.GetComponent<RendererComponent>().m_VA->Bind();
+		RenderCommand::DrawIndexed(entity.GetComponent<RendererComponent>().m_VA);
 	}
 
 	//void Renderer::Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam)

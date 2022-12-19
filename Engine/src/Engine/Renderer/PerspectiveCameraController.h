@@ -19,7 +19,7 @@ namespace Engine
 		PerspectiveCamera& GetCamera() { return *m_Camera; }
 		const PerspectiveCamera& GetCamera() const { return *m_Camera; }
 
-		glm::vec3 GetPos() { return m_CameraPosition; }
+		glm::vec3& GetPos() { return m_CameraPosition; }
 
 	private:
 		bool OnMouseScrolled(MouseScrolledEvent& e);
@@ -30,7 +30,7 @@ namespace Engine
 
 		bool m_Rotation;
 		glm::vec2 m_RenderwindowSize = { 1280, 720 };
-		glm::vec3 m_CameraPosition = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 m_CameraPosition = { 0.0f, 5.0f, 5.0f };
 		glm::vec3 m_CameraRotation = { 0.0f, 0.0f, 0.0f };
 		float m_CameraTranslationSpeed = 5.0f, m_CameraRotationSpeed = 100.0f;
 

@@ -3,6 +3,7 @@
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/PerspectiveCameraController.h"
 
 #include <glm/glm.hpp>
 
@@ -49,12 +50,55 @@ namespace Engine
 	struct FlatMaterialComponent
 	{
 		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-		glm::mat4 m_Transform{ 1.f };
 
 		FlatMaterialComponent() = default;
 		FlatMaterialComponent(const FlatMaterialComponent&) = default;
-		FlatMaterialComponent(const glm::vec4& color, const glm::mat4& transform)
-			: m_Color(color), m_Transform(transform) {}
+		FlatMaterialComponent(const glm::vec4& color)
+			: m_Color(color) {}
+	};
+
+	struct TextureMaterialComponent
+	{
+		//uint8_t data[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
+
+		std::shared_ptr<Texture2D> m_Tex = nullptr;
+
+		TextureMaterialComponent() = default;
+		TextureMaterialComponent(const TextureMaterialComponent&) = default;
+		TextureMaterialComponent(const std::shared_ptr<Texture2D>& texture)
+			: m_Tex(texture) {}
+	};
+
+	struct PhongMaterialComponent
+	{
+		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		std::shared_ptr<Texture2D> m_Tex = nullptr;
+		glm::vec3 m_PCamPoition{ 0.f, 0.f, 0.f};
+		glm::vec3 m_LightColor{ 0.9f, 0.9f, 0.3f };
+		float m_SpecularStrength{ 3.f };
+		glm::vec3 m_LightPosition{1}; 
+
+		PhongMaterialComponent() = default;
+		PhongMaterialComponent(const PhongMaterialComponent&) = default;
+		PhongMaterialComponent(const glm::vec4& color, const std::shared_ptr<Texture2D>& texture, glm::vec3& pCamPos,
+			const glm::vec3& lightColor, const float& specularStrength, const glm::vec3& lightPosition)
+			: m_Color(color), m_Tex(texture), m_PCamPoition(pCamPos), m_LightColor(lightColor), m_SpecularStrength(specularStrength), m_LightPosition(lightPosition) {}
+	};
+
+	struct LightComponent
+	{
+		float m_AmbientStrength{ 10.f };
+		glm::vec3 m_AmbientColor{ 0.6, 0.6, 0.6 };
+		float m_LightStrength{ 1.f };
+		glm::vec3 m_LightColor{0.9f, 0.9f, 0.3f};
+		float m_SpecularStrength{ 3.f };
+		int m_SpecularExponent{ 4 };
+		glm::vec3 m_ObjectColor{ 1.f, 1.f, 1.f };
+
+		LightComponent() = default;
+		LightComponent(const LightComponent&) = default;
+		LightComponent(const float lightStrength, const float specularStrength)
+			: m_LightStrength(lightStrength), m_SpecularStrength(specularStrength) {}
 	};
 
 	struct PathfindingComponent
@@ -79,31 +123,5 @@ namespace Engine
 	{
 		float m_radius{ 2.f };
 		uint32_t m_ID{};
-	};
-
-	struct TextureComponent
-	{
-		std::shared_ptr<Texture2D> m_Tex = nullptr;
-
-		TextureComponent() = default;
-		TextureComponent(const TextureComponent&) = default;
-		TextureComponent(std::shared_ptr<Texture2D> tex)
-			: m_Tex(tex) {}
-	};
-
-	struct LightComponent
-	{
-		float m_AmbientStrength{ 10.f };
-		glm::vec3 m_AmbientColor{ 0.6, 0.6, 0.6 };
-		float m_LightStrength{ 1.f };
-		glm::vec3 m_LightColor{0.9f, 0.9f, 0.3f};
-		float m_SpecularStrength{ 3.f };
-		int m_SpecularExponent{ 4 };
-		glm::vec3 m_ObjectColor{ 1.f, 1.f, 1.f };
-
-		LightComponent() = default;
-		LightComponent(const LightComponent&) = default;
-		LightComponent(const float lightStrength)
-			: m_LightStrength(lightStrength) {}
 	};
 }

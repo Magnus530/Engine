@@ -1,31 +1,35 @@
 #pragma once
 
-#include "epch.h"
-#include "Renderer.h"
+#include <memory>
+#include "Engine/Scene/Entity.h"
+#include "Engine/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
 
 namespace Engine
 {
-	class RenderType
+	class RenderContext;
+
+	class RenderState
 	{
 	public:
-		virtual ~RenderType() = 0;
-		virtual void InitShaderUniforms(Engine::Renderer::SceneData* sceneData, Entity& entity, Entity& light,
-			PerspectiveCameraController& pCam, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary) = 0;
+		virtual ~RenderState() {}
+
+		void SetRenderContext(Engine::RenderContext* context)
+		{
+			this->contextPtr = context;
+		}
+
+		virtual void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) = 0;
 
 	protected:
-		Engine::Renderer::SceneData* m_SceneData;
+		Engine::RenderContext* contextPtr = nullptr;
 	};
 
-	RenderType::~RenderType() {}
-
-	class FlatShader : public RenderType
+	class FlatShaderState : public RenderState
 	{
 	public:
-		~FlatShader() {};
-		virtual void InitShaderUniforms(Engine::Renderer::SceneData* sceneData, Entity& entity, Entity& light,
-			PerspectiveCameraController& pCam, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary) override
+		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
 		{
 			std::shared_ptr<Engine::Shader> flatShader = shaderLibrary->Get("Flat");
 			std::shared_ptr<Engine::OpenGLShader> flatOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader);
@@ -41,12 +45,10 @@ namespace Engine
 		}
 	};
 
-	class TextureShader : public RenderType
+	class TextureShaderState : public RenderState
 	{
 	public:
-		~TextureShader() {};
-		virtual void InitShaderUniforms(Engine::Renderer::SceneData* sceneData, Entity& entity, Entity& light,
-			PerspectiveCameraController& pCam, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary) override
+		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
 		{
 			std::shared_ptr<Engine::Shader> textureShader = shaderLibrary->Get("Texture");
 			std::shared_ptr<Engine::OpenGLShader> flatOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader);
@@ -61,12 +63,10 @@ namespace Engine
 		}
 	};
 
-	class PhongShader : public RenderType
+	class PhongShaderState : public RenderState
 	{
 	public:
-		~PhongShader() {};
-		virtual void InitShaderUniforms(Engine::Renderer::SceneData* sceneData, Entity& entity, Entity& light,
-			PerspectiveCameraController& pCam, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary) override
+		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
 		{
 			std::shared_ptr<Engine::Shader> phongShader = shaderLibrary->Get("Phong");
 			std::shared_ptr<Engine::OpenGLShader> phongOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(phongShader);
@@ -81,12 +81,10 @@ namespace Engine
 			phongOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::FlatMaterialComponent>().m_Color));
 			entity.GetComponent<TextureMaterialComponent>().m_Tex->Bind();
 
-			auto tempLight = light.GetComponent<Engine::LightComponent>();
-
-			phongOpenGLShader->UploadUniformFloat3("u_LightPosition", light.GetComponent<Engine::TransformComponent>().GetPosition());
-			phongOpenGLShader->UploadUniformFloat3("u_CameraPosition", pCam.GetPos());
-			phongOpenGLShader->UploadUniformFloat3("u_LightColor", tempLight.m_LightColor);
-			phongOpenGLShader->UploadUniformFloat("u_SpecularStrength", tempLight.m_SpecularStrength);
+			phongOpenGLShader->UploadUniformFloat3("u_LightPosition", entity.GetComponent<Engine::PhongMaterialComponent>().m_LightPosition);
+			phongOpenGLShader->UploadUniformFloat3("u_CameraPosition", entity.GetComponent<Engine::PhongMaterialComponent>().m_PCamPoition);
+			phongOpenGLShader->UploadUniformFloat3("u_LightColor", entity.GetComponent<Engine::PhongMaterialComponent>().m_LightColor);
+			phongOpenGLShader->UploadUniformFloat("u_SpecularStrength", entity.GetComponent<Engine::PhongMaterialComponent>().m_SpecularStrength);
 		}
 	};
 }

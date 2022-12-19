@@ -37,17 +37,21 @@ public:
 
 		//Create entities here
 
-		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_ActiveScene);
-		m_PlaneEntity.AddComponent<Engine::RendererComponent>(m_PlaneVA);
-		m_PlaneEntity.AddComponent<Engine::TextureComponent>(m_WhiteTexture);
-		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
-		m_PlaneEntity.AddComponent<Engine::FlatMaterialComponent>(glm::vec4{ 1.f, 1.f, 0.f, 1.f }, m_PlaneEntity.GetComponent<Engine::TransformComponent>().m_Transform);
-
 		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sphere", m_SphereVA, m_ActiveScene);
 		m_LightEntity.AddComponent<Engine::RendererComponent>(m_SphereVA);
-		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 1 });
+		m_LightEntity.AddComponent<Engine::FlatMaterialComponent>(glm::vec4{ 0.f, 0.f, 1.f, 1.f });
+		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 1 }, float { 3 });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
+
+		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_ActiveScene);
+		m_PlaneEntity.AddComponent<Engine::RendererComponent>(m_PlaneVA);
+		m_PlaneEntity.AddComponent<Engine::FlatMaterialComponent>(glm::vec4{ 1.f, 1.f, 0.f, 1.f });
+		m_PlaneEntity.AddComponent<Engine::TextureMaterialComponent>(m_WhiteTexture);
+		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
+		m_PlaneEntity.AddComponent<Engine::PhongMaterialComponent>(glm::vec4{ 0.f, 0.f, 1.f, 1.f }, m_WhiteTexture, m_PCameraController.GetPos(),
+			m_LightEntity.GetComponent<Engine::LightComponent>().m_LightColor, m_LightEntity.GetComponent<Engine::LightComponent>().m_SpecularStrength,
+			m_LightEntity.GetComponent<Engine::TransformComponent>().GetPosition());
 
 		m_Audio = std::make_shared<Engine::AudioEngine>();
 	}
@@ -67,7 +71,8 @@ public:
 		//Engine::Renderer::Submit(Engine::ShaderType::Texture, m_CubeVA, m_CubeEntity, m_LightEntity, m_PCameraController);
 		//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_SphereVA, m_LightEntity, m_LightEntity, m_PCameraController);
 
-		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_PlaneEntity);
+		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_LightEntity);
+		Engine::Renderer::Submit(Engine::ShaderType::Phong, m_PlaneEntity);
 		
 		Engine::Renderer::EndScene();
 	}
