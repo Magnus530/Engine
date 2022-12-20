@@ -4,6 +4,7 @@
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/PerspectiveCameraController.h"
+#include "Engine/Renderer/Shader.h"
 
 #include <glm/glm.hpp>
 
@@ -47,6 +48,13 @@ namespace Engine
 			: m_VA(va) {}
 	};
 
+	struct MaterialComponent
+	{
+		Engine::ShaderType m_ShaderType;
+		MaterialComponent(const ShaderType& shaderType)
+			: m_ShaderType(shaderType) {}
+	};
+
 	struct FlatMaterialComponent
 	{
 		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
@@ -73,7 +81,7 @@ namespace Engine
 	{
 		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 		std::shared_ptr<Texture2D> m_Tex = nullptr;
-		glm::vec3 m_PCamPoition{ 0.f, 0.f, 0.f};
+		glm::vec3 m_PCamPosition{ 0.f, 0.f, 0.f};
 		glm::vec3 m_LightColor{ 0.9f, 0.9f, 0.3f };
 		float m_SpecularStrength{ 3.f };
 		glm::vec3 m_LightPosition{1}; 
@@ -82,18 +90,18 @@ namespace Engine
 		PhongMaterialComponent(const PhongMaterialComponent&) = default;
 		PhongMaterialComponent(const glm::vec4& color, const std::shared_ptr<Texture2D>& texture, glm::vec3& pCamPos,
 			const glm::vec3& lightColor, const float& specularStrength, const glm::vec3& lightPosition)
-			: m_Color(color), m_Tex(texture), m_PCamPoition(pCamPos), m_LightColor(lightColor), m_SpecularStrength(specularStrength), m_LightPosition(lightPosition) {}
+			: m_Color(color), m_Tex(texture), m_PCamPosition(pCamPos), m_LightColor(lightColor), m_SpecularStrength(specularStrength), 
+			m_LightPosition(lightPosition) {}
 	};
 
 	struct LightComponent
 	{
-		float m_AmbientStrength{ 10.f };
+		float m_AmbientStrength{ 0.f };
 		glm::vec3 m_AmbientColor{ 0.6, 0.6, 0.6 };
-		float m_LightStrength{ 1.f };
-		glm::vec3 m_LightColor{0.9f, 0.9f, 0.3f};
+		float m_LightStrength{ 0.5f };
+		glm::vec3 m_LightColor{ 0.9f, 0.9f, 0.3f};
 		float m_SpecularStrength{ 3.f };
-		int m_SpecularExponent{ 4 };
-		glm::vec3 m_ObjectColor{ 1.f, 1.f, 1.f };
+		int m_SpecularExponent{ 0 };
 
 		LightComponent() = default;
 		LightComponent(const LightComponent&) = default;

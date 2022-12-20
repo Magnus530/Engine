@@ -1493,6 +1493,7 @@
     <ClInclude Include="src\Engine\AssetInit\Material.h" />
     <ClInclude Include="src\Engine\Renderer\RenderState.h" />
     <ClInclude Include="src\Engine\Renderer\RenderContext.h" />
+    <ClInclude Include="src\Engine\Scene\Systems\LightSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1610,5 +1611,6 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\AssetInit\Material.cpp" />
+    <ClCompile Include="src\Engine\Scene\Systems\LightSystem.cpp" />
   </ItemGroup>
 </Project>

@@ -78,11 +78,11 @@ namespace Engine
 				entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
 			phongOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-			phongOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::FlatMaterialComponent>().m_Color));
+			phongOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::PhongMaterialComponent>().m_Color));
 			entity.GetComponent<TextureMaterialComponent>().m_Tex->Bind();
 
 			phongOpenGLShader->UploadUniformFloat3("u_LightPosition", entity.GetComponent<Engine::PhongMaterialComponent>().m_LightPosition);
-			phongOpenGLShader->UploadUniformFloat3("u_CameraPosition", entity.GetComponent<Engine::PhongMaterialComponent>().m_PCamPoition);
+			phongOpenGLShader->UploadUniformFloat3("u_CameraPosition", entity.GetComponent<Engine::PhongMaterialComponent>().m_PCamPosition);
 			phongOpenGLShader->UploadUniformFloat3("u_LightColor", entity.GetComponent<Engine::PhongMaterialComponent>().m_LightColor);
 			phongOpenGLShader->UploadUniformFloat("u_SpecularStrength", entity.GetComponent<Engine::PhongMaterialComponent>().m_SpecularStrength);
 		}

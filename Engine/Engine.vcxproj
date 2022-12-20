@@ -210,6 +210,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClInclude Include="src\Engine\Scene\EntityInitializer.h" />
     <ClInclude Include="src\Engine\Scene\Scene.h" />
     <ClInclude Include="src\Engine\Scene\Splines\BSpline.h" />
+    <ClInclude Include="src\Engine\Scene\Systems\LightSystem.h" />
     <ClInclude Include="src\Engine\Scene\Systems\PathfindingSystem.h" />
     <ClInclude Include="src\Engine\Scene\Systems\TransformSystem.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
@@ -667,6 +668,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClCompile Include="src\Engine\Scene\EntityInitializer.cpp" />
     <ClCompile Include="src\Engine\Scene\Scene.cpp" />
     <ClCompile Include="src\Engine\Scene\Splines\BSpline.cpp" />
+    <ClCompile Include="src\Engine\Scene\Systems\LightSystem.cpp" />
     <ClCompile Include="src\Engine\Scene\Systems\PathfindingSystem.cpp" />
     <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />

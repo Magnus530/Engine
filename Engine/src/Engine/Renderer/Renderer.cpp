@@ -43,7 +43,7 @@ namespace Engine
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
-	void Renderer::Submit(const ShaderType& shaderType, Entity& entity)
+	void Renderer::Submit(const Engine::ShaderType& shaderType, Entity& entity)
 	{
 		std::shared_ptr<Engine::RenderContext> contextPtr;
 
@@ -58,7 +58,7 @@ namespace Engine
 			}
 			case Engine::ShaderType::Texture:
 			{
-				Engine::FlatShaderState* textureStatePtr = new Engine::FlatShaderState;
+				Engine::TextureShaderState* textureStatePtr = new Engine::TextureShaderState;
 				contextPtr = std::make_shared<Engine::RenderContext>(textureStatePtr, entity, m_ShaderLibrary, m_SceneData);
 				contextPtr->InitShader();
 				break;
@@ -76,14 +76,14 @@ namespace Engine
 		RenderCommand::DrawIndexed(entity.GetComponent<RendererComponent>().m_VA);
 	}
 
-	//void Renderer::Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam)
-	//{
-	//	Engine::RenderFactory::CreateShaderType(shaderType)->InitShaderUniforms(m_SceneData, entity, light, pCam, m_ShaderLibrary);
+	void Renderer::Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam)
+	{
+		Engine::RenderFactory::CreateShaderType(shaderType)->InitShaderUniforms(m_SceneData, entity, light, pCam, m_ShaderLibrary);
 
 
-	//	vertexArray->Bind();
-	//	RenderCommand::DrawIndexed(vertexArray);
-	//}
+		vertexArray->Bind();
+		RenderCommand::DrawIndexed(vertexArray);
+	}
 
 	inline glm::vec2 Renderer::GetWindowSize()
 	{
