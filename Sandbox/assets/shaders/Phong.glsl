@@ -31,27 +31,28 @@ in vec2 UV;       //for textures
 uniform sampler2D textureSampler;
 
 uniform float u_AmbientStrength = 1.;
+uniform vec3 u_AmbientColor = vec3(.3, .3, 1.);  // blue
 
 uniform vec3 u_LightPosition;
-uniform vec3 u_LightColor = vec3(.3, .3, 1.);  //blueish
+uniform vec3 u_LightColor = vec3(.3, .3, 1.);  //blue
 uniform float u_LightStrength = 0.3;
 uniform float u_SpecularStrength = 0.2;
 uniform int u_SpecularExponent = 20;
 
-uniform vec3 u_ObjectColor = vec3(1.0, 1.0, 1.0); //white
+uniform vec3 u_Color = vec3(1.0, 1.0, 1.0); //white
 
-uniform vec3 u_CameraPosition = vec3(0, 0, 0);;
+uniform vec3 u_CameraPosition = vec3(0, 0, 0);
 
 void main()
 {
     //ambient
-    vec3 ambient = u_AmbientStrength * u_LightColor;
+    vec3 ambient = u_AmbientStrength * u_AmbientColor;
 
     //diffuse
     vec3 normalCorrected = normalize(normalTransposed);
     vec3 lightDirection = normalize(u_LightPosition - fragmentPosition);
     float angleFactor = max(dot(normalCorrected, lightDirection), 0.0);
-    vec3 diffuse = angleFactor * u_ObjectColor * u_LightColor * u_LightStrength;
+    vec3 diffuse = angleFactor * u_Color * u_LightColor * u_LightStrength;
 
     //specular
     vec3 viewDirection = normalize(u_CameraPosition - fragmentPosition);

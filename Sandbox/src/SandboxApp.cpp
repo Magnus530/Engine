@@ -40,7 +40,7 @@ public:
 		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sphere", m_SphereVA, m_ActiveScene);
 		m_LightEntity.AddComponent<Engine::RendererComponent>(m_SphereVA);
 		m_LightEntity.AddComponent<Engine::FlatMaterialComponent>(glm::vec4{ 1.f, 1.f, 0.f, 1.f });
-		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 1.0f }, float { 3.f });
+		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
@@ -49,9 +49,12 @@ public:
 		m_PlaneEntity.AddComponent<Engine::FlatMaterialComponent>(glm::vec4{ 0.f, 0.f, 1.f, 1.f });
 		m_PlaneEntity.AddComponent<Engine::TextureMaterialComponent>(m_WhiteTexture);
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
+
+		auto lightcomp = m_LightEntity.GetComponent<Engine::LightComponent>();
+
 		m_PlaneEntity.AddComponent<Engine::PhongMaterialComponent>(glm::vec4{ 0.f, 0.f, 1.f, 1.f }, m_WhiteTexture,m_PCameraController.GetPos(),
-			m_LightEntity.GetComponent<Engine::LightComponent>().m_LightColor, m_LightEntity.GetComponent<Engine::LightComponent>().m_SpecularStrength,
-			m_LightEntity.GetComponent<Engine::TransformComponent>().GetPosition());
+			lightcomp.m_LightColor, lightcomp.m_SpecularStrength, m_LightEntity.GetComponent<Engine::TransformComponent>().GetPosition(),
+			lightcomp.m_AmbientStrength);
 
 		m_Audio = std::make_shared<Engine::AudioEngine>();
 	}

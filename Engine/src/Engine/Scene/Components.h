@@ -85,19 +85,20 @@ namespace Engine
 		glm::vec3 m_LightColor{ 0.9f, 0.9f, 0.3f };
 		float m_SpecularStrength{ 3.f };
 		glm::vec3 m_LightPosition{1}; 
+		float m_AmbientStrength{ 0.f };
+		glm::vec3 m_AmbientColor = glm::vec3{ m_Color.x, m_Color.y, m_Color.z };
 
 		PhongMaterialComponent() = default;
 		PhongMaterialComponent(const PhongMaterialComponent&) = default;
 		PhongMaterialComponent(const glm::vec4& color, const std::shared_ptr<Texture2D>& texture, glm::vec3& pCamPos,
-			const glm::vec3& lightColor, const float& specularStrength, const glm::vec3& lightPosition)
+			const glm::vec3& lightColor, const float& specularStrength, const glm::vec3& lightPosition, const float& ambientStrength)
 			: m_Color(color), m_Tex(texture), m_PCamPosition(pCamPos), m_LightColor(lightColor), m_SpecularStrength(specularStrength), 
-			m_LightPosition(lightPosition) {}
+			m_LightPosition(lightPosition), m_AmbientStrength(ambientStrength) {}
 	};
 
 	struct LightComponent
 	{
-		float m_AmbientStrength{ 0.f };
-		glm::vec3 m_AmbientColor{ 0.6, 0.6, 0.6 };
+		float m_AmbientStrength{ 1.f };
 		float m_LightStrength{ 0.5f };
 		glm::vec3 m_LightColor{ 0.9f, 0.9f, 0.3f};
 		float m_SpecularStrength{ 3.f };
