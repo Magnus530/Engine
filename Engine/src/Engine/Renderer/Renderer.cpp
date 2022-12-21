@@ -43,11 +43,11 @@ namespace Engine
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
-	void Renderer::Submit(const Engine::ShaderType& shaderType, Entity& entity)
+	void Renderer::Submit(Entity& entity)
 	{
 		std::shared_ptr<Engine::RenderContext> contextPtr;
 
-		switch (shaderType)
+		switch (entity.GetComponent<Engine::MaterialComponent>().m_ShaderType)
 		{
 			case Engine::ShaderType::Flat:
 			{

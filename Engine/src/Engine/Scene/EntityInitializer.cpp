@@ -13,7 +13,8 @@ namespace Engine
 		return tempEntity;
 	}
 
-	Engine::Entity EntityInitializer::EntityInit(const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& Scene)
+	Engine::Entity EntityInitializer::EntityInit(const Engine::ShaderType& shaderType, const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
+		std::shared_ptr<Engine::Scene>& Scene, const glm::vec3& color, std::shared_ptr<Engine::Texture2D>& tex)
 	{
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
@@ -35,6 +36,8 @@ namespace Engine
 		vertexarr->SetIndexBuffer(ObjIB);
 
 		Engine::Entity tempEntity = Scene->CreateEntity(objname);
+		tempEntity.AddComponent<RendererComponent>(vertexarr);
+		MaterialInit(shaderType, tempEntity, color, tex);
 
 		return tempEntity;
 	}
@@ -62,5 +65,30 @@ namespace Engine
 		Engine::Entity tempEntity = Scene->CreateEntity("");
 
 		return tempEntity;
+	}
+
+	void EntityInitializer::MaterialInit(const Engine::ShaderType& shaderType, Engine::Entity& entity, const glm::vec3& color, std::shared_ptr<Engine::Texture2D>& tex)
+	{
+		switch (shaderType)
+		{
+			case Engine::ShaderType::Flat:
+			{
+				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Flat);
+				entity.AddComponent<FlatMaterialComponent>(glm::vec4{ color, 1.f });
+				break;
+			}
+			case Engine::ShaderType::Texture:
+			{
+				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Texture);
+				entity.AddComponent<TextureMaterialComponent>(tex);
+				break;
+			}
+			case Engine::ShaderType::Phong:
+			{
+				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Phong);
+				entity.AddComponent<PhongMaterialComponent>(glm::vec4{ color, 1.f }, tex);
+				break;
+			}
+		}
 	}
 }

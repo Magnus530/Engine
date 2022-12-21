@@ -21,7 +21,7 @@ TransformExampleLayer::TransformExampleLayer()
 	std::vector<uint32_t> indices;
 	Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 	m_Scene = std::make_shared<Engine::Scene>();
-	m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_Scene);
+	//m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_Scene);
 	//m_Entity.AddComponent<Engine::RendererComponent>(glm::vec4(0.5f, 0.2f, 0.6f, 1.f));
 
 	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();

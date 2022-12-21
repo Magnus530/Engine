@@ -20,7 +20,7 @@ namespace Engine
 		static void RenderInit();
 
 		static void Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam);
-		static void Submit(const Engine::ShaderType& shaderType, Entity& entity);
+		static void Submit(Entity& entity);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 

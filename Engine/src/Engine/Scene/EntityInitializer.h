@@ -7,6 +7,8 @@ https://www.youtube.com/watch?v=wP3glUDGhi8 */
 #include "Engine/Scene/Entity.h"
 #include "Engine/Renderer/vertex.h"
 #include "Engine/Renderer/VertexArray.h"
+#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Texture.h"
 
 #include <string>
 #include <vector>
@@ -26,8 +28,12 @@ namespace Engine
 		static EntityInitializer& GetInstance() { return *m_Instance; }
 
 		static Engine::Entity EntityInit(const std::string objname, std::shared_ptr<Engine::Scene>& Scene);
-		static Engine::Entity EntityInit(const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& Scene);
+		static Engine::Entity EntityInit(const Engine::ShaderType& shaderType, const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
+			std::shared_ptr<Engine::Scene>& Scene, const glm::vec3& color = { 1.f, 1.f, 1.f }, std::shared_ptr<Engine::Texture2D>& tex = Engine::Texture2D::Create("assets/textures/white.png"));
 		static Engine::Entity EntityInit(int shapenum, std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& Scene);
+
+		static void MaterialInit(const Engine::ShaderType& shaderType, Engine::Entity& entity, const glm::vec3& color = { 1.f, 1.f, 1.f }, 
+			std::shared_ptr<Engine::Texture2D>& tex = Engine::Texture2D::Create("assets/textures/white.png"));
 
 	protected:
 		EntityInitializer() = default;

@@ -69,7 +69,7 @@ public:
 		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 
 		m_Scene = std::make_shared<Engine::Scene>();
-		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Monkey", m_VA, m_Scene);
+		//m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Monkey", m_VA, m_Scene);
 		m_Entity.AddComponent<Engine::RendererComponent>();
 		m_Entity.AddComponent<Engine::PathfindingComponent>();
 
@@ -84,7 +84,7 @@ public:
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_Grid = Engine::NodeGridSystem::GetGridAtIndex(0);
 
 		// Planes
-		m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
+		//m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
 		m_Plane.AddComponent<Engine::RendererComponent>();
 
 		// Vertex Array Pathfinding Obstructions
