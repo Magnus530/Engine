@@ -156,11 +156,11 @@ public:
 						int j = 0;
 						for (auto& jt = m_ActiveScene->m_Textures.begin(); jt != m_ActiveScene->m_Textures.end(); jt++)
 						{
-							const bool is_Selected = (currentTexture == j);
+							const bool is_Selected = (currentPhongTexture == j);
 							if (ImGui::Selectable(m_TextureNames[j].c_str(), is_Selected))
 							{
 								it->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex = jt->second;
-								currentTexture = j;
+								currentPhongTexture = j;
 							}
 
 							if (is_Selected)
