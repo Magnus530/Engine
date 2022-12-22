@@ -51,7 +51,7 @@ namespace Engine
 		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
 		{
 			std::shared_ptr<Engine::Shader> textureShader = shaderLibrary->Get("Texture");
-			std::shared_ptr<Engine::OpenGLShader> flatOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader);
+			std::shared_ptr<Engine::OpenGLShader> textureOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader);
 
 			textureShader->Bind();
 			std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);

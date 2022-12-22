@@ -41,7 +41,7 @@ public:
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Cube", m_CubeVA, m_ActiveScene, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Cube", m_CubeVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 1.0f }, m_WolfLogoTexture);
 
 		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
@@ -80,16 +80,24 @@ public:
 		ImGui::Begin("Settings");
 
 		int i = 0;
-
 		std::vector<std::string> m_TextureNames;
+		std::vector<const char*> m_TexNames;
 
 		for (auto& it = m_ActiveScene->m_Textures.begin(); it != m_ActiveScene->m_Textures.end(); it++)
 		{
 			m_TextureNames.push_back((it)->first);
 		}
 
-		static const char* currentTexture = { m_TextureNames[0].c_str() };
-		static const char* items[]{"Tree"};
+		for (std::string const& str : m_TextureNames)
+		{
+			m_TexNames.push_back(str.data());
+		}
+
+		static int currentTexture = 0;
+		static int currentPhongTexture = 0;
+		const char* comboTexPreviewValue = m_TexNames[currentTexture];
+		const char* comboPhongPreviewValue = m_TexNames[currentPhongTexture];
+
 		for (auto& it = m_ActiveScene->m_EntityMap.begin(); it != m_ActiveScene->m_EntityMap.end(); it++)
 		{
 			ImGui::Separator();
@@ -100,8 +108,8 @@ public:
 			{
 				case Engine::ShaderType::Flat:
 				{
-					glm::vec4& objColor = (it)->second->GetComponent<Engine::FlatMaterialComponent>().m_Color;
 					ImGui::PushID(i);
+					glm::vec4& objColor = (it)->second->GetComponent<Engine::FlatMaterialComponent>().m_Color;
 					ImGui::ColorEdit4("Color", glm::value_ptr(objColor));
 					ImGui::Separator();
 					ImGui::Checkbox("Show Custom Color", &(it)->second->GetComponent<Engine::RendererComponent>().m_bCustomColor);
@@ -113,17 +121,58 @@ public:
 				case Engine::ShaderType::Texture:
 				{
 					ImGui::PushID(i);
-					//ImGui::BeginCombo("Texture Selection", currentTexture, );
+					ImGui::PushItemWidth(200.f);
+					if (ImGui::BeginCombo("Texture Selection", comboTexPreviewValue))
+					{
+						int j = 0;
+						for (auto& jt = m_ActiveScene->m_Textures.begin(); jt != m_ActiveScene->m_Textures.end(); jt++)
+						{
+							const bool is_Selected = (currentTexture == j);
+							if (ImGui::Selectable(m_TextureNames[j].c_str(), is_Selected))
+							{
+								it->second->GetComponent<Engine::TextureMaterialComponent>().m_Tex = jt->second;
+								currentTexture = j;
+							}
+
+							if (is_Selected)
+							{
+								ImGui::SetItemDefaultFocus();
+							}
+							j++;
+						}
+						ImGui::EndCombo();
+					}
 					ImGui::Separator();
 					ImGui::PopID();
-
+					i++;
 					break;
 				}
-
 				case Engine::ShaderType::Phong:
 				{
-					glm::vec4& objColor = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_Color;
 					ImGui::PushID(i);
+					ImGui::PushItemWidth(200.f);
+					if (ImGui::BeginCombo("Phong Texture Selection", comboPhongPreviewValue))
+					{
+						int j = 0;
+						for (auto& jt = m_ActiveScene->m_Textures.begin(); jt != m_ActiveScene->m_Textures.end(); jt++)
+						{
+							const bool is_Selected = (currentTexture == j);
+							if (ImGui::Selectable(m_TextureNames[j].c_str(), is_Selected))
+							{
+								it->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex = jt->second;
+								currentTexture = j;
+							}
+
+							if (is_Selected)
+							{
+								ImGui::SetItemDefaultFocus();
+							}
+							j++;
+						}
+						ImGui::EndCombo();
+					}
+					ImGui::Separator();
+					glm::vec4& objColor = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_Color;
 					ImGui::ColorEdit4("Color", glm::value_ptr(objColor));
 					ImGui::Separator();
 					ImGui::Checkbox("Show Custom Color", &(it)->second->GetComponent<Engine::RendererComponent>().m_bCustomColor);
