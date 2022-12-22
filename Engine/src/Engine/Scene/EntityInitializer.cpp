@@ -7,14 +7,14 @@ namespace Engine
 {
 	EntityInitializer* EntityInitializer::m_Instance = new EntityInitializer;
 
-	Engine::Entity EntityInitializer::EntityInit(const std::string objname, std::shared_ptr<Engine::Scene>& Scene)
+	Engine::Entity EntityInitializer::EntityInit(const std::string objname, std::shared_ptr<Engine::Scene>& scene)
 	{
-		Engine::Entity tempEntity = Scene->CreateEntity(objname);
+		Engine::Entity tempEntity = scene->CreateEntity(objname);
 		return tempEntity;
 	}
 
 	Engine::Entity EntityInitializer::EntityInit(const Engine::ShaderType& shaderType, const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
-		std::shared_ptr<Engine::Scene>& Scene, const glm::vec3& color, std::shared_ptr<Engine::Texture2D>& tex)
+		std::shared_ptr<Engine::Scene>& scene, const glm::vec3& color, std::shared_ptr<Engine::Texture2D>& tex)
 	{
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
@@ -35,14 +35,17 @@ namespace Engine
 		ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
 		vertexarr->SetIndexBuffer(ObjIB);
 
-		Engine::Entity tempEntity = Scene->CreateEntity(objname);
+		Engine::Entity tempEntity = scene->CreateEntity(objname);
 		tempEntity.AddComponent<RendererComponent>(vertexarr);
 		MaterialInit(shaderType, tempEntity, color, tex);
+
+		std::shared_ptr<Engine::Entity> sharedEntity = std::make_shared<Engine::Entity>(tempEntity);
+		scene->m_EntityMap.insert({ objname, sharedEntity });
 
 		return tempEntity;
 	}
 
-	Engine::Entity EntityInitializer::EntityInit(int shapenum, std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& Scene)
+	Engine::Entity EntityInitializer::EntityInit(int shapenum, std::shared_ptr<Engine::VertexArray>& vertexarr, std::shared_ptr<Engine::Scene>& scene)
 	{
 		vertexarr.reset(Engine::VertexArray::Create()); // OpenGLVertexArray*
 
@@ -62,7 +65,7 @@ namespace Engine
 		PrimitiveIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
 		vertexarr->SetIndexBuffer(PrimitiveIB);
 
-		Engine::Entity tempEntity = Scene->CreateEntity("");
+		Engine::Entity tempEntity = scene->CreateEntity("");
 
 		return tempEntity;
 	}

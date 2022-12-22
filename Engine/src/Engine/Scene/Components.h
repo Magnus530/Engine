@@ -37,8 +37,6 @@ namespace Engine
 	struct RendererComponent
 	{
 		std::shared_ptr<VertexArray> m_VA;
-		std::shared_ptr<VertexBuffer> m_VB;
-		std::shared_ptr<IndexBuffer> m_IB;
 
 		bool m_bCustomColor = false;
 
