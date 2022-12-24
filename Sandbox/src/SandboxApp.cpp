@@ -41,7 +41,8 @@ public:
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Cube", m_CubeVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 1.0f }, m_WolfLogoTexture);
+		m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Cube", m_CubeVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 1.0f }, 
+			std::pair<std::string, std::shared_ptr<Engine::Texture2D>>("Wolf", m_WolfLogoTexture));
 
 		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
@@ -80,23 +81,21 @@ public:
 		ImGui::Begin("Settings");
 
 		int i = 0;
-		std::vector<std::string> m_TextureNames;
-		std::vector<const char*> m_TexNames;
+		std::vector<std::string> m_TempTextureNames;
+		std::vector<const char*> m_TextureNames;
 
 		for (auto& it = m_ActiveScene->m_Textures.begin(); it != m_ActiveScene->m_Textures.end(); it++)
 		{
-			m_TextureNames.push_back((it)->first);
+			m_TempTextureNames.push_back((it)->first);
 		}
 
-		for (std::string const& str : m_TextureNames)
+		for (std::string const& str : m_TempTextureNames)
 		{
-			m_TexNames.push_back(str.data());
+			m_TextureNames.push_back(str.data());
 		}
 
 		static int currentTexture = 0;
 		static int currentPhongTexture = 0;
-		const char* comboTexPreviewValue = m_TexNames[currentTexture];
-		const char* comboPhongPreviewValue = m_TexNames[currentPhongTexture];
 
 		for (auto& it = m_ActiveScene->m_EntityMap.begin(); it != m_ActiveScene->m_EntityMap.end(); it++)
 		{
@@ -120,6 +119,16 @@ public:
 				}
 				case Engine::ShaderType::Texture:
 				{
+					for (int i = 0; i < m_TempTextureNames.size(); i++)
+					{
+						auto tempTexName = (it)->second->GetComponent<Engine::TextureMaterialComponent>().m_Tex.first;
+						if (tempTexName.c_str() == m_TempTextureNames[i])
+						{
+							currentTexture = i;
+						}
+					}
+					const char* comboTexPreviewValue = m_TextureNames[currentTexture];
+
 					ImGui::PushID(i);
 					ImGui::PushItemWidth(200.f);
 					if (ImGui::BeginCombo("Texture Selection", comboTexPreviewValue))
@@ -128,9 +137,10 @@ public:
 						for (auto& jt = m_ActiveScene->m_Textures.begin(); jt != m_ActiveScene->m_Textures.end(); jt++)
 						{
 							const bool is_Selected = (currentTexture == j);
-							if (ImGui::Selectable(m_TextureNames[j].c_str(), is_Selected))
+							if (ImGui::Selectable(m_TempTextureNames[j].c_str(), is_Selected))
 							{
-								it->second->GetComponent<Engine::TextureMaterialComponent>().m_Tex = jt->second;
+								it->second->GetComponent<Engine::TextureMaterialComponent>().m_Tex.first = jt->first;
+								it->second->GetComponent<Engine::TextureMaterialComponent>().m_Tex.second = jt->second;
 								currentTexture = j;
 							}
 
@@ -149,6 +159,16 @@ public:
 				}
 				case Engine::ShaderType::Phong:
 				{
+					for (int i = 0; i < m_TempTextureNames.size(); i++)
+					{
+						auto tempTexName = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex.first;
+						if (tempTexName.c_str() == m_TempTextureNames[i])
+						{
+							currentPhongTexture = i;
+						}
+					}
+					const char* comboPhongPreviewValue = m_TextureNames[currentPhongTexture];
+
 					ImGui::PushID(i);
 					ImGui::PushItemWidth(200.f);
 					if (ImGui::BeginCombo("Phong Texture Selection", comboPhongPreviewValue))
@@ -157,9 +177,10 @@ public:
 						for (auto& jt = m_ActiveScene->m_Textures.begin(); jt != m_ActiveScene->m_Textures.end(); jt++)
 						{
 							const bool is_Selected = (currentPhongTexture == j);
-							if (ImGui::Selectable(m_TextureNames[j].c_str(), is_Selected))
+							if (ImGui::Selectable(m_TempTextureNames[j].c_str(), is_Selected))
 							{
-								it->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex = jt->second;
+								it->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex.first = jt->first;
+								it->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex.second = jt->second;
 								currentPhongTexture = j;
 							}
 

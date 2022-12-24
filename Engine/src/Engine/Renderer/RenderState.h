@@ -59,7 +59,7 @@ namespace Engine
 			std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformMat4("u_Transform",
 				entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
-			entity.GetComponent<TextureMaterialComponent>().m_Tex->Bind();
+			entity.GetComponent<TextureMaterialComponent>().m_Tex.second->Bind();
 		}
 	};
 
@@ -79,7 +79,7 @@ namespace Engine
 
 			phongOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 			phongOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::PhongMaterialComponent>().m_Color));
-			entity.GetComponent<PhongMaterialComponent>().m_Tex->Bind();
+			entity.GetComponent<PhongMaterialComponent>().m_Tex.second->Bind();
 
 			phongOpenGLShader->UploadUniformFloat("u_AmbientStrength", entity.GetComponent<Engine::PhongMaterialComponent>().m_AmbientStrength);
 			phongOpenGLShader->UploadUniformFloat3("u_AmbientColor", entity.GetComponent<Engine::PhongMaterialComponent>().m_AmbientColor);

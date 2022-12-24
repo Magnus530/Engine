@@ -14,7 +14,7 @@ namespace Engine
 	}
 
 	Engine::Entity EntityInitializer::EntityInit(const Engine::ShaderType& shaderType, const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
-		std::shared_ptr<Engine::Scene>& scene, const glm::vec3& color, std::shared_ptr<Engine::Texture2D>& tex)
+		std::shared_ptr<Engine::Scene>& scene, const glm::vec3& color, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex)
 	{
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
@@ -70,7 +70,7 @@ namespace Engine
 		return tempEntity;
 	}
 
-	void EntityInitializer::MaterialInit(const Engine::ShaderType& shaderType, Engine::Entity& entity, const glm::vec3& color, std::shared_ptr<Engine::Texture2D>& tex)
+	void EntityInitializer::MaterialInit(const Engine::ShaderType& shaderType, Engine::Entity& entity, const glm::vec3& color, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex)
 	{
 		switch (shaderType)
 		{
@@ -83,13 +83,13 @@ namespace Engine
 			case Engine::ShaderType::Texture:
 			{
 				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Texture);
-				entity.AddComponent<TextureMaterialComponent>(tex);
+				entity.AddComponent<TextureMaterialComponent>(tex.first, tex.second);
 				break;
 			}
 			case Engine::ShaderType::Phong:
 			{
 				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Phong);
-				entity.AddComponent<PhongMaterialComponent>(glm::vec4{ color, 1.f }, tex);
+				entity.AddComponent<PhongMaterialComponent>(glm::vec4{ color, 1.f }, tex.first, tex.second);
 				break;
 			}
 		}
