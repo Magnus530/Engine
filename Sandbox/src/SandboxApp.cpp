@@ -1,7 +1,7 @@
 /* The game engine series by The Cherno on Youtube, was a helpful source when creating this engine.
 https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=1 */
 
-#include <Engine.h>
+#include "Engine.h"
 #include "Engine/Core/EntryPoint.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
@@ -78,134 +78,7 @@ public:
 
 	virtual void OnImGuiRender() override
 	{
-		ImGui::Begin("Settings");
-
-		int i = 0;
-		std::vector<std::string> m_TempTextureNames;
-		std::vector<const char*> m_TextureNames;
-
-		for (auto& it = m_ActiveScene->m_Textures.begin(); it != m_ActiveScene->m_Textures.end(); it++)
-		{
-			m_TempTextureNames.push_back((it)->first);
-		}
-
-		for (std::string const& str : m_TempTextureNames)
-		{
-			m_TextureNames.push_back(str.data());
-		}
-
-		static int currentTexture = 0;
-		static int currentPhongTexture = 0;
-
-		for (auto& it = m_ActiveScene->m_EntityMap.begin(); it != m_ActiveScene->m_EntityMap.end(); it++)
-		{
-			ImGui::Separator();
-			auto& tag = (it)->second->GetComponent<Engine::TagComponent>().Tag;
-			ImGui::Text("%s", tag.c_str());
-
-			switch ((it)->second->GetComponent<Engine::MaterialComponent>().m_ShaderType)
-			{
-				case Engine::ShaderType::Flat:
-				{
-					ImGui::PushID(i);
-					glm::vec4& objColor = (it)->second->GetComponent<Engine::FlatMaterialComponent>().m_Color;
-					ImGui::ColorEdit4("Color", glm::value_ptr(objColor));
-					ImGui::Separator();
-					ImGui::Checkbox("Show Custom Color", &(it)->second->GetComponent<Engine::RendererComponent>().m_bCustomColor);
-					ImGui::Separator();
-					ImGui::PopID();
-					i++;
-					break;
-				}
-				case Engine::ShaderType::Texture:
-				{
-					for (int i = 0; i < m_TempTextureNames.size(); i++)
-					{
-						auto tempTexName = (it)->second->GetComponent<Engine::TextureMaterialComponent>().m_Tex.first;
-						if (tempTexName.c_str() == m_TempTextureNames[i])
-						{
-							currentTexture = i;
-						}
-					}
-					const char* comboTexPreviewValue = m_TextureNames[currentTexture];
-
-					ImGui::PushID(i);
-					ImGui::PushItemWidth(200.f);
-					if (ImGui::BeginCombo("Texture Selection", comboTexPreviewValue))
-					{
-						int j = 0;
-						for (auto& jt = m_ActiveScene->m_Textures.begin(); jt != m_ActiveScene->m_Textures.end(); jt++)
-						{
-							const bool is_Selected = (currentTexture == j);
-							if (ImGui::Selectable(m_TempTextureNames[j].c_str(), is_Selected))
-							{
-								it->second->GetComponent<Engine::TextureMaterialComponent>().m_Tex.first = jt->first;
-								it->second->GetComponent<Engine::TextureMaterialComponent>().m_Tex.second = jt->second;
-								currentTexture = j;
-							}
-
-							if (is_Selected)
-							{
-								ImGui::SetItemDefaultFocus();
-							}
-							j++;
-						}
-						ImGui::EndCombo();
-					}
-					ImGui::Separator();
-					ImGui::PopID();
-					i++;
-					break;
-				}
-				case Engine::ShaderType::Phong:
-				{
-					for (int i = 0; i < m_TempTextureNames.size(); i++)
-					{
-						auto tempTexName = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex.first;
-						if (tempTexName.c_str() == m_TempTextureNames[i])
-						{
-							currentPhongTexture = i;
-						}
-					}
-					const char* comboPhongPreviewValue = m_TextureNames[currentPhongTexture];
-
-					ImGui::PushID(i);
-					ImGui::PushItemWidth(200.f);
-					if (ImGui::BeginCombo("Phong Texture Selection", comboPhongPreviewValue))
-					{
-						int j = 0;
-						for (auto& jt = m_ActiveScene->m_Textures.begin(); jt != m_ActiveScene->m_Textures.end(); jt++)
-						{
-							const bool is_Selected = (currentPhongTexture == j);
-							if (ImGui::Selectable(m_TempTextureNames[j].c_str(), is_Selected))
-							{
-								it->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex.first = jt->first;
-								it->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex.second = jt->second;
-								currentPhongTexture = j;
-							}
-
-							if (is_Selected)
-							{
-								ImGui::SetItemDefaultFocus();
-							}
-							j++;
-						}
-						ImGui::EndCombo();
-					}
-					ImGui::Separator();
-					glm::vec4& objColor = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_Color;
-					ImGui::ColorEdit4("Color", glm::value_ptr(objColor));
-					ImGui::Separator();
-					ImGui::Checkbox("Show Custom Color", &(it)->second->GetComponent<Engine::RendererComponent>().m_bCustomColor);
-					ImGui::Separator();
-					ImGui::PopID();
-					i++;
-					break;
-				}
-			}
-		}
-
-		ImGui::End();
+		Engine::ImGuiSystem::GuiEntitySettings(m_ActiveScene);
 	}
 
 	void OnEvent(Engine::Event& e) override
