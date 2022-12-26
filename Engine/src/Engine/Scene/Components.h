@@ -7,6 +7,7 @@
 #include "Engine/Renderer/Shader.h"
 
 #include <glm/glm.hpp>
+#include <utility>
 
 namespace Engine
 {
@@ -37,8 +38,6 @@ namespace Engine
 	struct RendererComponent
 	{
 		std::shared_ptr<VertexArray> m_VA;
-		std::shared_ptr<VertexBuffer> m_VB;
-		std::shared_ptr<IndexBuffer> m_IB;
 
 		bool m_bCustomColor = false;
 
@@ -69,18 +68,21 @@ namespace Engine
 	{
 		//uint8_t data[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
 
-		std::shared_ptr<Texture2D> m_Tex = nullptr;
+		std::pair<std::string, std::shared_ptr<Texture2D>> m_Tex;
 
 		TextureMaterialComponent() = default;
 		TextureMaterialComponent(const TextureMaterialComponent&) = default;
-		TextureMaterialComponent(const std::shared_ptr<Texture2D>& texture)
-			: m_Tex(texture) {}
+		TextureMaterialComponent(const std::string name, const std::shared_ptr<Texture2D>& texture)
+		{
+			m_Tex.first = name;
+			m_Tex.second = texture;
+		}
 	};
 
 	struct PhongMaterialComponent
 	{
 		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-		std::shared_ptr<Texture2D> m_Tex = nullptr;
+		std::pair<std::string, std::shared_ptr<Texture2D>> m_Tex;
 		glm::vec3 m_PCamPosition{ 0.f, 0.f, 0.f};
 
 		float m_AmbientStrength{ 0.f };
@@ -91,8 +93,12 @@ namespace Engine
 
 		PhongMaterialComponent() = default;
 		PhongMaterialComponent(const PhongMaterialComponent&) = default;
-		PhongMaterialComponent(const glm::vec4& color, const std::shared_ptr<Texture2D>& texture)
-			: m_Color(color), m_Tex(texture) {}
+		PhongMaterialComponent(const glm::vec4& color, const std::string name, const std::shared_ptr<Texture2D>& texture)
+			: m_Color(color) 
+		{
+			m_Tex.first = name;
+			m_Tex.second = texture;
+		}
 	};
 
 	struct LightComponent

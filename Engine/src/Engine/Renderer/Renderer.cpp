@@ -2,7 +2,6 @@
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
-#include "Engine/Renderer/RenderFactory.h"
 #include "Engine/Renderer/RenderContext.h"
 
 namespace Engine
@@ -76,13 +75,12 @@ namespace Engine
 		RenderCommand::DrawIndexed(entity.GetComponent<RendererComponent>().m_VA);
 	}
 
-	void Renderer::Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam)
+	std::shared_ptr<Engine::Texture2D> Renderer::CreateTexture(const std::string name, const std::string filePath, const std::shared_ptr<Engine::Scene>& scene)
 	{
-		Engine::RenderFactory::CreateShaderType(shaderType)->InitShaderUniforms(m_SceneData, entity, light, pCam, m_ShaderLibrary);
+		std::shared_ptr<Engine::Texture2D> tempTexture = Engine::Texture2D::Create(filePath);
+		scene->m_Textures.insert({name, tempTexture});
 
-
-		vertexArray->Bind();
-		RenderCommand::DrawIndexed(vertexArray);
+		return tempTexture;
 	}
 
 	inline glm::vec2 Renderer::GetWindowSize()

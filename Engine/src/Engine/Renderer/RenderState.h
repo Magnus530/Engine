@@ -51,7 +51,7 @@ namespace Engine
 		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
 		{
 			std::shared_ptr<Engine::Shader> textureShader = shaderLibrary->Get("Texture");
-			std::shared_ptr<Engine::OpenGLShader> flatOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader);
+			std::shared_ptr<Engine::OpenGLShader> textureOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader);
 
 			textureShader->Bind();
 			std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
@@ -59,7 +59,7 @@ namespace Engine
 			std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformMat4("u_Transform",
 				entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
-			entity.GetComponent<TextureMaterialComponent>().m_Tex->Bind();
+			entity.GetComponent<TextureMaterialComponent>().m_Tex.second->Bind();
 		}
 	};
 
@@ -79,7 +79,7 @@ namespace Engine
 
 			phongOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 			phongOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::PhongMaterialComponent>().m_Color));
-			entity.GetComponent<PhongMaterialComponent>().m_Tex->Bind();
+			entity.GetComponent<PhongMaterialComponent>().m_Tex.second->Bind();
 
 			phongOpenGLShader->UploadUniformFloat("u_AmbientStrength", entity.GetComponent<Engine::PhongMaterialComponent>().m_AmbientStrength);
 			phongOpenGLShader->UploadUniformFloat3("u_AmbientColor", entity.GetComponent<Engine::PhongMaterialComponent>().m_AmbientColor);

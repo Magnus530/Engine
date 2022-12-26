@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Engine/Renderer/PerspectiveCameraController.h"
 #include "Engine/Scene/Entity.h"
+#include "Engine/Renderer/Texture.h"
 
 namespace Engine
 {
@@ -18,12 +19,11 @@ namespace Engine
 		static void EndScene();
 
 		static void RenderInit();
-
-		static void Submit(const ShaderType& shaderType, const std::shared_ptr<VertexArray>& vertexArray, Entity& entity, Entity& light, PerspectiveCameraController& pCam);
 		static void Submit(Entity& entity);
 
-		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+		static std::shared_ptr<Engine::Texture2D> CreateTexture(const std::string name, const std::string filePath, const std::shared_ptr<Engine::Scene>& scene);
 
+		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 		inline static glm::vec2 GetWindowSize();
 
 		struct SceneData
@@ -33,6 +33,7 @@ namespace Engine
 		};
 
 		static SceneData* m_SceneData;
+
 	private:
 
 		struct WindowSize

@@ -1,7 +1,7 @@
 /* The game engine series by The Cherno on Youtube, was a helpful source when creating this engine.
 https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT&index=1 */
 
-#include <Engine.h>
+#include "Engine.h"
 #include "Engine/Core/EntryPoint.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
@@ -15,7 +15,7 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 #include "Engine/AssetInit/ObjLoader.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
 #include "Engine/Scene/EntityInitializer.h"
-#include "Engine/AssetInit/Material.h"
+#include <unordered_map>
 
 // Layers
 #include "PathfindingLayer.h"
@@ -28,12 +28,11 @@ public:
 		: Layer("Example"), m_OCameraController(1280.0f / 720.0f, true), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
 		Engine::Renderer::RenderInit();
-
-		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
-		m_WolfLogoTexture = Engine::Texture2D::Create("assets/textures/wolf.png");
-		m_WhiteTexture = Engine::Texture2D::Create("assets/textures/white.png");
-		
 		m_ActiveScene = std::make_shared<Engine::Scene>();
+
+		m_Texture = Engine::Renderer::CreateTexture("Chess", "assets/textures/checkerboard.png", m_ActiveScene);
+		m_WolfLogoTexture = Engine::Renderer::CreateTexture("Wolf", "assets/textures/wolf.png", m_ActiveScene);
+		m_WhiteTexture = Engine::Renderer::CreateTexture("White", "assets/textures/white.png", m_ActiveScene);
 
 		//Create entities here
 
@@ -41,6 +40,9 @@ public:
 		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
+
+		m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Cube", m_CubeVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 1.0f }, 
+			std::pair<std::string, std::shared_ptr<Engine::Texture2D>>("Wolf", m_WolfLogoTexture));
 
 		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
@@ -60,45 +62,23 @@ public:
 
 		m_Audio->update(ts);
 
-		if (m_PlaneEntity.HasComponent<Engine::PhongMaterialComponent>())
-		{
-			Engine::LightSystem::UpdateLight(m_PlaneEntity.GetComponent<Engine::PhongMaterialComponent>(), m_LightEntity, m_PCameraController);
-		}
 
-		Engine::Renderer::Submit(m_LightEntity);
-		Engine::Renderer::Submit(m_PlaneEntity);
+		for (auto& it = m_ActiveScene->m_EntityMap.begin(); it != m_ActiveScene->m_EntityMap.end(); it++)
+		{
+			Engine::Renderer::Submit(*(it)->second);
+
+			if ((it)->second->HasComponent<Engine::PhongMaterialComponent>())
+			{
+				Engine::LightSystem::UpdateLight((it)->second->GetComponent<Engine::PhongMaterialComponent>(), m_LightEntity, m_PCameraController);
+			}
+		}
 
 		Engine::Renderer::EndScene();
 	}
 
 	virtual void OnImGuiRender() override
 	{
-		ImGui::Begin("Settings");
-		if (m_PlaneEntity)
-		{
-			//ImGui::Separator();
-			//auto& tag = m_PlaneEntity.GetComponent<Engine::TagComponent>().Tag;
-			//ImGui::Text("%s", tag.c_str());
-			//auto& objColor = m_PlaneEntity.GetComponent<Engine::FlatMaterialComponent>().m_Color;
-			//ImGui::ColorEdit4("Plane Color", glm::value_ptr(m_PlaneEntity.GetComponent<Engine::FlatMaterialComponent>().m_Color));
-			//ImGui::Separator();
-			//ImGui::Checkbox("Show Custom Color", &m_PlaneEntity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-			//ImGui::Separator();
-		}
-
-		if (m_CubeEntity)
-		{
-			//ImGui::Separator();
-			//auto& tag = m_CubeEntity.GetComponent<Engine::TagComponent>().Tag;
-			//ImGui::Text("%s", tag.c_str());
-			//auto& objColor = m_CubeEntity.GetComponent<Engine::FlatMaterialComponent>().m_Color;
-			//ImGui::ColorEdit4("Cube Color", glm::value_ptr(m_CubeEntity.GetComponent<Engine::FlatMaterialComponent>().m_Color));
-			//ImGui::Separator();
-			//ImGui::Checkbox("Show Custom Color", &m_CubeEntity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-			//ImGui::Separator();
-		}
-
-		ImGui::End();
+		Engine::ImGuiSystem::GuiEntitySettings(m_ActiveScene);
 	}
 
 	void OnEvent(Engine::Event& e) override
@@ -115,11 +95,8 @@ private:
 
 	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture, m_WhiteTexture;
 
-	std::shared_ptr<Engine::Material> FlatMaterial;
-
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
-
 
 	std::shared_ptr<Engine::Scene> m_ActiveScene;
 
