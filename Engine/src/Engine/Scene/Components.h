@@ -21,7 +21,6 @@ namespace Engine
 	struct TransformComponent
 	{
 		glm::mat4 m_Transform	{ 1.f };
-		float m_Speed{ 2.f };
 
 		glm::vec3 GetPosition() const { return m_Transform[3]; }
 
@@ -50,19 +49,42 @@ namespace Engine
 			: m_Color(color) {}
 	};
 
+		enum PatrolType
+		{
+			// In Order of m_PatrolPath
+			Single,
+			Loop,
+			Reverse,
+		};
 	struct PathfindingComponent
 	{
+		// Start node and current grid
 		std::shared_ptr<class PNode> m_StartNode;
 		std::shared_ptr<struct NodeGrid> m_Grid;
 		std::shared_ptr<class PNode> m_TargetNode;
 		std::shared_ptr<class PNode> m_IntermediateTargetNode;
 
-		std::vector<std::shared_ptr<class PNode>> m_CurrentPath;	// reduntant TODO: remove
+		// Moving Through Path
+		std::vector<std::shared_ptr<class PNode>> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
 		std::shared_ptr<struct BSpline> m_SplinePath = std::make_shared<BSpline>();
 		float m_SplineMovement{};	// How far along the spline has the Entity gone?
-		bool bStartedPathfinding{};
+		bool bIsMovingAlongPath{};
 		bool bReachedTarget{};
 		bool bIsObstructed{};
+
+		// MovementSpeed
+		float m_SplineLength{};
+		float m_EntityPathSpeed{ 5.f };
+
+		// Patrol
+		bool bPatrolling{};
+			/* Only relevant for PatrolType::Reverse 
+				Checks if entity is currently going the reverse way of the path */
+		bool bReverse{};
+		PatrolType m_PatrolType = PatrolType::Loop;
+		std::vector<glm::vec3> m_PatrolPath;
+		int m_CurrentPatrolPoint{};
+		glm::vec3 m_PatrolPauseLocation;
 
 		PathfindingComponent() = default;
 		PathfindingComponent(const PathfindingComponent&) = default;
@@ -73,12 +95,4 @@ namespace Engine
 		float m_radius{ 2.f };
 		uint32_t m_ID{};
 	};
-
-	//class TestComponent
-	//{
-	//public:
-	//	TestComponent();
-	//	~TestComponent();
-	//	int data{};
-	//};
 }

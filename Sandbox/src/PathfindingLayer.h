@@ -112,9 +112,7 @@ public:
 		/*--------------------- PATHFINDING: Moving m_Entity along path -----------------------------*/
 		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
-		transform.m_Speed = m_SplineSpeed;
-		if (pathfinder.bStartedPathfinding)
-			Engine::PathfindingSystem::MoveAlongPath(pathfinder, transform, ts);
+		Engine::PathfindingSystem::MoveAlongPath(pathfinder, transform, ts);
 
 		Engine::NodeGridSystem::UpdateFalseObstructionNodes(0);
 		/************************************************************************************************/
@@ -205,7 +203,6 @@ public:
 		ImGui::PopID();
 
 		// TransformTesting -  Rotate to vector
-		// 
 		static float x{ 1 };
 		static float y{ 1 };
 		static float z{ -1 };
@@ -272,10 +269,40 @@ public:
 		ImGui::Checkbox("Render Nodegrid", &bRenderNodeGrid);
 		ImGui::Separator();
 		
+
 		// SPLINE SPEED ------------------------------------------------------------------------------------
 		ImGui::PushItemWidth(150.f);
-		ImGui::SliderFloat("Monkey Movement Speed", &m_SplineSpeed, 0.f, 2.f, "%0.1f");
-			
+		ImGui::DragFloat("Monkey Movement Speed", &m_Entity.GetComponent<Engine::PathfindingComponent>().m_EntityPathSpeed, 0.2f, 0.0f, 1000.f, "%.1f");
+		
+
+		// PATROL ---------------------------------------------------------------
+		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
+		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+		glm::vec3 currentPos = transform.GetPosition() - glm::vec3(0, 0.5, 0);
+
+		if (ImGui::Button("Start\nPatrol", ImVec2(100, 100)))
+			Engine::PathfindingSystem::StartPatrol(pathfinder, currentPos);
+		ImGui::SameLine();
+		if (ImGui::Button("Clear Patrol Path", ImVec2(90, 40)))
+			Engine::PathfindingSystem::ClearPatrol(pathfinder);
+
+		static bool bPatrolpaused{};
+		if (ImGui::Button(bPatrolpaused ? "Resume Patrol" : "Exit Patrol", ImVec2(100, 70)))
+		{
+			if (!bPatrolpaused)
+			{
+				Engine::PathfindingSystem::PausePatrol(pathfinder, currentPos);
+				//Engine::PathfindingSystem::CancelMovementAlongPath(pathfinder);
+				bPatrolpaused = true;
+			}
+			else
+			{
+				Engine::PathfindingSystem::ResumePatrol(pathfinder, currentPos);
+				//Engine::PathfindingSystem::ResumeMovementAlongPath(pathfinder, currentPos);
+				bPatrolpaused = false;
+			}
+		}
+
 
 		// ADJUST OBSTRTUCTION ENTITIES ------------------------------------------------------------------------------------
 		ImGui::Separator();
@@ -286,10 +313,10 @@ public:
 		if (ImGui::Button("DELETE\nObstruction", ImVec2(100.f, 100.f)))
 			DeleteObstructor();
 
-		uint32_t size = m_Obstructors.size();
+		size_t size = m_Obstructors.size();
 
 		static auto ID = ImGui::GetActiveID();
-		for (uint32_t i{}; i < size; i++)
+		for (size_t i{}; i < size; i++)
 		{
 			ImGui::Separator();
 			ImGui::PushID(i);
@@ -334,15 +361,26 @@ public:
 			mousePos.y = event.GetY();
 		}
 
-		if (e.GetEventType() == Engine::EventType::MouseButtonPressed && Engine::Input::IsMouseButtonPressed(E_MOUSE_BUTTON_1))
+
+		if (e.GetEventType() == Engine::EventType::MouseButtonPressed && Engine::Input::IsMouseButtonPressed(E_MOUSE_BUTTON_LEFT) && Engine::Input::IsKeyPressed(E_KEY_LEFT_ALT))
 		{
+			// Set Patrol point
 			glm::vec3 ray{};
 			Engine::RayCast::FromScreenPosition(ray, mousePos, m_PCameraController.GetCamera().GetProjectionMatrix(), m_PCameraController.GetCamera().GetViewMatrix());
-
 			glm::vec3 pos = m_PCameraController.GetCamera().GetPosition();
 			glm::vec3 Intersection;
-
-			// Start Pathfinding
+			if (Engine::RayCast::IntersectWithWAPlaneXZ(Intersection, ray, pos))
+			{
+				m_Entity.GetComponent<Engine::PathfindingComponent>().m_PatrolPath.push_back(Intersection);
+			}
+		}
+		else if (e.GetEventType() == Engine::EventType::MouseButtonPressed && Engine::Input::IsMouseButtonPressed(E_MOUSE_BUTTON_LEFT))
+		{
+			// Start Pathfinding - Find raycasted point on XZ plane - Node closest to location
+			glm::vec3 ray{};
+			Engine::RayCast::FromScreenPosition(ray, mousePos, m_PCameraController.GetCamera().GetProjectionMatrix(), m_PCameraController.GetCamera().GetViewMatrix());
+			glm::vec3 pos = m_PCameraController.GetCamera().GetPosition();
+			glm::vec3 Intersection;
 			if (Engine::RayCast::IntersectWithWAPlaneXZ(Intersection, ray, pos)) 
 			{
 				auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
@@ -354,6 +392,7 @@ public:
 				Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0, 0.5f, 0));
 			}
 		}
+
 	}
 
 
@@ -367,7 +406,7 @@ public:
 		Engine::ObjLoader::ReadFile(objname, vertices, indices);
 		vertexarr.reset(Engine::VertexArray::Create());
 		std::shared_ptr<Engine::VertexBuffer> ObjVB;
-		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
+		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), (uint32_t)vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
 		ObjVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },
@@ -399,7 +438,7 @@ public:
 	}
 	void DeleteObstructor()
 	{
-		uint32_t size = m_Obstructors.size();
+		size_t size = m_Obstructors.size();
 		if (size == 0) return;
 		Engine::NodeGridSystem::DeleteObstructionSphere(0, size - 1);
 		m_Obstructors.erase(--m_Obstructors.end());

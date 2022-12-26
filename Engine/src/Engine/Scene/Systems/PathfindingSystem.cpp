@@ -10,24 +10,26 @@ namespace Engine {
         const bool NoMovement = comp.m_StartNode == comp.m_TargetNode;
         if (NoMovement) return;
         
-        if (comp.bStartedPathfinding)
+        if (comp.bIsMovingAlongPath)
             comp.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(0, currentPosition);
-        comp.bStartedPathfinding = true;    // In init or FindPath?
+        comp.bIsMovingAlongPath = true;    // In init or FindPath?
         //*** END Init Pathfinding ***
 
         // Bit reduntant for pathfinding component to have array of node pointers, when it only uses their locations
-        comp.m_CurrentPath = FindPath(comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bIsObstructed);
+        comp.m_CurrentPath = FindPathAStar(comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bIsObstructed);
         const bool NoMovIntermediate = comp.m_StartNode == comp.m_IntermediateTargetNode;
         if (NoMovIntermediate) {
-            comp.bStartedPathfinding = false;
+            comp.bIsMovingAlongPath = false;
             comp.bReachedTarget = true;
             return;
         }
 
+        // Adding spline control points to pathfinding component
         comp.m_SplinePath->m_Controlpoints.clear();
         comp.m_SplinePath->m_Controlpoints.push_back(currentPosition);
         for (auto it = comp.m_CurrentPath.end(); it != comp.m_CurrentPath.begin();)
             comp.m_SplinePath->m_Controlpoints.push_back((*--it)->m_Data->m_Position);
+
         
         // In case of only having two control points. Create a third in between, or else the spline functions doesn't work.
         if (comp.m_SplinePath->m_Controlpoints.size() == 2) {
@@ -41,24 +43,50 @@ namespace Engine {
         
         comp.m_SplineMovement = 0.f;    // Reset movement along spline
         comp.bReachedTarget = false;
+
+
+        // Get length of spline path for accurate movement speed through spline
+        comp.m_SplineLength = 0.f;
+        glm::vec3 prevPos = currentPosition;
+        for (float t{}; t < 1.f; t += 0.05)
+        {
+            glm::vec3 pos = BSplineCreator::GetPositionAlongSpline(*comp.m_SplinePath, t);
+
+            float l = glm::length(pos - prevPos);
+            comp.m_SplineLength += l;
+
+            prevPos = BSplineCreator::GetPositionAlongSpline(*comp.m_SplinePath, t);
+        }
 	}
 
     void PathfindingSystem::MoveAlongPath(PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime)
     {
+        if (!pathfinder.bIsMovingAlongPath) return;
+        if (pathfinder.bReachedTarget) return;
+
+        //float prevT = pathfinder.m_SplineMovement;
         float& t = pathfinder.m_SplineMovement;
-        float speed = transform.m_Speed;
+        float speed = pathfinder.m_EntityPathSpeed / pathfinder.m_SplineLength;
+        if (speed <= 0.f) return;
 
-        if (t < 0.99f)
+        if (t < 0.99f) {
             t = std::clamp<float>(t += deltatime * speed, 0.f, 0.99f);
-        else {
-            t = 0.99f;
-
-            if (pathfinder.bReachedTarget)
-                pathfinder.m_StartNode = pathfinder.m_TargetNode;
+            //pathfinder.m_CurrentPatrolPoint += t - prevT;
+        }
+        else {  // Reached end of path
+            //t = 0.99f;
+            t = 0.f;
+            pathfinder.m_StartNode = pathfinder.m_TargetNode;
             pathfinder.bReachedTarget = true;
+
+            if (pathfinder.bPatrolling) {
+                PatrolUpdate(pathfinder, transform.GetPosition());
+                return;
+            }
         }
         
-        if (!pathfinder.bReachedTarget) {
+        if (!pathfinder.bReachedTarget) 
+        {
             glm::vec3 previousPosition = transform.GetPosition();
             glm::vec3 pos = BSplineCreator::GetPositionAlongSpline(*pathfinder.m_SplinePath, t);
 
@@ -68,12 +96,123 @@ namespace Engine {
             // tmp method
             // Transforming the Entity should NOT be done here. This function should instead just give a intended position along the path
             TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0,0.5f,0));   // Manually adding extra height
-            //TransformSystem::RotateToDirectionVector2D(transform, glm::normalize(direction));
             TransformSystem::RotateToDirectionVector(transform, glm::normalize(direction));
         }
     }
 
-    // INEFFICIENT - Needs a proper indexed nodegrid to improve search time
+    void PathfindingSystem::ResumeMovementAlongPath(PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
+    {
+        pathfinder.bIsMovingAlongPath = true;
+        pathfinder.m_StartNode = GetNodeClosestToPosition(0, currentPosition);
+        FindPath(pathfinder, currentPosition);
+    }
+
+    void PathfindingSystem::CancelMovementAlongPath(PathfindingComponent& pathfinder)
+    {
+        pathfinder.bIsMovingAlongPath = false;
+        pathfinder.m_CurrentPath.clear();
+    }
+
+    void PathfindingSystem::StartPatrol(PathfindingComponent& pathfinder, const glm::vec3 currentPosition, PatrolType patroltype/* = PatrolType::Loop*/)
+    {
+        if (pathfinder.m_PatrolPath.size() < 2)
+            return;
+
+        // Called at start of patrol and each time entity reaches their target
+            // Sets next point in patrolpath
+        pathfinder.bPatrolling = true;
+        pathfinder.m_PatrolType = patroltype;
+        pathfinder.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(0, currentPosition);  // Kan også finne ut av hvilken punkt den er nærmest, og starte der. For å kunne restarte patrol
+        PatrolUpdate(pathfinder, currentPosition);
+    }
+
+    void PathfindingSystem::PatrolUpdate(PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
+    {
+        switch (pathfinder.m_PatrolType)
+        {
+        case Engine::Single: 
+        {
+            pathfinder.m_CurrentPatrolPoint++;
+            if (pathfinder.m_CurrentPatrolPoint >= pathfinder.m_PatrolPath.size())
+                return;
+            break;
+        }
+        case Engine::Loop:
+        {
+            pathfinder.bReachedTarget = false;
+            pathfinder.m_CurrentPatrolPoint++;
+            if (pathfinder.m_CurrentPatrolPoint >= pathfinder.m_PatrolPath.size())
+                pathfinder.m_CurrentPatrolPoint = 0;
+            break;
+        }
+        case Engine::Reverse:
+        {
+            pathfinder.bReachedTarget = false;
+            pathfinder.bReverse ? pathfinder.m_CurrentPatrolPoint-- : pathfinder.m_CurrentPatrolPoint++;
+            if (pathfinder.m_CurrentPatrolPoint == pathfinder.m_PatrolPath.size())
+                pathfinder.m_CurrentPatrolPoint --;
+            else if (pathfinder.m_CurrentPatrolPoint < 0)
+                pathfinder.m_CurrentPatrolPoint = 0;
+            break;
+        }
+        default:
+            break;
+        }
+        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(0, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
+        FindPath(pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
+    }
+
+    void PathfindingSystem::PausePatrol(PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
+    {
+        pathfinder.bPatrolling = false;
+        pathfinder.m_PatrolPauseLocation = currentPosition;
+        CancelMovementAlongPath(pathfinder);
+    }
+
+    void PathfindingSystem::ResumePatrol(PathfindingComponent& pathfinder, const glm::vec3 currentPosition, PatrolType patroltype)
+    {
+        pathfinder.bPatrolling = true;
+        pathfinder.bIsMovingAlongPath = true;
+        pathfinder.m_PatrolType = patroltype;
+        pathfinder.m_StartNode = GetNodeClosestToPosition(0, currentPosition);
+        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(0, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
+        FindPath(pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
+    }
+
+    void PathfindingSystem::AddPatrolPath(PathfindingComponent& pathfinder, std::vector<glm::vec3> patrolpath)
+    {
+        for (const auto& it : patrolpath)
+            pathfinder.m_PatrolPath.push_back(it);
+    }
+
+    void PathfindingSystem::AddToPatrolPath(PathfindingComponent& pathfinder, glm::vec3 pos)
+    {
+        pathfinder.m_PatrolPath.push_back(pos);
+    }
+
+    void PathfindingSystem::AddToPatrolPathAt(PathfindingComponent& pathfinder, glm::vec3 pos, unsigned int index)
+    {
+        if (pathfinder.m_PatrolPath.size() < index) return;
+
+        unsigned int i{};
+        for (auto& it = pathfinder.m_PatrolPath.begin(); it != pathfinder.m_PatrolPath.end();)
+        {
+            if (i == index) {
+                pathfinder.m_PatrolPath.insert(it, pos);
+                return;
+            }
+            i++;
+        }
+    }
+
+    void PathfindingSystem::ClearPatrol(PathfindingComponent& pathfinder)
+    {
+        pathfinder.bPatrolling = false;
+        pathfinder.m_CurrentPatrolPoint = 0;
+        pathfinder.m_PatrolPath.clear();
+    }
+
+    // INEFFICIENT - Needs a properly indexed nodegrid to improve search time
     std::shared_ptr<PNode> PathfindingSystem::GetNodeClosestToPosition(uint32_t gridIndex, glm::vec3 position)
     {
         std::shared_ptr<NodeGrid> grid = NodeGridSystem::GetGridAtIndex(gridIndex);
@@ -92,7 +231,7 @@ namespace Engine {
         return node;
     }
 
-	std::vector<std::shared_ptr<PNode>> PathfindingSystem::FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked)
+	std::vector<std::shared_ptr<PNode>> PathfindingSystem::FindPathAStar(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked)
     {
         std::vector<std::shared_ptr<PNode>> path;
         intermediate = nullptr;
@@ -170,7 +309,7 @@ namespace Engine {
             }
         }
         /* If a path was not found, find the path to the closestNode */
-        path = FindPath(start, closestNode, intermediate);
+        path = FindPathAStar(start, closestNode, intermediate);
         *blocked = true;
         intermediate = closestNode;
         return path;
@@ -179,7 +318,6 @@ namespace Engine {
 
 
     //************************************************************************* NODE GRID SYSTEM ***************************************************************************************************//
-    //NodeGridSystem::Grids* NodeGridSystem::m_Grids = new NodeGridSystem::Grids();
     static std::vector<std::shared_ptr<NodeGrid>> m_NodeGrids;
 
     /* Nodes, that potentially, are no longer obstructions */

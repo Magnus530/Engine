@@ -11,9 +11,7 @@ namespace Engine {
 	struct NodeGrid
 	{
 		NodeGrid(glm::vec3 position, glm::vec3 extent, std::vector<std::shared_ptr<PNode>>& nodes)
-			: m_Position{ position }, m_Extent{ extent }, m_Nodes{ nodes } {
-			//m_ObstructionSpheres = std::make_shared<class PathObstructionSphereCollection>();
-		}
+			: m_Position{ position }, m_Extent{ extent }, m_Nodes{ nodes } {}
 
 		glm::vec3 m_Position;
 		glm::vec3 m_Extent;
@@ -25,14 +23,34 @@ namespace Engine {
 	// Given a Nodegrid, finds a path from A to B
 	class PathfindingSystem
 	{
-	public://Functions
+	public:
 		static void FindPath(PathfindingComponent& comp, const glm::vec3 currentPosition);
-		static void MoveAlongPath(PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime);
+		// Deciding type of PathMovement - Regular, Patrol ... etc
+		static void PathMovement(PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime);
 
+		// General Movement
+		static void MoveAlongPath(PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime);
+		static void ResumeMovementAlongPath(PathfindingComponent& pathfinder, const glm::vec3 currentPosition);
+		static void CancelMovementAlongPath(PathfindingComponent&);
+
+		// Patrol
+		static void MoveAlongPatrol(PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime);
+		static void StartPatrol(PathfindingComponent& pathfinder, const glm::vec3 currentPosition, PatrolType patroltype = PatrolType::Loop);
+		static void PatrolUpdate(PathfindingComponent& pathfinder, const glm::vec3 currentPosition);
+
+		static void PausePatrol(PathfindingComponent& pathfinder, const glm::vec3 currentPosition);
+		static void ResumePatrol(PathfindingComponent& pathfinder, const glm::vec3 currentPosition, PatrolType patroltype = PatrolType::Loop);
+
+		static void AddPatrolPath(PathfindingComponent& pathfinder, std::vector<glm::vec3> patrolpath);
+		static void AddToPatrolPath(PathfindingComponent& pathfinder, glm::vec3 pos);
+		static void AddToPatrolPathAt(PathfindingComponent& pathfinder, glm::vec3 pos, unsigned int index);
+		static void ClearPatrol(PathfindingComponent& pathfinder);
+
+		// 
 		static std::shared_ptr<PNode> GetNodeClosestToPosition(uint32_t gridIndex, glm::vec3 position);
 
-	private://Data
-		static std::vector<std::shared_ptr<PNode>> FindPath(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked = nullptr);
+	private:
+		static std::vector<std::shared_ptr<PNode>> FindPathAStar(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked = nullptr);
 	};
 
 
