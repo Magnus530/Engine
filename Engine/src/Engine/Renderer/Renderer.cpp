@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
+#include "Engine/Renderer/RenderContext.h"
 
 namespace Engine
 {
@@ -29,46 +30,57 @@ namespace Engine
 	void Renderer::EndScene()
 	{}
 
-	//void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray, const glm::mat4 transform)
-	//{
-	//	shader->Bind();
-	//	std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ProjectionView", m_SceneData->ProjectionMatrix);
-	//	std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewMatrix", m_SceneData->ViewMatrix);
-	//	std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Transform", transform);
-	//	vertexArray->Bind();
-	//	RenderCommand::DrawIndexed(vertexArray);
-	//}
-
-	void Renderer::Submit(const ShaderType& shaderType, const std::shared_ptr<Shader>& shader,
-		const std::shared_ptr<VertexArray>& vertexArray, Entity& entity)
+	void Renderer::RenderInit()
 	{
-		shader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ProjectionView", m_SceneData->ProjectionMatrix);
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_ViewMatrix", m_SceneData->ViewMatrix);
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_Transform", 
-			entity.GetComponent<Engine::TransformComponent>().m_Transform);
+		m_ShaderLibrary = std::make_shared<Engine::ShaderLibrary>();
 
-		switch (shaderType)
+		std::shared_ptr<Shader> flatShader = m_ShaderLibrary->Load("assets/shaders/Flat.glsl");
+		std::shared_ptr<Shader> textureShader = m_ShaderLibrary->Load("assets/shaders/Texture.glsl");
+		std::shared_ptr<Shader> phongShader = m_ShaderLibrary->Load("assets/shaders/Phong.glsl");
+
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+	}
+
+	void Renderer::Submit(Entity& entity)
+	{
+		std::shared_ptr<Engine::RenderContext> contextPtr;
+
+		switch (entity.GetComponent<Engine::MaterialComponent>().m_ShaderType)
 		{
-			case ShaderType::Flat:
+			case Engine::ShaderType::Flat:
 			{
-				auto flatOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(shader);
-				flatOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-				flatOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::RendererComponent>().m_Color));
+				Engine::FlatShaderState* flatStatePtr = new Engine::FlatShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(flatStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
 				break;
 			}
-			case ShaderType::Texture:
+			case Engine::ShaderType::Texture:
 			{
-				entity.GetComponent<RendererComponent>().m_Tex->Bind();
+				Engine::TextureShaderState* textureStatePtr = new Engine::TextureShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(textureStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
 				break;
 			}
-			case ShaderType::Phong:
+			case Engine::ShaderType::Phong:
+			{
+				Engine::PhongShaderState* phongStatePtr = new Engine::PhongShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(phongStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
 				break;
-
+			}
 		}
 
-		vertexArray->Bind();
-		RenderCommand::DrawIndexed(vertexArray);
+		entity.GetComponent<RendererComponent>().m_VA->Bind();
+		RenderCommand::DrawIndexed(entity.GetComponent<RendererComponent>().m_VA);
+	}
+
+	std::shared_ptr<Engine::Texture2D> Renderer::CreateTexture(const std::string name, const std::string filePath, const std::shared_ptr<Engine::Scene>& scene)
+	{
+		std::shared_ptr<Engine::Texture2D> tempTexture = Engine::Texture2D::Create(filePath);
+		scene->m_Textures.insert({name, tempTexture});
+
+		return tempTexture;
 	}
 
 	inline glm::vec2 Renderer::GetWindowSize()

@@ -3,8 +3,11 @@
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/PerspectiveCameraController.h"
+#include "Engine/Renderer/Shader.h"
 
 #include <glm/glm.hpp>
+#include <utility>
 
 namespace Engine
 {
@@ -33,23 +36,86 @@ namespace Engine
 
 	struct RendererComponent
 	{
-		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-
 		std::shared_ptr<VertexArray> m_VA;
-		std::shared_ptr<VertexBuffer> m_VB;
-		std::shared_ptr<IndexBuffer> m_IB;
-
-		std::shared_ptr<Texture2D> m_Tex = nullptr;
 
 		bool m_bCustomColor = false;
 
 		RendererComponent() = default;
 		RendererComponent(const RendererComponent&) = default;
-		RendererComponent(const glm::vec4& color)
+		RendererComponent(std::shared_ptr<VertexArray> va)
+			: m_VA(va) {}
+	};
+
+	struct MaterialComponent
+	{
+		Engine::ShaderType m_ShaderType;
+		MaterialComponent(const ShaderType& shaderType)
+			: m_ShaderType(shaderType) {}
+	};
+
+	struct FlatMaterialComponent
+	{
+		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+
+		FlatMaterialComponent() = default;
+		FlatMaterialComponent(const FlatMaterialComponent&) = default;
+		FlatMaterialComponent(const glm::vec4& color)
 			: m_Color(color) {}
 	};
 
-		enum PatrolType
+
+	struct TextureMaterialComponent
+	{
+		//uint8_t data[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
+
+		std::pair<std::string, std::shared_ptr<Texture2D>> m_Tex;
+
+		TextureMaterialComponent() = default;
+		TextureMaterialComponent(const TextureMaterialComponent&) = default;
+		TextureMaterialComponent(const std::string name, const std::shared_ptr<Texture2D>& texture)
+		{
+			m_Tex.first = name;
+			m_Tex.second = texture;
+		}
+	};
+
+	struct PhongMaterialComponent
+	{
+		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		std::pair<std::string, std::shared_ptr<Texture2D>> m_Tex;
+		glm::vec3 m_PCamPosition{ 0.f, 0.f, 0.f};
+
+		float m_AmbientStrength{ 0.f };
+		glm::vec3 m_AmbientColor = glm::vec3{ m_Color.x, m_Color.y, m_Color.z };
+		glm::vec3 m_LightPosition{ 0.f, 0.f, 0.f }; 
+		glm::vec3 m_LightColor{ 0.9f, 0.9f, 0.3f };
+		float m_SpecularStrength{ 3.f };
+
+		PhongMaterialComponent() = default;
+		PhongMaterialComponent(const PhongMaterialComponent&) = default;
+		PhongMaterialComponent(const glm::vec4& color, const std::string name, const std::shared_ptr<Texture2D>& texture)
+			: m_Color(color) 
+		{
+			m_Tex.first = name;
+			m_Tex.second = texture;
+		}
+	};
+
+	struct LightComponent
+	{
+		float m_AmbientStrength{ 1.f };
+		float m_LightStrength{ 0.5f };
+		glm::vec3 m_LightColor{ 0.9f, 0.9f, 0.3f};
+		float m_SpecularStrength{ 3.f };
+		int m_SpecularExponent{ 0 };
+
+		LightComponent() = default;
+		LightComponent(const LightComponent&) = default;
+		LightComponent(const float lightStrength, const float specularStrength)
+			: m_LightStrength(lightStrength), m_SpecularStrength(specularStrength) {}
+	};
+
+			enum PatrolType
 		{
 			// In Order of m_PatrolPath
 			Single,

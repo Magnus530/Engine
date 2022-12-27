@@ -17,7 +17,7 @@ private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader, m_Textureshader;
 	std::shared_ptr<Engine::Texture2D> m_Texture;
-
+	std::shared_ptr<Engine::AudioEngine> m_Audio;
 	Engine::PerspectiveCameraController m_PCameraController;
 
 private:
@@ -69,10 +69,11 @@ public:
 		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 
 		m_Scene = std::make_shared<Engine::Scene>();
-		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Monkey", m_VA, m_Scene);
+		//m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Monkey", m_VA, m_Scene);
 		m_Entity.AddComponent<Engine::RendererComponent>();
 		m_Entity.AddComponent<Engine::PathfindingComponent>();
 
+		m_Audio = std::make_shared<Engine::AudioEngine>();
 		/* Set m_Entity location to Pathfinding Node 1 */
 		std::shared_ptr<Engine::PNode> startNode = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, 0);
 		glm::vec3 startPosition = startNode->m_Data->m_Position;
@@ -83,11 +84,11 @@ public:
 		m_Entity.GetComponent<Engine::PathfindingComponent>().m_Grid = Engine::NodeGridSystem::GetGridAtIndex(0);
 
 		// Planes
-		m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
+		//m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
 		m_Plane.AddComponent<Engine::RendererComponent>();
 
 		// Vertex Array Pathfinding Obstructions
-		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, så Initialiserer den for seg selv her
+		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, sï¿½ Initialiserer den for seg selv her
 	}
 
 	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
@@ -103,6 +104,7 @@ public:
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Engine::RenderCommand::Clear();
 
+		m_Audio->update(ts);
 
 		// Render Objects
 		glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
@@ -136,13 +138,22 @@ public:
 		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
 		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
 
-		
-		Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_VA, m_Entity);	
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", glm::vec4(.7, .1, .6, 1));
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
+
+		//Engine::TransformSystem::UpdateMatrix(transform);
+		//Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
+		//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_VA, m_Entity);	
 		
 		
 		/*-----------RENDER OBSTRUCTIONS---------------*/
 		for (uint32_t i{}; i < m_Obstructors.size(); i++)
-			Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_BeveledCubeVA, m_Obstructors[i]);
+		{
+			//auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
+			//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
+			//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_BeveledCubeVA, m_Obstructors[i]);
+		}
 
 
 		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", bShowShaderColor);
@@ -198,7 +209,7 @@ public:
 		ImGui::PushID(0);
 		ImGui::PushItemWidth(200.f);
 		ImGui::Text("Monkey");
-		ImGui::ColorEdit3("", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
+		//ImGui::ColorEdit3("", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
 		ImGui::Checkbox("Show Normals", &m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 		ImGui::PopID();
 
@@ -250,7 +261,7 @@ public:
 				it.GetComponent<Engine::RendererComponent>().m_bCustomColor = bObstructor_ShowNormal;
 		if (!bObstructor_ShowNormal)
 			for (auto& it : m_Obstructors)
-				it.GetComponent<Engine::RendererComponent>().m_Color = glm::vec4(color, 1.f);
+				//it.GetComponent<Engine::RendererComponent>().m_Color = glm::vec4(color, 1.f);
 		ImGui::PopID();
 
 

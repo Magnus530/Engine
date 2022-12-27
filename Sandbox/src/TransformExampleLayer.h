@@ -23,6 +23,8 @@ private:
 	std::shared_ptr<Engine::Scene> m_Scene;
 	Engine::Entity m_Entity;
 
+	std::shared_ptr<Engine::AudioEngine> m_Audio;
+
 private: // Transform testing
 	//bool bSetWorldPosition{};
 	glm::vec3 m_Position{};
