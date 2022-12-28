@@ -4,6 +4,9 @@
 #include "Engine/Scene/Components.h"
 #include "Engine/Renderer/RenderContext.h"
 
+#include "glad/glad.h"
+#include "stb_image.h"
+
 namespace Engine
 {
 	Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData;
@@ -37,9 +40,7 @@ namespace Engine
 		std::shared_ptr<Shader> flatShader = m_ShaderLibrary->Load("assets/shaders/Flat.glsl");
 		std::shared_ptr<Shader> textureShader = m_ShaderLibrary->Load("assets/shaders/Texture.glsl");
 		std::shared_ptr<Shader> phongShader = m_ShaderLibrary->Load("assets/shaders/Phong.glsl");
-
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		std::shared_ptr<Shader> skyboxShader = m_ShaderLibrary->Load("assets/shaders/Skybox.glsl");
 	}
 
 	void Renderer::Submit(Entity& entity)
@@ -69,6 +70,13 @@ namespace Engine
 				contextPtr->InitShader();
 				break;
 			}
+			case Engine::ShaderType::Skybox:
+			{
+				Engine::SkyboxShaderState* skyboxStatePtr = new Engine::SkyboxShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(skyboxStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
+				break;
+			}
 		}
 
 		entity.GetComponent<RendererComponent>().m_VA->Bind();
@@ -81,6 +89,7 @@ namespace Engine
 		scene->m_Textures.insert({name, tempTexture});
 
 		return tempTexture;
+
 	}
 
 	inline glm::vec2 Renderer::GetWindowSize()

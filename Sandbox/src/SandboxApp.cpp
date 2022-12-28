@@ -17,6 +17,10 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 #include "Engine/Scene/EntityInitializer.h"
 #include <unordered_map>
 
+//#include "stb_image.h"
+//#include <glad/glad.h>
+
+
 // Layers
 #include "PathfindingLayer.h"
 #include "TransformExampleLayer.h"
@@ -33,6 +37,7 @@ public:
 		m_Texture = Engine::Renderer::CreateTexture("Chess", "assets/textures/checkerboard.png", m_ActiveScene);
 		m_WolfLogoTexture = Engine::Renderer::CreateTexture("Wolf", "assets/textures/wolf.png", m_ActiveScene);
 		m_WhiteTexture = Engine::Renderer::CreateTexture("White", "assets/textures/white.png", m_ActiveScene);
+		m_SkyTexture = Engine::Renderer::CreateTexture("Sky", "assets/textures/skybox.png", m_ActiveScene);
 
 		//Create entities here
 
@@ -41,8 +46,23 @@ public:
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		m_CubeEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Cube", m_CubeVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 1.0f }, 
-			std::pair<std::string, std::shared_ptr<Engine::Texture2D>>("Wolf", m_WolfLogoTexture));
+		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Cube", m_SkyboxVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_SkyboxEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 30.0f, 30.0f, 30.0f });
+		
+		std::string cubemapFaces[6] =
+		{
+			"assets/textures/skyRight.png",
+			"assets/textures/skyLeft.png",
+			"assets/textures/skyTop.png",
+			"assets/textures/skyBottom.png",
+			"assets/textures/skyFront.png",
+			"assets/textures/skyBack.png"
+		};
+
+		//unsigned int cubemapTexture;
+		//glGenTextures(1, &cubemapTexture);
+		//glBindTexture(GL_TEXTURE_CUBE);
+
 
 		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
@@ -91,9 +111,9 @@ private:
 
 	std::shared_ptr<Engine::AudioEngine> m_Audio;
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
-	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA;
+	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA;
 
-	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture, m_WhiteTexture;
+	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture, m_SkyTexture, m_WhiteTexture;
 
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
@@ -104,6 +124,7 @@ private:
 	Engine::Entity m_CubeEntity;
 	Engine::Entity m_PlaneEntity;
 	Engine::Entity m_LightEntity;
+	Engine::Entity m_SkyboxEntity;
 };
 
 class Sandbox : public Engine::Application

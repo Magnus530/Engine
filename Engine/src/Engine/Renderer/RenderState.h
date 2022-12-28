@@ -89,4 +89,21 @@ namespace Engine
 			phongOpenGLShader->UploadUniformFloat("u_SpecularStrength", entity.GetComponent<Engine::PhongMaterialComponent>().m_SpecularStrength);
 		}
 	};
+
+	class SkyboxShaderState : public RenderState
+	{
+	public:
+		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
+		{
+			std::shared_ptr<Engine::Shader> skyboxShader = shaderLibrary->Get("Skybox");
+			std::shared_ptr<Engine::OpenGLShader> skyboxOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(skyboxShader);
+
+			skyboxShader->Bind();
+			std::dynamic_pointer_cast<OpenGLShader>(skyboxShader)->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
+			std::dynamic_pointer_cast<OpenGLShader>(skyboxShader)->UploadUniformMat4("u_ViewMatrix", sceneData->ViewMatrix);
+			std::dynamic_pointer_cast<OpenGLShader>(skyboxShader)->UploadUniformMat4("u_Transform",
+				entity.GetComponent<Engine::TransformComponent>().m_Transform);
+
+		}
+	};
 }
