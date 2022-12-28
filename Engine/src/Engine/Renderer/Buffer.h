@@ -1,7 +1,5 @@
 #pragma once
 
-//#include "../Objects/vertex.h"
-
 namespace Engine
 {
 	enum class ShaderDataType

@@ -6,6 +6,9 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
 
+#include "glad/glad.h"
+
+
 namespace Engine
 {
 	class RenderContext;
@@ -104,6 +107,10 @@ namespace Engine
 			std::dynamic_pointer_cast<OpenGLShader>(skyboxShader)->UploadUniformMat4("u_Transform",
 				entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
+			glBindTexture(GL_TEXTURE_CUBE_MAP, entity.GetComponent<SkyboxMaterialComponent>().m_CubemapTexture);
+
+			skyboxOpenGLShader->UploadUniformInt("skybox", 0);
+			glEnable(GL_DEPTH_TEST);
 		}
 	};
 }

@@ -18,7 +18,7 @@ namespace Engine
 			textureNames.push_back((it)->first);
 		}
 
-		for (auto& it = scene->m_EntityMap.begin(); it != scene->m_EntityMap.end(); it++)
+		for (auto& it = scene->m_Entities.begin(); it != scene->m_Entities.end(); it++)
 		{
 			ImGui::Separator();
 			auto& tag = (it)->second->GetComponent<Engine::TagComponent>().Tag;

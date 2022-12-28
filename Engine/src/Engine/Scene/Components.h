@@ -101,6 +101,16 @@ namespace Engine
 		}
 	};
 
+	struct SkyboxMaterialComponent
+	{
+		unsigned int m_CubemapTexture = 0;
+
+		SkyboxMaterialComponent() = default;
+		SkyboxMaterialComponent(const SkyboxMaterialComponent&) = default;
+		SkyboxMaterialComponent(const unsigned int& cubeTex)
+			: m_CubemapTexture(cubeTex) {}
+	};
+
 	struct LightComponent
 	{
 		float m_AmbientStrength{ 1.f };

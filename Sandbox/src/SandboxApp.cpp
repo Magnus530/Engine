@@ -11,15 +11,12 @@ https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHP
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Engine/Renderer/VertexArray.h"
 #include "Engine/AssetInit/ObjLoader.h"
 #include "Platform/OpenGL/OpenGLVertexArray.h"
-#include "Engine/Scene/EntityInitializer.h"
+//#include "Engine/Renderer/CubemapMid.h"
+#include "Platform/OpenGL/OpenGLCubemap.h"
+
 #include <unordered_map>
-
-//#include "stb_image.h"
-//#include <glad/glad.h>
-
 
 // Layers
 #include "PathfindingLayer.h"
@@ -34,21 +31,11 @@ public:
 		Engine::Renderer::RenderInit();
 		m_ActiveScene = std::make_shared<Engine::Scene>();
 
-		m_Texture = Engine::Renderer::CreateTexture("Chess", "assets/textures/checkerboard.png", m_ActiveScene);
-		m_WolfLogoTexture = Engine::Renderer::CreateTexture("Wolf", "assets/textures/wolf.png", m_ActiveScene);
-		m_WhiteTexture = Engine::Renderer::CreateTexture("White", "assets/textures/white.png", m_ActiveScene);
-		m_SkyTexture = Engine::Renderer::CreateTexture("Sky", "assets/textures/skybox.png", m_ActiveScene);
+		Engine::Renderer::CreateTexture("Chess", "assets/textures/checkerboard.png", m_ActiveScene);
+		Engine::Renderer::CreateTexture("Wolf", "assets/textures/wolf.png", m_ActiveScene);
+		Engine::Renderer::CreateTexture("White", "assets/textures/white.png", m_ActiveScene);
+		//Engine::Renderer::CreateTexture("Sky", "assets/textures/skybox.png", m_ActiveScene);
 
-		//Create entities here
-
-		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 0.0f });
-		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
-		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
-		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
-
-		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Cube", m_SkyboxVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 1.0f });
-		Engine::TransformSystem::SetScale(m_SkyboxEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 30.0f, 30.0f, 30.0f });
-		
 		std::string cubemapFaces[6] =
 		{
 			"assets/textures/skyRight.png",
@@ -59,12 +46,24 @@ public:
 			"assets/textures/skyBack.png"
 		};
 
-		//unsigned int cubemapTexture;
-		//glGenTextures(1, &cubemapTexture);
-		//glBindTexture(GL_TEXTURE_CUBE);
+		std::shared_ptr<Engine::OpenGLCubemap> ogcmap = std::make_shared<Engine::OpenGLCubemap>(Engine::OpenGLCubemap::OpenGLCubemap(cubemapFaces));
 
+		//Engine::CubemapMid::start();
 
-		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
+		
+
+		//Create entities here
+
+		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 0.0f });
+		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
+		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
+
+		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Skybox, "Cube", m_SkyboxVA, m_ActiveScene, ogcmap->m_CubemapTexture, 
+			glm::vec3{ 1.0f, 1.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_SkyboxEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 30.0f, 30.0f, 30.0f });
+
+		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
 
 		m_Audio = std::make_shared<Engine::AudioEngine>();
@@ -83,7 +82,7 @@ public:
 		m_Audio->update(ts);
 
 
-		for (auto& it = m_ActiveScene->m_EntityMap.begin(); it != m_ActiveScene->m_EntityMap.end(); it++)
+		for (auto& it = m_ActiveScene->m_Entities.begin(); it != m_ActiveScene->m_Entities.end(); it++)
 		{
 			Engine::Renderer::Submit(*(it)->second);
 
@@ -112,8 +111,6 @@ private:
 	std::shared_ptr<Engine::AudioEngine> m_Audio;
 	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA;
-
-	std::shared_ptr<Engine::Texture2D> m_Texture, m_WolfLogoTexture, m_SkyTexture, m_WhiteTexture;
 
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;

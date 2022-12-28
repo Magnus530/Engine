@@ -18,8 +18,10 @@ namespace Engine
 
 		void OnUpdate(Timestep ts);
 
-		std::unordered_map<std::string, std::shared_ptr<Engine::Entity>> m_EntityMap;
+		std::unordered_map<std::string, std::shared_ptr<Engine::Entity>> m_Entities;
 		std::unordered_map<std::string, std::shared_ptr<Engine::Texture2D>> m_Textures;
+
+		std::unordered_map<std::string, std::shared_ptr<Engine::TextureCubemap>> m_Skyboxes;
 
 	private:
 		entt::registry m_Registry;
