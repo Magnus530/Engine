@@ -1499,9 +1499,7 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Core\ImGuiSystem.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLCubemap.h" />
-    <ClInclude Include="src\Engine\Renderer\CubemapTest.h" />
-    <ClInclude Include="src\Engine\Renderer\CubemapMid.h" />
-    <ClInclude Include="src\Platform\OpenGL\CubemaptestGL.h" />
+    <ClInclude Include="src\Engine\Renderer\TextureList.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1623,5 +1621,6 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Core\ImGuiSystem.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLCubemap.cpp" />
+    <ClCompile Include="src\Engine\Renderer\TextureList.cpp" />
   </ItemGroup>
 </Project>

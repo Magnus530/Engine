@@ -8,6 +8,7 @@
 namespace Engine
 {
 	class Entity;
+	class OpenGLCubemap;
 	class Scene
 	{
 	public:
@@ -21,7 +22,7 @@ namespace Engine
 		std::unordered_map<std::string, std::shared_ptr<Engine::Entity>> m_Entities;
 		std::unordered_map<std::string, std::shared_ptr<Engine::Texture2D>> m_Textures;
 
-		std::unordered_map<std::string, std::shared_ptr<Engine::TextureCubemap>> m_Skyboxes;
+		std::unordered_map<std::string, std::shared_ptr<Engine::OpenGLCubemap>> m_Skyboxes;
 
 	private:
 		entt::registry m_Registry;

@@ -12,10 +12,16 @@ namespace Engine
 
 		int i = 0;
 		std::vector<std::string> textureNames;
+		std::vector<std::string> skyboxNames;
 
 		for (auto& it = scene->m_Textures.begin(); it != scene->m_Textures.end(); it++)
 		{
 			textureNames.push_back((it)->first);
+		}
+
+		for (auto& it = scene->m_Skyboxes.begin(); it != scene->m_Skyboxes.end(); it++)
+		{
+			skyboxNames.push_back((it)->first);
 		}
 
 		for (auto& it = scene->m_Entities.begin(); it != scene->m_Entities.end(); it++)
@@ -108,6 +114,40 @@ namespace Engine
 				ImGui::PopID();
 				i++;
 				break;
+			}
+			case ShaderType::Skybox:
+			{
+				static int currentSkyboxTexture = 0;
+				const char* comboSkyPreviewValue = EntityNameCompare((it)->second->GetComponent<Engine::SkyboxMaterialComponent>().m_CubeTex.first, skyboxNames);
+
+				ImGui::PushID(i);
+				ImGui::PushItemWidth(200.f);
+				if (ImGui::BeginCombo("Skybox Selection", comboSkyPreviewValue))
+				{
+					int j = 0;
+					for (auto& jt = scene->m_Skyboxes.begin(); jt != scene->m_Skyboxes.end(); jt++)
+					{
+						const bool is_Selected = (currentSkyboxTexture == j);
+						if (ImGui::Selectable(skyboxNames[j].c_str(), is_Selected))
+						{
+							it->second->GetComponent<Engine::SkyboxMaterialComponent>().m_CubeTex.first = jt->first;
+							it->second->GetComponent<Engine::SkyboxMaterialComponent>().m_CubeTex.second = jt->second;
+							currentSkyboxTexture = j;
+						}
+
+						if (is_Selected)
+						{
+							ImGui::SetItemDefaultFocus();
+						}
+						j++;
+					}
+					ImGui::EndCombo();
+				}
+				ImGui::Separator();
+				ImGui::PopID();
+				i++;
+				break;
+
 			}
 			}
 		}

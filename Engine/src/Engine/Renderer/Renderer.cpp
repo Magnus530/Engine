@@ -3,7 +3,6 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Renderer/RenderContext.h"
-#include "Engine/Renderer/CubemapMid.h"
 
 #include "glad/glad.h"
 #include "stb_image.h"
@@ -47,8 +46,6 @@ namespace Engine
 	void Renderer::Submit(Entity& entity)
 	{
 		std::shared_ptr<Engine::RenderContext> contextPtr;
-
-		//Engine::CubemapMid::CubemapRender(m_SceneData);
 
 		switch (entity.GetComponent<Engine::MaterialComponent>().m_ShaderType)
 		{
@@ -94,12 +91,12 @@ namespace Engine
 		return tempTexture;
 	}
 
-	std::shared_ptr<Engine::TextureCubemap> Renderer::CreateSkybox(const std::string name, const std::string cubeArr[], const std::shared_ptr<Engine::Scene>& scene)
+	std::shared_ptr<Engine::OpenGLCubemap> Renderer::CreateSkybox(const std::string name, const std::string cubeArr[], const std::shared_ptr<Engine::Scene>& scene)
 	{
-		std::shared_ptr<Engine::TextureCubemap> tempSkybox = Engine::TextureCubemap::Create(cubeArr);
-		scene->m_Skyboxes.insert({ name, tempSkybox });
+		std::shared_ptr<Engine::OpenGLCubemap> tempCubemap = std::make_shared<Engine::OpenGLCubemap>(Engine::OpenGLCubemap::OpenGLCubemap(cubeArr));
+		scene->m_Skyboxes.insert({ name, tempCubemap });
 
-		return tempSkybox;
+		return tempCubemap;
 	}
 
 	inline glm::vec2 Renderer::GetWindowSize()

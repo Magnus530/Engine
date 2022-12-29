@@ -106,7 +106,7 @@ namespace Engine
 			glDepthMask(GL_TRUE);
 			skyboxOpenGLShader->UploadUniformInt("skybox", 0);
 			glDepthFunc(GL_LEQUAL);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, entity.GetComponent<SkyboxMaterialComponent>().m_CubemapTexture);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->m_CubemapTexture);
 		}
 	};
 }

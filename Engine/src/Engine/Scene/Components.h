@@ -5,6 +5,7 @@
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/PerspectiveCameraController.h"
 #include "Engine/Renderer/Shader.h"
+#include "Platform/OpenGL/OpenGLCubemap.h"
 
 #include <glm/glm.hpp>
 #include <utility>
@@ -103,12 +104,15 @@ namespace Engine
 
 	struct SkyboxMaterialComponent
 	{
-		unsigned int m_CubemapTexture = 0;
+		std::pair<std::string, std::shared_ptr<Engine::OpenGLCubemap>> m_CubeTex;
 
 		SkyboxMaterialComponent() = default;
 		SkyboxMaterialComponent(const SkyboxMaterialComponent&) = default;
-		SkyboxMaterialComponent(const unsigned int& cubeTex)
-			: m_CubemapTexture(cubeTex) {}
+		SkyboxMaterialComponent(const std::string name, const std::shared_ptr<Engine::OpenGLCubemap>& texture)
+		{
+			m_CubeTex.first = name;
+			m_CubeTex.second = texture;
+		}
 	};
 
 	struct LightComponent
