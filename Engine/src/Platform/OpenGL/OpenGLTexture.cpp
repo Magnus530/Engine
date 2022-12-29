@@ -43,7 +43,7 @@ namespace Engine
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D()
-	{
+	{ 
 		glDeleteTextures(1, &m_RendererID);
 	}
 

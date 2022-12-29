@@ -7,7 +7,7 @@ namespace Engine
 {
 	enum class ShaderType
 	{
-		Flat = 0, Texture = 1, Phong = 2
+		Flat = 0, Texture = 1, Phong = 2, Skybox = 3
 	};
 
 	class Shader
