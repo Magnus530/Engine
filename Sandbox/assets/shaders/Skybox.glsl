@@ -24,7 +24,6 @@ void main(void)
 out vec4 fragmentColor;
 
 in vec3 texCoords;
-
 uniform samplerCube skybox;
 
 void main(void)

@@ -34,23 +34,18 @@ public:
 		Engine::Renderer::CreateTexture("Chess", "assets/textures/checkerboard.png", m_ActiveScene);
 		Engine::Renderer::CreateTexture("Wolf", "assets/textures/wolf.png", m_ActiveScene);
 		Engine::Renderer::CreateTexture("White", "assets/textures/white.png", m_ActiveScene);
-		//Engine::Renderer::CreateTexture("Sky", "assets/textures/skybox.png", m_ActiveScene);
 
 		std::string cubemapFaces[6] =
 		{
-			"assets/textures/skyRight.png",
-			"assets/textures/skyLeft.png",
-			"assets/textures/skyTop.png",
-			"assets/textures/skyBottom.png",
-			"assets/textures/skyFront.png",
-			"assets/textures/skyBack.png"
+			"assets/textures/right.jpg",
+			"assets/textures/left.jpg",
+			"assets/textures/top.jpg",
+			"assets/textures/bottom.jpg",
+			"assets/textures/front.jpg",
+			"assets/textures/back.jpg"
 		};
 
 		std::shared_ptr<Engine::OpenGLCubemap> ogcmap = std::make_shared<Engine::OpenGLCubemap>(Engine::OpenGLCubemap::OpenGLCubemap(cubemapFaces));
-
-		//Engine::CubemapMid::start();
-
-		
 
 		//Create entities here
 
@@ -59,9 +54,7 @@ public:
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Skybox, "Cube", m_SkyboxVA, m_ActiveScene, ogcmap->m_CubemapTexture, 
-			glm::vec3{ 1.0f, 1.0f, 1.0f });
-		Engine::TransformSystem::SetScale(m_SkyboxEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 30.0f, 30.0f, 30.0f });
+		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Skybox, "Cube", m_SkyboxVA, m_ActiveScene, ogcmap->m_CubemapTexture);
 
 		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
