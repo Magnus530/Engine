@@ -78,7 +78,7 @@ project "Engine"
 
 	libdirs
 	{
-	"%{fmodlibdir.FMOD}"
+		"%{fmodlibdir.FMOD}"
 	}
 	
 	links
@@ -107,9 +107,8 @@ project "Engine"
 		symbols "on"
 		links 
 		{
-		"fmodstudioL_vc.lib"
+			"fmodstudioL_vc.lib"
 		}
-
 
 	filter "configurations:Release"
 		defines "E_RELEASE"
@@ -119,7 +118,6 @@ project "Engine"
 		"fmodstudio_vc.lib"
 		}
 
-
 	filter "configurations:Dist"
 		defines "E_DIST"
 		runtime "Release"
@@ -127,15 +125,16 @@ project "Engine"
 		links {
 		"fmodstudio_vc.lib"
 		}
-
 		
-		-- FMOD
+		
 	filter { "system:windows"}
-		postbuildcommands
-		{
-			("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmod.dll $(TargetDir)"),
-			("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudio.dll $(TargetDir)")
-		}
+	postbuildcommands
+	{
+		--("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmod.dll $(TargetDir)"),
+		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodL.dll $(TargetDir)"),
+		--("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudio.dll $(TargetDir)"),
+		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudioL.dll $(TargetDir)")
+	}
 
 project "Sandbox"
 	location "Sandbox"
@@ -164,10 +163,15 @@ project "Sandbox"
 		"%{IncludeDir.FMOD}"
 	}
 
+		libdirs
+	{
+		"%{fmodlibdir.FMOD}"
+	}
+
 	links
 	{
-		"Engine"
---		"fmod_vc.lib"
+		"Engine",
+		"fmodL_vc.lib"
 	}
 
 	filter
@@ -193,3 +197,12 @@ project "Sandbox"
 		defines "E_DIST"
 		runtime "Release"
 		optimize "on"
+
+	filter { "system:windows"}
+	postbuildcommands
+	{
+		--("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmod.dll $(TargetDir)"),
+		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodL.dll $(TargetDir)"),
+		--("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudio.dll $(TargetDir)"),
+		("{COPYFILE} %{wks.location}%{fmodlibdir.FMOD}/fmodstudioL.dll $(TargetDir)")
+	}

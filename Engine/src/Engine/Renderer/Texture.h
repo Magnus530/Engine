@@ -22,4 +22,10 @@ namespace Engine
 	public:
 		static std::shared_ptr<Texture2D> Create(const std::string& path);
 	};
+
+	class TextureCubemap : public Texture
+	{
+	public:
+		static std::shared_ptr<TextureCubemap> Create(const std::string cubeArr[]);
+	};
 }

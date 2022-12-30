@@ -21,12 +21,13 @@ TransformExampleLayer::TransformExampleLayer()
 	std::vector<uint32_t> indices;
 	Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 	m_Scene = std::make_shared<Engine::Scene>();
-	m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_Scene);
-	m_Entity.AddComponent<Engine::RendererComponent>(glm::vec4(0.5f, 0.2f, 0.6f, 1.f));
+	//m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_Scene);
+	//m_Entity.AddComponent<Engine::RendererComponent>(glm::vec4(0.5f, 0.2f, 0.6f, 1.f));
 
 	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
 	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
+	m_Audio = std::make_shared<Engine::AudioEngine>();
 }
 
 void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
@@ -43,6 +44,8 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
 	glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
+
+	m_Audio->update(ts);
 	// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
 	static float sin{};
 	sin += ts;
@@ -68,7 +71,7 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	shader->UploadUniformFloat3("u_Color", m_ObjColor);
 	shader->UploadUniformInt("u_ShowNormals", bShowNormals);
 
-	Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_CubeVA, m_Entity);
+	//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_CubeVA, m_Entity);
 	//Engine::Renderer::Submit(m_Shader, m_CubeVA, transform.m_Transform);
 
 	// End Scene
@@ -132,7 +135,7 @@ void TransformExampleLayer::OnImGuiRender()
 
 	ImGui::Separator();
 	ImGui::PushItemWidth(200.f);
-	ImGui::ColorEdit3("Object color", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
+	//ImGui::ColorEdit3("Object color", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
 	ImGui::Checkbox("Show Normals", &m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 	ImGui::Separator();
 

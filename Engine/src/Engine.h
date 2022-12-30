@@ -20,11 +20,14 @@
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Systems/TransformSystem.h"
 #include "Engine/Scene/Systems/PathfindingSystem.h"
+#include "Engine/Scene/Systems/LightSystem.h"
 #include "Engine/Scene/EntityInitializer.h"
+#include "Engine/Core/ImGuiSystem.h"
 
 // ---------------Renderer---------------
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RenderCommand.h"
+#include "Engine/Renderer/TextureList.h"
 
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/Shader.h"
@@ -44,5 +47,5 @@
 // --------------Mesh Objects---------------
 #include "Engine/AssetInit/ObjLoader.h"
 
-// ---------------Audio Engine---------------
+// --------------Audio Engine---------------
 #include "Engine/FMOD/AudioEngine.h"
