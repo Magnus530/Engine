@@ -106,6 +106,7 @@ namespace Engine
 	//	playSound("assets/audio/sfx_sound.wav", glm::vec3(), -6.f);
 	//	setChannelVolume("assets/audio/Cartoon_song.wav", 12.f);
 	//}
+
 	//------------------------------
 	// Update the engine properties
 	//------------------------------
@@ -247,8 +248,8 @@ namespace Engine
 		auto tFoundIt = sgpImplementation->mBanks.find(strBankName);
 		if (tFoundIt != sgpImplementation->mBanks.end())
 			return;
-		AudioEngine::errorCheck(tFoundIt->second->unload()); // check for errors and unload banks
-		sgpImplementation->mBanks.erase(tFoundIt); // erase from the cache
+		AudioEngine::errorCheck(tFoundIt->second->unload());	// check for errors and unload banks
+		sgpImplementation->mBanks.erase(tFoundIt);			// erase from the cache
 	}
 	
 	// PLAYBACK
