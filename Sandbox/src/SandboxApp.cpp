@@ -34,12 +34,12 @@ public:
 
 		//Create entities here
 
+		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Sky"));
+
 		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 0.0f });
 		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
-
-		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Sky"));
 
 		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
@@ -56,8 +56,6 @@ public:
 
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-
-
 		for (auto& it = m_ActiveScene->m_Entities.begin(); it != m_ActiveScene->m_Entities.end(); it++)
 		{
 			Engine::Renderer::Submit(*(it)->second);
@@ -73,7 +71,8 @@ public:
 
 	virtual void OnImGuiRender() override
 	{
-		Engine::ImGuiSystem::GuiEntitySettings(m_ActiveScene);
+		std::shared_ptr<Engine::ImGuiSystem> imGuiPtr = std::make_shared<Engine::ImGuiSystem>();
+		imGuiPtr->GuiEntitySettings(m_ActiveScene);
 	}
 
 	void OnEvent(Engine::Event& e) override

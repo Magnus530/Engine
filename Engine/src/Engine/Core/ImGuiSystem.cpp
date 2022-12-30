@@ -13,6 +13,7 @@ namespace Engine
 		int i = 0;
 		std::vector<std::string> textureNames;
 		std::vector<std::string> skyboxNames;
+		std::vector<std::string> shaderNames = { "Flat", "Texture", "Phong" };
 
 		for (auto& it = scene->m_Textures.begin(); it != scene->m_Textures.end(); it++)
 		{
@@ -34,12 +35,16 @@ namespace Engine
 			{
 			case Engine::ShaderType::Flat:
 			{
+				static int currentShader = 0;
+				const char* comboShaderPreviewValue = shaderNames[0].c_str();
+
 				ImGui::PushID(i);
 				glm::vec4& objColor = (it)->second->GetComponent<Engine::FlatMaterialComponent>().m_Color;
 				ImGui::ColorEdit4("Color", glm::value_ptr(objColor));
 				ImGui::Separator();
-				ImGui::Checkbox("Show Custom Color", &(it)->second->GetComponent<Engine::RendererComponent>().m_bCustomColor);
+				ShaderSelect(it->second, currentShader, comboShaderPreviewValue, shaderNames);
 				ImGui::Separator();
+				ImGui::Checkbox("Show Custom Color", &(it)->second->GetComponent<Engine::RendererComponent>().m_bCustomColor);
 				ImGui::PopID();
 				i++;
 				break;
@@ -47,7 +52,9 @@ namespace Engine
 			case Engine::ShaderType::Texture:
 			{
 				static int currentTexture = 0;
+				static int currentShader = 0;
 				const char* comboTexPreviewValue = EntityNameCompare((it)->second->GetComponent<Engine::TextureMaterialComponent>().m_Tex.first, textureNames);
+				const char* comboShaderPreviewValue = shaderNames[1].c_str();
 
 				ImGui::PushID(i);
 				ImGui::PushItemWidth(200.f);
@@ -73,6 +80,8 @@ namespace Engine
 					ImGui::EndCombo();
 				}
 				ImGui::Separator();
+				ShaderSelect(it->second, currentShader, comboShaderPreviewValue, shaderNames);
+				ImGui::Separator();
 				ImGui::PopID();
 				i++;
 				break;
@@ -80,7 +89,9 @@ namespace Engine
 			case Engine::ShaderType::Phong:
 			{		
 				static int currentPhongTexture = 0;
+				static int currentShader = 0;
 				const char* comboPhongPreviewValue = EntityNameCompare((it)->second->GetComponent<Engine::PhongMaterialComponent>().m_Tex.first, textureNames);
+				const char* comboShaderPreviewValue = shaderNames[2].c_str();
 
 				ImGui::PushID(i);
 				ImGui::PushItemWidth(200.f);
@@ -107,7 +118,11 @@ namespace Engine
 				}
 				ImGui::Separator();
 				glm::vec4& objColor = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_Color;
+				glm::vec3& objAColor = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_AmbientColor;
 				ImGui::ColorEdit4("Color", glm::value_ptr(objColor));
+				ImGui::ColorEdit3("Ambient Color", glm::value_ptr(objAColor));
+				ImGui::Separator();
+				ShaderSelect(it->second, currentShader, comboShaderPreviewValue, shaderNames);
 				ImGui::Separator();
 				ImGui::Checkbox("Show Custom Color", &(it)->second->GetComponent<Engine::RendererComponent>().m_bCustomColor);
 				ImGui::Separator();
@@ -147,7 +162,6 @@ namespace Engine
 				ImGui::PopID();
 				i++;
 				break;
-
 			}
 			}
 		}
@@ -169,5 +183,93 @@ namespace Engine
 		}
 
 		return tempComboVal = names[tempNameIndex].c_str();
+	}
+
+	void ImGuiSystem::ShaderSelect(std::shared_ptr<Engine::Entity>& entity, int& currShader, const char* comboPreview, std::vector<std::string>& names)
+	{
+		ImGui::PushItemWidth(200.f);
+		if (ImGui::BeginCombo("Shader Selection", comboPreview))
+		{
+			int k = 0;
+			for (int j = 0; j < names.size(); j++)
+			{
+				const bool is_Selected = (currShader == k);
+				if (ImGui::Selectable(names[k].c_str(), is_Selected))
+				{
+					switch (entity->GetComponent<MaterialComponent>().m_ShaderType)
+					{
+					case Engine::ShaderType::Flat:
+					{
+						if (names[k] == "Texture")
+						{
+							entity->GetComponent<Engine::MaterialComponent>().m_ShaderType = Engine::ShaderType::Texture;
+							entity->RemoveComponent<Engine::FlatMaterialComponent>();
+							entity->AddComponent<Engine::TextureMaterialComponent>("White", Engine::Texture2D::Create("assets/textures/white.png"));
+							currShader = k;
+							break;
+						}
+						else if (names[k] == "Phong")
+						{
+							entity->GetComponent<Engine::MaterialComponent>().m_ShaderType = Engine::ShaderType::Phong;
+							entity->RemoveComponent<Engine::FlatMaterialComponent>();
+							entity->AddComponent<Engine::PhongMaterialComponent>(glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }, "White", Engine::Texture2D::Create("assets/textures/white.png"));
+							currShader = k;
+							break;
+						}
+						break;
+					}
+					case Engine::ShaderType::Texture:
+					{
+						if (names[k] == "Flat")
+						{
+							entity->GetComponent<Engine::MaterialComponent>().m_ShaderType = Engine::ShaderType::Flat;
+							entity->RemoveComponent<Engine::TextureMaterialComponent>();
+							entity->AddComponent<Engine::FlatMaterialComponent>();
+							currShader = k;
+							break;
+						}
+						else if (names[k] == "Phong")
+						{
+							entity->GetComponent<Engine::MaterialComponent>().m_ShaderType = Engine::ShaderType::Phong;
+							entity->RemoveComponent<Engine::TextureMaterialComponent>();
+							entity->AddComponent<Engine::PhongMaterialComponent>(glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }, "White", Engine::Texture2D::Create("assets/textures/white.png"));
+							currShader = k;
+							break;
+						}
+						break;
+					}
+					case Engine::ShaderType::Phong:
+					{
+						if (names[k] == "Flat")
+						{
+							entity->GetComponent<Engine::MaterialComponent>().m_ShaderType = Engine::ShaderType::Flat;
+							entity->RemoveComponent<Engine::PhongMaterialComponent>();
+							entity->AddComponent<Engine::FlatMaterialComponent>();
+							currShader = k;
+							//Engine::FlatShaderState* flatStatePtr = new Engine::FlatShaderState;
+							//m_RContextPtr->TransitionTo(flatStatePtr);
+							break;
+						}
+						else if (names[k] == "Texture")
+						{
+							entity->GetComponent<Engine::MaterialComponent>().m_ShaderType = Engine::ShaderType::Texture;
+							entity->RemoveComponent<Engine::PhongMaterialComponent>();
+							entity->AddComponent<Engine::TextureMaterialComponent>("White", Engine::Texture2D::Create("assets/textures/white.png"));
+							currShader = k;
+							break;
+						}
+						break;
+					}
+					}
+				}
+
+				if (is_Selected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+				k++;
+			}
+			ImGui::EndCombo();
+		}
 	}
 }
