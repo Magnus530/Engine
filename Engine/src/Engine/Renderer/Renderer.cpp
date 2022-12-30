@@ -3,9 +3,7 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Renderer/RenderContext.h"
-
-#include "glad/glad.h"
-#include "stb_image.h"
+#include "Engine/Core/ImGuiSystem.h"
 
 namespace Engine
 {

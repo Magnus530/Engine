@@ -118,7 +118,9 @@ namespace Engine
 				}
 				ImGui::Separator();
 				glm::vec4& objColor = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_Color;
+				glm::vec3& objAColor = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_AmbientColor;
 				ImGui::ColorEdit4("Color", glm::value_ptr(objColor));
+				ImGui::ColorEdit3("Ambient Color", glm::value_ptr(objAColor));
 				ImGui::Separator();
 				ShaderSelect(it->second, currentShader, comboShaderPreviewValue, shaderNames);
 				ImGui::Separator();
@@ -244,6 +246,8 @@ namespace Engine
 							entity->RemoveComponent<Engine::PhongMaterialComponent>();
 							entity->AddComponent<Engine::FlatMaterialComponent>();
 							currShader = k;
+							//Engine::FlatShaderState* flatStatePtr = new Engine::FlatShaderState;
+							//m_RContextPtr->TransitionTo(flatStatePtr);
 							break;
 						}
 						else if (names[k] == "Texture")

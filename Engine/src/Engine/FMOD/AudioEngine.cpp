@@ -125,7 +125,7 @@ namespace Engine
 
 			//AE->setChannelVolume(musicPath1, 12.f);
 		}
-		if (Input::IsKeyPressed(E_KEY_Q))
+		if (Input::IsKeyPressed(E_KEY_U))
 		{
 			AE->playSound(oneShot1, glm::vec3());
 			//AE->setChannelVolume(musicPath1, -12.f);
