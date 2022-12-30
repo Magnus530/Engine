@@ -6,7 +6,7 @@
 #include "Terrain.h"
 #include "Triangle.h"
 #include "Point.h"
-#include "vertex.h"
+#include "../Objects/vertex.h"
 
 //#include "Readers.h"
 
@@ -30,7 +30,7 @@ std::vector <Triangle> LAS_Read(std::string filepath) {
 			inn >> y;
 			inn >> z;
 
-			vertex v = vertex(x, z, y);
+			Engine::Vertex v = Engine::Vertex(x, y, z);
 			Point p = Point(Point_index, v);
 			Point_index++;
 			P.push_back(&p);

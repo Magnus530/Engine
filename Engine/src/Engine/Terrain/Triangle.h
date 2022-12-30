@@ -1,5 +1,7 @@
 #pragma once
 #include "Point.h"
+#include "../Objects/vertex.h"
+
 class Triangle
 {
 public:

@@ -9,15 +9,14 @@ void Point::addneightbor(Point n) {
 	}
 	Neightbors.push_back(n._id); 
 	float cal, cal2, val1, val2; 
-	val1 = info.getX() - n.info.getX();
-	val2 = info.getZ() - n.info.getZ();
+	val1 = getx() - n.getx();
+	val2 = getz() - n.getz();
 	cal = (sqrt)((val1 * val1) + (val2 * val2));
 	val1 = cal;
-	val2 = info.getY() - n.info.getY();
+	val2 = gety() - n.gety();
 	cal2 = (sqrt)((val1 * val1) - (val2 * val2));
 	distances.push_back({ cal, cal2 });
 }
-
 
 void Point::removeneighbor(Point n) {
 	bool found{ false };
