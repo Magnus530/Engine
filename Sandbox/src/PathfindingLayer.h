@@ -39,9 +39,9 @@ private:
 private: // Visual Aid & ImGui related elements
 	bool bRenderNodeGrid{ true };
 	bool bShowShaderColor{ true };
-	std::shared_ptr<Engine::PNode> m_StartNode;
-	std::shared_ptr<Engine::PNode> m_TargetNode;
-	std::vector<std::shared_ptr<Engine::PNode>> m_BlockedNodes;
+	int m_StartNode;
+	int m_TargetNode;
+	std::vector<int> m_BlockedNodes;
 
 private: // Screen RayCasting
 	glm::vec2 mousePos;
@@ -52,15 +52,22 @@ public:
 	PathfindingLayer()
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
+		/* Sizeof */
+		E_CORE_TRACE("Sizeof: NodeGrid = {0}", sizeof(Engine::NodeGrid));
+		E_CORE_TRACE("Sizeof: PathObstructionSphereCollection = {0}", sizeof(Engine::PathObstructionSphereCollection));
+		E_CORE_TRACE("Sizeof: glm::vec3 = {0}", sizeof(glm::vec3));
+		E_CORE_TRACE("Sizeof: std::vector<int> = {0}", sizeof(std::vector<int>));
+		E_CORE_TRACE("Sizeof: std::vector<int>* = {0}", sizeof(std::vector<int>*));
+
 		/* Pathfinding */
-		Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), glm::vec3((int)21, 0, (int)17), 1);
+		Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), glm::vec3((int)20, 0, (int)20), 1);
 
-		m_Shader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
-		m_Textureshader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
-		m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
+		//m_Shader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
+		//m_Textureshader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+		//m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
 
-		m_Textureshader->Bind();
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Textureshader)->UploadUniformInt("u_Texture", 0);
+		//m_Textureshader->Bind();
+		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Textureshader)->UploadUniformInt("u_Texture", 0);
 
 		/* Loading obj */
 		std::vector<Engine::Vertex> vertices;
@@ -69,26 +76,26 @@ public:
 		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 
 		m_Scene = std::make_shared<Engine::Scene>();
-		//m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Monkey", m_VA, m_Scene);
-		m_Entity.AddComponent<Engine::RendererComponent>();
+		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_VA, m_Scene, glm::vec3(0.7, 0.4, 0.2));
 		m_Entity.AddComponent<Engine::PathfindingComponent>();
 
+		// Audio
 		m_Audio = std::make_shared<Engine::AudioEngine>();
+
 		/* Set m_Entity location to Pathfinding Node 1 */
-		std::shared_ptr<Engine::PNode> startNode = Engine::NodeGridSystem::GetNodeAtIndexWithinGrid(0, 0);
-		glm::vec3 startPosition = startNode->m_Data->m_Position;
+		glm::vec3 startPosition = Engine::NodeGridSystem::GetNodeLocation(0, 0);
 		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition + glm::vec3(0, 0.5f, 0)); //Manually adding extra height
 		Engine::TransformSystem::RotateToDirectionVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(-1, 0, 1)));
 
-		m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode = startNode;
-		m_Entity.GetComponent<Engine::PathfindingComponent>().m_Grid = Engine::NodeGridSystem::GetGridAtIndex(0);
+		m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode = 0;
+		m_Entity.GetComponent<Engine::PathfindingComponent>().m_Grid = 0;
 
-		// Planes
-		//m_Plane = Engine::EntityInitializer::GetInstance().EntityInit("Plane", m_PlaneVA, m_Scene);
-		m_Plane.AddComponent<Engine::RendererComponent>();
 
-		// Vertex Array Pathfinding Obstructions
+		// Vertex Array Pathfinding 
+			// Obstructions
 		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, s� Initialiserer den for seg selv her
+			// Nodes
+		InitVertexArray("Plane", m_PlaneVA);
 	}
 
 	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
@@ -115,85 +122,49 @@ public:
 		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
 		Engine::PathfindingSystem::MoveAlongPath(pathfinder, transform, ts);
-
 		Engine::NodeGridSystem::UpdateFalseObstructionNodes(0);
-		/************************************************************************************************/
 
-		// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
-		static float sin{};
-		sin += ts;
-		float tmp = sinf(sin);
-		float fleeting = (sinf(sin) + 1) / 2;
-
-
-		glm::vec4 nodeColor(0.1, 0.5, 0.1, 1);
-		glm::vec4 startColor(1, 0, 0, 1);
-		glm::vec4 targetColor(0, 0, 1, 1);
-		glm::vec4 blockColor(0, 0, 0, 1);
 
 		/* --------------------- RENDERING ------------------------ */
-		//m_Texture->Bind();
-		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->Bind();
-		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", glm::vec4(.7, .1, .6, 1));
-		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
-		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
-
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_Color", glm::vec4(.7, .1, .6, 1));
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec4(.7, .1, .6, 1));
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", false);
-
-		//Engine::TransformSystem::UpdateMatrix(transform);
-		//Engine::Renderer::Submit(m_Shader, m_VA, transform.m_Transform);		// Render m_Obj
-		//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_VA, m_Entity);	
-		
+		Engine::Renderer::Submit(m_Entity);
 		
 		/*-----------RENDER OBSTRUCTIONS---------------*/
-		for (uint32_t i{}; i < m_Obstructors.size(); i++)
-		{
-			//auto& transform2 = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
-			//Engine::Renderer::Submit(m_Shader, m_BeveledCubeVA, transform2.m_Transform);
-			//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_BeveledCubeVA, m_Obstructors[i]);
-		}
-
-
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformInt("u_ShowCustomColor", bShowShaderColor);
-		/* ------- RENDER NODEGRID -------- */
+		for (auto& it : m_Obstructors)
+			Engine::Renderer::Submit(it);
+		
+#ifdef E_DEBUG /* ------- RENDER NODEGRID -------- */
 		if (bRenderNodeGrid)
 		{
+			glm::vec4 nodeColor(0.1, 0.5, 0.1, 1);
+			glm::vec4 startColor(1, 0, 0, 1);
+			glm::vec4 targetColor(0, 0, 1, 1);
+			glm::vec4 blockColor(0, 0, 0, 1);
+
 			float scale = 0.1f;
 			bool alteredColor{};
-			std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
-			for (auto& it : Engine::NodeGridSystem::GetGridAtIndex(0)->m_Nodes)
+			auto grid = Engine::NodeGridSystem::GetGridAtIndex(0);
+			for (size_t i{0}; i < grid->m_NodeLocations->size(); i++)
 			{
-				glm::vec3 position = it->m_Data->m_Position;
-				if (it == pathfinder.m_StartNode) {
-					std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", startColor);
-					alteredColor = true;
+				if (i == pathfinder.m_StartNode) {
+					Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, startColor);
 				}
-				else if (it == m_TargetNode) {
-					std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", targetColor);
-					alteredColor = true;
+				else if (i == m_TargetNode) {
+					Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, targetColor);
 				}
-				else if (it->IsObstruction()) {
-					std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", blockColor);
-					alteredColor = true;
+				else if (grid->m_NodeObstructionStatus->at(i)) {
+					Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, blockColor);
 				}
-
-				//Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(position / scale)));
-				if (alteredColor) {
-					std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", nodeColor);
-					alteredColor = false;
+				else {
+					Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, nodeColor);
 				}
 			}
 
 			/* ----- RENDER SPLINE PATH ----- */
-			std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", glm::vec3(1, 1, 1));
 			scale /= 2.f;
 			for (auto& it : pathfinder.m_SplinePath->m_Controlpoints)
-			{
-				//Engine::Renderer::Submit(m_Shader, m_PlaneVA, glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0)));
-			}
+				Engine::Renderer::Submit(m_PlaneVA, glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0), scale, {1,1,1});
 		}
+#endif
 		// End Render Scene
 		Engine::Renderer::EndScene();
 	}
@@ -201,7 +172,7 @@ public:
 	//----------------------------------------------------------------IMGUI-------------------------------------------------------------------------------------------------------------------------
 	virtual void OnImGuiRender() override
 	{
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
 
 		ImGui::Begin("Pathfinder");
 		
@@ -209,7 +180,6 @@ public:
 		ImGui::PushID(0);
 		ImGui::PushItemWidth(200.f);
 		ImGui::Text("Monkey");
-		//ImGui::ColorEdit3("", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
 		ImGui::Checkbox("Show Normals", &m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 		ImGui::PopID();
 
@@ -261,7 +231,7 @@ public:
 				it.GetComponent<Engine::RendererComponent>().m_bCustomColor = bObstructor_ShowNormal;
 		if (!bObstructor_ShowNormal)
 			for (auto& it : m_Obstructors)
-				//it.GetComponent<Engine::RendererComponent>().m_Color = glm::vec4(color, 1.f);
+				it.GetComponent<Engine::FlatMaterialComponent>().m_Color = glm::vec4(color, 1.f);
 		ImGui::PopID();
 
 
@@ -436,8 +406,11 @@ public:
 	}
 	void CreateObstructor(glm::vec3 pos, float radius = 2.f)
 	{
-		Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit("Obstructor " + std::to_string(m_Obstructors.size()-1), m_Scene);
-		ent.AddComponent<Engine::RendererComponent>();
+		//Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit("Obstructor " + std::to_string(m_Obstructors.size()-1), m_Scene);
+		//Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Obstructor " + std::to_string(m_Obstructors.size() - 1), m_VA, m_Scene, glm::vec3(0.7, 0.4, 0.2));
+		Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "BeveledCube"/* + std::to_string(m_Obstructors.size() - 1)*/, m_VA, m_Scene, glm::vec3(0.7, 0.4, 0.2));
+
+		//ent.AddComponent<Engine::RendererComponent>();
 		ent.AddComponent<Engine::ObstructionSphereComponent>();
 		auto& obs = ent.GetComponent<Engine::ObstructionSphereComponent>();
 		obs.m_radius = radius;

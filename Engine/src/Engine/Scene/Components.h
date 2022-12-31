@@ -125,13 +125,18 @@ namespace Engine
 	struct PathfindingComponent
 	{
 		// Start node and current grid
-		std::shared_ptr<class PNode> m_StartNode;
-		std::shared_ptr<struct NodeGrid> m_Grid;
-		std::shared_ptr<class PNode> m_TargetNode;
-		std::shared_ptr<class PNode> m_IntermediateTargetNode;
+		//std::shared_ptr<class PNode> m_StartNode;
+		//std::shared_ptr<struct NodeGrid> m_Grid;
+		//std::shared_ptr<class PNode> m_TargetNode;
+		//std::shared_ptr<class PNode> m_IntermediateTargetNode;
+		int m_Grid{};
+		int m_StartNode{};
+		int m_TargetNode{};
+		int m_IntermediateTargetNode{};
 
 		// Moving Through Path
-		std::vector<std::shared_ptr<class PNode>> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
+		//std::vector<std::shared_ptr<class PNode>> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
+		std::vector<int> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
 		std::shared_ptr<struct BSpline> m_SplinePath = std::make_shared<BSpline>();
 		float m_SplineMovement{};	// How far along the spline has the Entity gone?
 		bool bIsMovingAlongPath{};

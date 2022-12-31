@@ -21,6 +21,10 @@ namespace Engine
 		static void RenderInit();
 		static void Submit(Entity& entity);
 
+#ifdef E_DEBUG
+		static void Submit(const std::shared_ptr<VertexArray> va, glm::vec3 location, float scale = 1.f, glm::vec3 color = {0.f, .7f, .7f});
+#endif
+
 		static std::shared_ptr<Engine::Texture2D> CreateTexture(const std::string name, const std::string filePath, const std::shared_ptr<Engine::Scene>& scene);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }

@@ -75,6 +75,22 @@ namespace Engine
 		RenderCommand::DrawIndexed(entity.GetComponent<RendererComponent>().m_VA);
 	}
 
+#ifdef E_DEBUG // Render call for DebugOnly objects 
+	void Renderer::Submit(const std::shared_ptr<VertexArray> va, glm::vec3 location, float scale, glm::vec3 color)
+	{
+		auto flatShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_ShaderLibrary->Get("Flat"));
+		flatShader->Bind();
+		flatShader->UploadUniformMat4("u_ProjectionView", m_SceneData->ProjectionMatrix);
+		flatShader->UploadUniformMat4("u_ViewMatrix", m_SceneData->ViewMatrix);
+		flatShader->UploadUniformMat4("u_Transform", glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), location));
+
+		flatShader->UploadUniformInt("u_CustomColor", 0);
+		flatShader->UploadUniformFloat3("u_Color", color);
+
+		va->Bind();
+		RenderCommand::DrawIndexed(va);
+	}
+#endif
 	std::shared_ptr<Engine::Texture2D> Renderer::CreateTexture(const std::string name, const std::string filePath, const std::shared_ptr<Engine::Scene>& scene)
 	{
 		std::shared_ptr<Engine::Texture2D> tempTexture = Engine::Texture2D::Create(filePath);

@@ -112,7 +112,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		//PushLayer(new PathfindingLayer());
+		PushLayer(new PathfindingLayer());
 		//PushLayer(new TransformExampleLayer());
 		
 		SetCurrentLayer(0);
