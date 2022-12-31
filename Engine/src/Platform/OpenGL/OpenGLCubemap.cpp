@@ -57,6 +57,8 @@ namespace Engine
 	}
 	void OpenGLCubemap::Bind(uint32_t slot) const
 	{
-		glBindTextureUnit(slot, m_RendererID);
+		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LEQUAL);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, slot);
 	}
 }

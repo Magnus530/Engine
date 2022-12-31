@@ -6,9 +6,6 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
 
-#include "glad/glad.h"
-
-
 namespace Engine
 {
 	class RenderContext;
@@ -20,7 +17,7 @@ namespace Engine
 
 		void SetRenderContext(Engine::RenderContext* context)
 		{
-			this->contextPtr = context;
+			contextPtr = context;
 		}
 
 		virtual void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) = 0;
@@ -103,10 +100,8 @@ namespace Engine
 			skyboxOpenGLShader->UploadUniformMat4("u_ViewMatrix", glm::mat4(glm::mat3(sceneData->ViewMatrix)));
 			skyboxOpenGLShader->UploadUniformMat4("u_Transform", entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
-			glDepthMask(GL_TRUE);
 			skyboxOpenGLShader->UploadUniformInt("skybox", 0);
-			glDepthFunc(GL_LEQUAL);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->m_CubemapTexture);
+			entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->Bind(entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->m_CubemapTexture);
 		}
 	};
 }

@@ -71,7 +71,8 @@ public:
 
 	virtual void OnImGuiRender() override
 	{
-		Engine::ImGuiSystem::GuiEntitySettings(m_ActiveScene);
+		std::shared_ptr<Engine::ImGuiSystem> imGuiPtr = std::make_shared<Engine::ImGuiSystem>();
+		imGuiPtr->GuiEntitySettings(m_ActiveScene);
 	}
 
 	void OnEvent(Engine::Event& e) override

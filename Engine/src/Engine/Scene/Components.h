@@ -86,8 +86,8 @@ namespace Engine
 		std::pair<std::string, std::shared_ptr<Texture2D>> m_Tex;
 		glm::vec3 m_PCamPosition{ 0.f, 0.f, 0.f};
 
-		float m_AmbientStrength{ 0.f };
-		glm::vec3 m_AmbientColor = glm::vec3{ m_Color.x, m_Color.y, m_Color.z };
+		float m_AmbientStrength{ 1.f };
+		glm::vec3 m_AmbientColor{ m_Color.x, m_Color.y, m_Color.z };
 		glm::vec3 m_LightPosition{ 0.f, 0.f, 0.f }; 
 		glm::vec3 m_LightColor{ 0.9f, 0.9f, 0.3f };
 		float m_SpecularStrength{ 3.f };
@@ -118,6 +118,7 @@ namespace Engine
 	struct LightComponent
 	{
 		float m_AmbientStrength{ 1.f };
+		glm::vec3 m_AmbientColor{ 0.9f, 0.9f, 0.3f };
 		float m_LightStrength{ 0.5f };
 		glm::vec3 m_LightColor{ 0.9f, 0.9f, 0.3f};
 		float m_SpecularStrength{ 3.f };
