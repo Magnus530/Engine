@@ -2,17 +2,19 @@
 #define BASICPARTICLERENDERER_H
 
 #include <memory>
-#include <QOpenGLFunctions_4_1_Core>
+//#include <QOpenGLFunctions_4_1_Core>
+#include <glad/glad.h>
 
-#include <QMatrix4x4>
-#include "vertex.h"
+//#include <QMatrix4x4>
+#include <glm/mat4x4.hpp>
+#include "Engine/Renderer/vertex.h"
 
 namespace particles
 {
 
     class ParticleSystem;
 
-    class IParticleRenderer :  protected QOpenGLFunctions_4_1_Core
+    class IParticleRenderer /*:  protected QOpenGLFunctions_4_1_Core*/
     {
     public:
         IParticleRenderer() { }
@@ -48,8 +50,8 @@ namespace particles
             void update() override;
             void render() override;
 
-            QMatrix4x4 mMatrix;
-            std::vector<Vertex> mVertices;
+            glm::mat4 mMatrix;
+            std::vector<Engine::Vertex> mVertices;
         };
 }
 
