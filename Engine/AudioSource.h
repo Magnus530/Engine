@@ -1,5 +1,11 @@
 #pragma once
-class AudioSource
-{
-};
+
+namespace Engine {
+
+	class AudioSource
+	{
+
+	};
+
+}
 

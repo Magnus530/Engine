@@ -1,5 +1,9 @@
 #pragma once
-class AudioListener
-{
-};
+namespace Engine {
+
+	class AudioListener
+	{
+	};
+
+}
 

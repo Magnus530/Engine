@@ -1506,10 +1506,13 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="AudioListener.h">
+    <ClInclude Include="src\Engine\FMOD\AudioListener.h">
       <Filter>src\Engine\FMOD</Filter>
     </ClInclude>
-    <ClInclude Include="AudioSource.h">
+    <ClInclude Include="src\Engine\FMOD\AudioSource.h">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\FMOD\AudioOcclusion.h">
       <Filter>src\Engine\FMOD</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1640,10 +1643,13 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="AudioListener.cpp">
+    <ClCompile Include="src\Engine\FMOD\AudioListener.cpp">
       <Filter>src\Engine\FMOD</Filter>
     </ClCompile>
-    <ClCompile Include="AudioSource.cpp">
+    <ClCompile Include="src\Engine\FMOD\AudioSource.cpp">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\FMOD\AudioOcclusion.cpp">
       <Filter>src\Engine\FMOD</Filter>
     </ClCompile>
   </ItemGroup>
