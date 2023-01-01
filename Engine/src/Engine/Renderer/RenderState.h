@@ -115,7 +115,10 @@ namespace Engine
 
 			billboardShader->Bind();
 			entity.GetComponent<BillboardMaterialComponent>().m_Tex.second->Bind();
-
+			
+			billboardOpenGLShader->UploadUniformFloat3("CameraRight_worldspace", entity.GetComponent<BillboardMaterialComponent>().m_CamRight);
+			billboardOpenGLShader->UploadUniformFloat3("CameraUp_worldspace", entity.GetComponent<BillboardMaterialComponent>().m_CamUp);
+			billboardOpenGLShader->UploadUniformMat4("VP", entity.GetComponent<BillboardMaterialComponent>().m_ProjViewMat);
 		}
 	};
 }

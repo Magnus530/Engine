@@ -44,7 +44,7 @@ public:
 		//m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		//Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
 
-		Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Billboard, "Plane", m_PlaneVA, m_ActiveScene);
+		Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Billboard, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 1.0f, 0.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Chess"));
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -65,6 +65,11 @@ public:
 			if ((it)->second->HasComponent<Engine::PhongMaterialComponent>())
 			{
 				Engine::LightSystem::UpdateLight((it)->second->GetComponent<Engine::PhongMaterialComponent>(), m_LightEntity, m_PCameraController);
+			}
+
+			if ((it)->second->HasComponent<Engine::BillboardMaterialComponent>())
+			{
+				Engine::BillboardSystem::UpdateBillboard((it)->second->GetComponent<Engine::BillboardMaterialComponent>(), m_PCameraController);
 			}
 		}
 

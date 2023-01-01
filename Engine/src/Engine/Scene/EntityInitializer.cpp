@@ -24,12 +24,23 @@ namespace Engine
 		vertexarr.reset(Engine::VertexArray::Create());
 		std::shared_ptr<Engine::VertexBuffer> ObjVB;
 		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
-		ObjVB->SetLayout
-		({
-			{ Engine::ShaderDataType::Float3, "a_Position" },
-			{ Engine::ShaderDataType::Float3, "a_Normal" },
-			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
-		});
+
+		if (shaderType == Engine::ShaderType::Billboard)
+		{
+			ObjVB->SetLayout
+			({
+				{ Engine::ShaderDataType::Float3, "a_Vertices" },
+			});
+		}
+		else
+		{
+			ObjVB->SetLayout
+			({
+				{ Engine::ShaderDataType::Float3, "a_Position" },
+				{ Engine::ShaderDataType::Float3, "a_Normal" },
+				{ Engine::ShaderDataType::Float2, "a_TexCoord" }
+			});
+		}
 		vertexarr->AddVertexBuffer(ObjVB);
 
 		std::shared_ptr<Engine::IndexBuffer> ObjIB;

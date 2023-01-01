@@ -77,10 +77,12 @@ namespace Engine
 				break;
 			}
 			case Engine::ShaderType::Billboard:
-			Engine::BillboardShaderState* billboardStatePtr = new Engine::BillboardShaderState;
-			contextPtr = std::make_shared<Engine::RenderContext>(billboardStatePtr, entity, m_ShaderLibrary, m_SceneData);
-			contextPtr->InitShader();
-			break;
+			{
+				Engine::BillboardShaderState* billboardStatePtr = new Engine::BillboardShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(billboardStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
+				break;
+			}
 		}
 
 		entity.GetComponent<RendererComponent>().m_VA->Bind();

@@ -121,10 +121,9 @@ namespace Engine
 
 		glm::vec3 m_CamRight{ 0.f, 0.f, 0.f };
 		glm::vec3 m_CamUp{ 0.f, 0.f, 0.f };
-		glm::mat4 m_ViewProjMat{ 1 }; // proj * view
+		glm::mat4 m_ProjViewMat{ 1 }; // proj * view
 		glm::vec3 m_BillboardPos{ 0.f, 0.f, 0.f };
 		glm::vec3 m_BillboardSize{ 1.f, 1.f, 1.f };
-		float m_LifeLevel = 0;
 
 		BillboardMaterialComponent() = default;
 		BillboardMaterialComponent(const BillboardMaterialComponent&) = default;
