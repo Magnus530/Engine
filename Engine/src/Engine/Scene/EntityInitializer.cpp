@@ -14,7 +14,7 @@ namespace Engine
 		return tempEntity;
 	}
 
-	Engine::Entity EntityInitializer::EntityInit(const Engine::ShaderType& shaderType, const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
+	Engine::Entity EntityInitializer::EntityInit(const Engine::ShaderType& shaderType, std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
 		std::shared_ptr<Engine::Scene>& scene, const glm::vec3& color, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex)
 	{
 		std::vector<Engine::Vertex> vertices;
@@ -36,6 +36,15 @@ namespace Engine
 		ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
 		vertexarr->SetIndexBuffer(ObjIB);
 
+		int i = 0;
+		for (auto& it = scene->m_Entities.begin(); it != scene->m_Entities.end(); it++)
+		{
+			if (it->second->GetComponent<Engine::TagComponent>().Tag == objname)
+			{
+				objname += std::to_string(i);
+			}
+			i++;
+		}
 		Engine::Entity tempEntity = scene->CreateEntity(objname);
 		tempEntity.AddComponent<RendererComponent>(vertexarr);
 		MaterialInit(shaderType, tempEntity, color, tex);
@@ -124,6 +133,12 @@ namespace Engine
 			{
 				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Phong);
 				entity.AddComponent<PhongMaterialComponent>(glm::vec4{ color, 1.f }, tex.first, tex.second);
+				break;
+			}
+			case Engine::ShaderType::Billboard:
+			{
+				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Billboard);
+				entity.AddComponent<BillboardMaterialComponent>(tex.first, tex.second);
 				break;
 			}
 		}

@@ -104,4 +104,18 @@ namespace Engine
 			entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->Bind(entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->m_CubemapTexture);
 		}
 	};
+
+	class BillboardShaderState : public RenderState
+	{
+	public:
+		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
+		{
+			std::shared_ptr<Engine::Shader> billboardShader = shaderLibrary->Get("Billboard");
+			std::shared_ptr<Engine::OpenGLShader> billboardOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(billboardShader);
+
+			billboardShader->Bind();
+			entity.GetComponent<BillboardMaterialComponent>().m_Tex.second->Bind();
+
+		}
+	};
 }

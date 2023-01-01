@@ -39,6 +39,7 @@ namespace Engine
 		std::shared_ptr<Shader> textureShader = m_ShaderLibrary->Load("assets/shaders/Texture.glsl");
 		std::shared_ptr<Shader> phongShader = m_ShaderLibrary->Load("assets/shaders/Phong.glsl");
 		std::shared_ptr<Shader> skyboxShader = m_ShaderLibrary->Load("assets/shaders/Skybox.glsl");
+		std::shared_ptr<Shader> billboardShader = m_ShaderLibrary->Load("assets/shaders/Billboard.glsl");
 	}
 
 	void Renderer::Submit(Entity& entity)
@@ -75,6 +76,11 @@ namespace Engine
 				contextPtr->InitShader();
 				break;
 			}
+			case Engine::ShaderType::Billboard:
+			Engine::BillboardShaderState* billboardStatePtr = new Engine::BillboardShaderState;
+			contextPtr = std::make_shared<Engine::RenderContext>(billboardStatePtr, entity, m_ShaderLibrary, m_SceneData);
+			contextPtr->InitShader();
+			break;
 		}
 
 		entity.GetComponent<RendererComponent>().m_VA->Bind();

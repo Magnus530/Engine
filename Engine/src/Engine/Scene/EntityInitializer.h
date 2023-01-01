@@ -29,7 +29,7 @@ namespace Engine
 		static EntityInitializer& GetInstance() { return *m_Instance; }
 
 		static Engine::Entity EntityInit(const std::string objname, std::shared_ptr<Engine::Scene>& scene);
-		static Engine::Entity EntityInit(const Engine::ShaderType& shaderType, const std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
+		static Engine::Entity EntityInit(const Engine::ShaderType& shaderType, std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
 			std::shared_ptr<Engine::Scene>& scene, const glm::vec3& color = { 1.f, 1.f, 1.f }, 
 			std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex = std::make_pair("White", Engine::Texture2D::Create("assets/textures/white.png")));
 		static Engine::Entity EntityInit(const std::string objname, std::shared_ptr<Engine::VertexArray>& va, std::shared_ptr<Engine::Scene>& scene,
