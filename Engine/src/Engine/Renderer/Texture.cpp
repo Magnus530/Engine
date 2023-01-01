@@ -3,6 +3,7 @@
 
 #include "Renderer.h"
 #include "Platform/OpenGL/OpenGLTexture.h"
+#include "Platform/OpenGL/OpenGLCubemap.h"
 
 namespace Engine
 {
@@ -18,5 +19,19 @@ namespace Engine
 		return nullptr;
 
 		return std::shared_ptr<Texture2D>();
+	}
+
+	std::shared_ptr<TextureCubemap> TextureCubemap::Create(const std::string cubeArr[])
+	{
+		switch (Renderer::GetAPI())
+		{
+			case RendererAPI::API::None:     E_CORE_ASSERT(false, "RendererAPI::None has yet to be supported."); return nullptr;
+			case RendererAPI::API::OpenGL:   return std::make_shared<OpenGLCubemap>(cubeArr);
+		}
+
+		E_CORE_ASSERT(false, "Unknown RendererAPI.");
+		return nullptr;
+
+		return std::shared_ptr<TextureCubemap>();
 	}
 }

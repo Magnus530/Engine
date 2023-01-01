@@ -201,6 +201,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClInclude Include="src\Engine\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Engine\Renderer\Shader.h" />
     <ClInclude Include="src\Engine\Renderer\Texture.h" />
+    <ClInclude Include="src\Engine\Renderer\TextureList.h" />
     <ClInclude Include="src\Engine\Renderer\VertexArray.h" />
     <ClInclude Include="src\Engine\Renderer\vertex.h" />
     <ClInclude Include="src\Engine\Scene\Components.h" />
@@ -215,6 +216,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLShader.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLCubemap.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLTexture.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLVertexArray.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
@@ -660,6 +662,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClCompile Include="src\Engine\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Engine\Renderer\Shader.cpp" />
     <ClCompile Include="src\Engine\Renderer\Texture.cpp" />
+    <ClCompile Include="src\Engine\Renderer\TextureList.cpp" />
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Engine\Renderer\vertex.cpp" />
     <ClCompile Include="src\Engine\Scene\Entity.cpp" />
@@ -673,6 +676,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLShader.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLCubemap.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLTexture.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLVertexArray.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />

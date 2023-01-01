@@ -17,7 +17,7 @@ namespace Engine
 
 		void SetRenderContext(Engine::RenderContext* context)
 		{
-			this->contextPtr = context;
+			contextPtr = context;
 		}
 
 		virtual void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) = 0;
@@ -35,10 +35,9 @@ namespace Engine
 			std::shared_ptr<Engine::OpenGLShader> flatOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(flatShader);
 
 			flatShader->Bind();
-			std::dynamic_pointer_cast<OpenGLShader>(flatShader)->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
-			std::dynamic_pointer_cast<OpenGLShader>(flatShader)->UploadUniformMat4("u_ViewMatrix", sceneData->ViewMatrix);
-			std::dynamic_pointer_cast<OpenGLShader>(flatShader)->UploadUniformMat4("u_Transform",
-				entity.GetComponent<Engine::TransformComponent>().m_Transform);
+			flatOpenGLShader->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
+			flatOpenGLShader->UploadUniformMat4("u_ViewMatrix", sceneData->ViewMatrix);
+			flatOpenGLShader->UploadUniformMat4("u_Transform", entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
 			flatOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 			flatOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::FlatMaterialComponent>().m_Color));
@@ -54,10 +53,9 @@ namespace Engine
 			std::shared_ptr<Engine::OpenGLShader> textureOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader);
 
 			textureShader->Bind();
-			std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
-			std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformMat4("u_ViewMatrix", sceneData->ViewMatrix);
-			std::dynamic_pointer_cast<OpenGLShader>(textureShader)->UploadUniformMat4("u_Transform",
-				entity.GetComponent<Engine::TransformComponent>().m_Transform);
+			textureOpenGLShader->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
+			textureOpenGLShader->UploadUniformMat4("u_ViewMatrix", sceneData->ViewMatrix);
+			textureOpenGLShader->UploadUniformMat4("u_Transform", entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
 			entity.GetComponent<TextureMaterialComponent>().m_Tex.second->Bind();
 		}
@@ -72,10 +70,9 @@ namespace Engine
 			std::shared_ptr<Engine::OpenGLShader> phongOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(phongShader);
 
 			phongShader->Bind();
-			std::dynamic_pointer_cast<OpenGLShader>(phongShader)->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
-			std::dynamic_pointer_cast<OpenGLShader>(phongShader)->UploadUniformMat4("u_ViewMatrix", sceneData->ViewMatrix);
-			std::dynamic_pointer_cast<OpenGLShader>(phongShader)->UploadUniformMat4("u_Transform",
-				entity.GetComponent<Engine::TransformComponent>().m_Transform);
+			phongOpenGLShader->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
+			phongOpenGLShader->UploadUniformMat4("u_ViewMatrix", sceneData->ViewMatrix);
+			phongOpenGLShader->UploadUniformMat4("u_Transform", entity.GetComponent<Engine::TransformComponent>().m_Transform);
 
 			phongOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
 			phongOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::PhongMaterialComponent>().m_Color));
@@ -87,6 +84,24 @@ namespace Engine
 			phongOpenGLShader->UploadUniformFloat3("u_CameraPosition", entity.GetComponent<Engine::PhongMaterialComponent>().m_PCamPosition);
 			phongOpenGLShader->UploadUniformFloat3("u_LightColor", entity.GetComponent<Engine::PhongMaterialComponent>().m_LightColor);
 			phongOpenGLShader->UploadUniformFloat("u_SpecularStrength", entity.GetComponent<Engine::PhongMaterialComponent>().m_SpecularStrength);
+		}
+	};
+
+	class SkyboxShaderState : public RenderState
+	{
+	public:
+		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
+		{
+			std::shared_ptr<Engine::Shader> skyboxShader = shaderLibrary->Get("Skybox");
+			std::shared_ptr<Engine::OpenGLShader> skyboxOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(skyboxShader);
+
+			skyboxShader->Bind();
+			skyboxOpenGLShader->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
+			skyboxOpenGLShader->UploadUniformMat4("u_ViewMatrix", glm::mat4(glm::mat3(sceneData->ViewMatrix)));
+			skyboxOpenGLShader->UploadUniformMat4("u_Transform", entity.GetComponent<Engine::TransformComponent>().m_Transform);
+
+			skyboxOpenGLShader->UploadUniformInt("skybox", 0);
+			entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->Bind(entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->m_CubemapTexture);
 		}
 	};
 }

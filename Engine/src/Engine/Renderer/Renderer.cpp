@@ -3,6 +3,7 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Renderer/RenderContext.h"
+#include "Engine/Core/ImGuiSystem.h"
 
 namespace Engine
 {
@@ -37,9 +38,7 @@ namespace Engine
 		std::shared_ptr<Shader> flatShader = m_ShaderLibrary->Load("assets/shaders/Flat.glsl");
 		std::shared_ptr<Shader> textureShader = m_ShaderLibrary->Load("assets/shaders/Texture.glsl");
 		std::shared_ptr<Shader> phongShader = m_ShaderLibrary->Load("assets/shaders/Phong.glsl");
-
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->Bind();
-		std::dynamic_pointer_cast<Engine::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		std::shared_ptr<Shader> skyboxShader = m_ShaderLibrary->Load("assets/shaders/Skybox.glsl");
 	}
 
 	void Renderer::Submit(Entity& entity)
@@ -66,6 +65,13 @@ namespace Engine
 			{
 				Engine::PhongShaderState* phongStatePtr = new Engine::PhongShaderState;
 				contextPtr = std::make_shared<Engine::RenderContext>(phongStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
+				break;
+			}
+			case Engine::ShaderType::Skybox:
+			{
+				Engine::SkyboxShaderState* skyboxStatePtr = new Engine::SkyboxShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(skyboxStatePtr, entity, m_ShaderLibrary, m_SceneData);
 				contextPtr->InitShader();
 				break;
 			}
@@ -97,6 +103,14 @@ namespace Engine
 		scene->m_Textures.insert({name, tempTexture});
 
 		return tempTexture;
+	}
+
+	std::shared_ptr<Engine::OpenGLCubemap> Renderer::CreateSkybox(const std::string name, const std::string cubeArr[], const std::shared_ptr<Engine::Scene>& scene)
+	{
+		std::shared_ptr<Engine::OpenGLCubemap> tempCubemap = std::make_shared<Engine::OpenGLCubemap>(Engine::OpenGLCubemap::OpenGLCubemap(cubeArr));
+		scene->m_Skyboxes.insert({ name, tempCubemap });
+
+		return tempCubemap;
 	}
 
 	inline glm::vec2 Renderer::GetWindowSize()

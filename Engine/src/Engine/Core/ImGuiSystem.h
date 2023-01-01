@@ -7,7 +7,8 @@ namespace Engine
 	class ImGuiSystem
 	{
 	public:
-		static void GuiEntitySettings(std::shared_ptr<Engine::Scene>& scene);
-		static const char* EntityNameCompare(const std::string& name, std::vector<std::string>& names);
+		void GuiEntitySettings(std::shared_ptr<Engine::Scene>& scene);
+		const char* EntityNameCompare(const std::string& name, std::vector<std::string>& names);
+		void ShaderSelect(std::shared_ptr<Engine::Entity>& entity, int& currShader, const char* comboPreview, std::vector<std::string>& names);
 	};
 }

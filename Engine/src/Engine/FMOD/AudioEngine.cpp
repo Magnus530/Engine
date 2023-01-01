@@ -116,7 +116,6 @@ namespace Engine
 		sgpImplementation->update(fTimeDeltaSeconds);
 		if (Input::IsKeyPressed(E_KEY_L))
 		{
-			
 			sgpImplementation->mpSystem->createReverb3D(&sgpImplementation->mpReverb);
 			//FMOD_REVERB_PROPERTIES propHanger = FMOD_PRESET_HANGAR;
 
@@ -125,11 +124,10 @@ namespace Engine
 
 			//AE->setChannelVolume(musicPath1, 12.f);
 		}
-		if (Input::IsKeyPressed(E_KEY_Q))
+		if (Input::IsKeyPressed(E_KEY_K))
 		{
 			AE->playSound(oneShot1, glm::vec3());
 			//AE->setChannelVolume(musicPath1, -12.f);
-
 		}
 		if (Input::IsKeyPressed(E_KEY_SPACE))
 		{

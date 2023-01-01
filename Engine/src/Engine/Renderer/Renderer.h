@@ -6,6 +6,7 @@
 #include "Engine/Renderer/PerspectiveCameraController.h"
 #include "Engine/Scene/Entity.h"
 #include "Engine/Renderer/Texture.h"
+#include "Platform/OpenGL/OpenGLCubemap.h"
 
 namespace Engine
 {
@@ -26,6 +27,7 @@ namespace Engine
 #endif
 
 		static std::shared_ptr<Engine::Texture2D> CreateTexture(const std::string name, const std::string filePath, const std::shared_ptr<Engine::Scene>& scene);
+		static std::shared_ptr<Engine::OpenGLCubemap> CreateSkybox(const std::string name, const std::string cubeArr[], const std::shared_ptr<Engine::Scene>& scene);
 
 		inline static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 		inline static glm::vec2 GetWindowSize();
