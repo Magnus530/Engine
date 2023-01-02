@@ -33,9 +33,17 @@ namespace Engine
 	{
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
-	void OpenGLRendererAPI::DrawPoint(const std::shared_ptr<VertexArray>& vertexArray)
+	void OpenGLRendererAPI::DrawPoint(const std::shared_ptr<VertexArray>& vertexArray, float size)
 	{
 		glDrawArrays(GL_POINT, 0, 1);
-		glPointSize(1.f);
+		glPointSize(size);
+	}
+	void OpenGLRendererAPI::DrawLine(const std::shared_ptr<VertexArray>& vertexArray)
+	{
+		glDrawArrays(GL_LINE, 0, vertexArray->GetIndexBuffer()->GetCount());
+	}
+	void OpenGLRendererAPI::DrawLineLoop(const std::shared_ptr<VertexArray>& vertexArray)
+	{
+		glDrawArrays(GL_LINE_LOOP, 0, vertexArray->GetIndexBuffer()->GetCount());
 	}
 }

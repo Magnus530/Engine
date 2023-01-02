@@ -1,5 +1,6 @@
 #include "epch.h"
 #include "RayCast.h"
+#include <glm/gtx/projection.hpp>
 
 namespace Engine {
 
@@ -74,6 +75,21 @@ namespace Engine {
 		return true;
 	}
 
+	bool RayCast::IntersectWithPlane(glm::vec3& intersect_OUT, const glm::vec3 planeNormal, const glm::vec3 vertexPosition, const glm::vec3 planeVector, const glm::vec3 ray, const glm::vec3 rayPosition)
+	{
+		if (!IntersectWithAlignedPlane(intersect_OUT, planeNormal, vertexPosition, ray, rayPosition))
+			return false;
+
+		auto proj = glm::proj(intersect_OUT - vertexPosition, planeVector);
+		if (glm::length(proj) > glm::length(planeVector))
+			return false;
+		if (glm::dot(glm::normalize(proj), glm::normalize(planeVector)) < 0.f)
+			return false;
+
+		intersect_OUT = vertexPosition + proj;
+		return true;
+	}
+
 	bool RayCast::IntersectSphere(glm::vec3& intersect_OUT, const glm::vec3& ray, const glm::vec3& rayPosition, const glm::vec3& spherePosition, const float& sphereRadius)
 	{
 		float tr = glm::dot(spherePosition - rayPosition, ray);
@@ -105,5 +121,58 @@ namespace Engine {
 		intersect_OUT.x = 0.f;
 		intersect_OUT.z = ((-pos.x * ray.z) / ray.x) + pos.z;
 		intersect_OUT.y = ((-pos.x * ray.y) / ray.x) + pos.y;
+	}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ------------------------------------------------------ COLLISION SYSTEM ------------------------------------------------------------------- //
+
+	// ----- SAT ----- //
+	bool CollisionSystem::IsColliding(glm::vec3 point, ConvexPolygon& a)
+	{
+		return FindMinSeparation(point, a) <= 0;
+	}
+
+	bool CollisionSystem::IsColliding(ConvexPolygon& a, ConvexPolygon& b)
+	{
+		return FindMinSeparation(a, b) <= 0.f && FindMinSeparation(b, a) <= 0.f;
+	}
+
+	float CollisionSystem::FindMinSeparation(ConvexPolygon& a, ConvexPolygon& b)
+	{
+		float separation = std::numeric_limits<float>::lowest();
+
+		// Loop through all normals in polygon "a"
+		for (int i = 0; i < a.m_Locations.size(); i++)
+		{
+			glm::vec3 location = a.m_Locations[i];
+			glm::vec3 normal = a.m_Normals[i];
+			float minSep = std::numeric_limits<float>::max();
+
+			for (glm::vec3 l : b.m_Locations)
+				minSep = std::min(minSep, glm::dot(l - location, normal));
+
+			if (minSep > separation)
+				separation = minSep;
+		}
+
+		return separation;
+	}
+	float CollisionSystem::FindMinSeparation(glm::vec3 point, ConvexPolygon& a)
+	{
+		float separation = std::numeric_limits<float>::lowest();
+
+		for (int i = 0; i < a.m_Locations.size(); i++)
+		{
+			glm::vec3 location = a.m_Locations[i];
+			glm::vec3 normal = a.m_Normals[i];
+			float minSep = std::numeric_limits<float>::max();
+
+			minSep = std::min(minSep, glm::dot(point - location, normal));
+
+			if (minSep > separation)
+				separation = minSep;
+		}
+		return separation;
 	}
 }

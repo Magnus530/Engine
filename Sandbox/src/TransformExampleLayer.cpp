@@ -14,19 +14,11 @@
 TransformExampleLayer::TransformExampleLayer()
 	: Layer("TransformTesting"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 {
-	m_Shader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
-
-	/* Loading obj */
-	std::vector<Engine::Vertex> vertices;
-	std::vector<uint32_t> indices;
-	Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 	m_Scene = std::make_shared<Engine::Scene>();
-	//m_Entity = Engine::EntityInitializer::GetInstance().EntityInit("Cube", m_CubeVA, m_Scene);
-	//m_Entity.AddComponent<Engine::RendererComponent>(glm::vec4(0.5f, 0.2f, 0.6f, 1.f));
-
-	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
-	//Engine::TransformSystem::SetWorldPosition(transform, glm::vec3(-3, -4, 0));
+	
+	m_Entity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_MonkeyVA, m_Scene);
+	m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor = true;
+	
 	m_Audio = std::make_shared<Engine::AudioEngine>();
 }
 
@@ -44,35 +36,9 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 	glm::mat4 projectionmatrix = m_PCameraController.GetCamera().GetProjectionMatrix();
 	glm::mat4 viewmatrix = m_PCameraController.GetCamera().GetViewMatrix();
 
-
 	m_Audio->update(ts);
-	// Changing color of the red channel - is multiplied in m_Shader's vertex shader 
-	static float sin{};
-	sin += ts;
-	float tmp = sinf(sin);
-	float fleeting = (sinf(sin) + 1) / 2;
 
-	// ---- TRANSFORMATION TESTING ---------------------
-	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-	//Engine::TransformSystem::SetWorldPosition(transform, m_Position);
-
-		// Rotation
-	if (bAddWorldRotation) {
-		Engine::TransformSystem::AddWorldRotation(transform, ts * m_RotationStrength, glm::vec3(0, 1.f, 0));
-	}
-	if (bAddLocalRotation) {
-		Engine::TransformSystem::AddLocalRotation(transform, ts * m_RotationStrength, glm::vec3(1.f, 0, 0));
-	}
-	
-	// Updating TransformComponent
-
-	// Draw Call for m_Obj
-	auto shader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Shader);
-	shader->UploadUniformFloat3("u_Color", m_ObjColor);
-	shader->UploadUniformInt("u_ShowNormals", bShowNormals);
-
-	//Engine::Renderer::Submit(Engine::ShaderType::Flat, m_Shader, m_CubeVA, m_Entity);
-	//Engine::Renderer::Submit(m_Shader, m_CubeVA, transform.m_Transform);
+	Engine::Renderer::Submit(m_Entity);
 
 	// End Scene
 	Engine::Renderer::EndScene();
@@ -80,64 +46,66 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 
 void TransformExampleLayer::OnImGuiRender()
 {
+
 	// Transformation Demo
-	ImGui::Begin("TransformTesting");
-	if (ImGui::Button("Reset Transformations")) {
-		//m_Obj->Reset();
-		m_Position *= 0.f;
-	}
-	ImGui::Separator();
+	std::shared_ptr<Engine::ImGuiSystem> imGuiPtr = std::make_shared<Engine::ImGuiSystem>();
+	imGuiPtr->GuiEntitySettings(m_Scene);
 
-	auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+	//auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+	//ImGui::PushItemWidth(100.f);
+	//ImGui::Separator();
 
-	ImGui::PushID(0);
-	ImGui::Text("Position");
-	ImGui::PushItemWidth(75.f);
-	const char* format = "%.1f";
+	//// POSITION
+	//ImGui::PushID(1);
+	//ImGui::Text("Position");
+	//if (ImGui::DragFloat("X", &m_Position.x, 0.01f))
+	//	Engine::TransformSystem::SetWorldPosition(transform, m_Position);
+	//ImGui::SameLine();
+	//if (ImGui::DragFloat("Y", &m_Position.y, 0.01f))
+	//	Engine::TransformSystem::SetWorldPosition(transform, m_Position);
+	//ImGui::SameLine();
+	//if (ImGui::DragFloat("Z", &m_Position.z, 0.01f))
+	//	Engine::TransformSystem::SetWorldPosition(transform, m_Position);
+	//ImGui::PopID();
 
-	if (ImGui::SliderFloat("X", &m_Position.x, -10.f, 10.f, format))
-		Engine::TransformSystem::SetWorldPosition(transform, m_Position);
-	ImGui::SameLine();
-	if (ImGui::SliderFloat("Y", &m_Position.y, -10.f, 10.f, format))
-		Engine::TransformSystem::SetWorldPosition(transform, m_Position);
-	ImGui::SameLine();
-	if (ImGui::SliderFloat("Z", &m_Position.z, -10.f, 10.f, format))
-		Engine::TransformSystem::SetWorldPosition(transform, m_Position);
-	ImGui::PopID();
-	ImGui::Separator();
+	//static glm::vec3 Rotator = transform.GetRotator();
 
-	ImGui::PushItemWidth(100.f);
-
-	ImGui::Text("Rotation");
-	ImGui::Checkbox("Add World Rotation", &bAddWorldRotation);
-	ImGui::Checkbox("Add Local Rotation", &bAddLocalRotation);
-	ImGui::SliderFloat("Rotation Strength", &m_RotationStrength, -1.f, 1.f);
-	ImGui::Separator();
+	//// ROTATION
+	//ImGui::PushID(2);
+	//ImGui::Text("Set Entity Rotation");
+	//if (ImGui::DragFloat("Pitch", &Rotator.x, 0.01f))
+	//	Engine::TransformSystem::SetRotation(transform, Rotator);
+	//ImGui::SameLine();
+	//if (ImGui::DragFloat("Yaw", &Rotator.y, 0.01f))
+	//	Engine::TransformSystem::SetRotation(transform, Rotator);
+	//ImGui::SameLine();
+	//if (ImGui::DragFloat("Roll", &Rotator.z, 0.01f))
+	//	Engine::TransformSystem::SetRotation(transform, Rotator);
+	//ImGui::PopID();
 
 
-	ImGui::PushID(1);
-	if (ImGui::SliderFloat("Scale", &m_SetScale, 0.f, 5.f))
-	{
-		Engine::TransformSystem::SetScale(m_Entity.GetComponent<Engine::TransformComponent>(), m_SetScale);
-	}
-	ImGui::Text("Scale");
-	static glm::vec3 Scale(1.f);
-	if (ImGui::SliderFloat("X", &Scale.x, 0, 10.f, format))
-		Engine::TransformSystem::SetScale(m_Entity.GetComponent<Engine::TransformComponent>(), Scale);
-	ImGui::SameLine();
-	if (ImGui::SliderFloat("Y", &Scale.y, 0, 10.f, format))
-		Engine::TransformSystem::SetScale(m_Entity.GetComponent<Engine::TransformComponent>(), Scale);
-	ImGui::SameLine();
-	if (ImGui::SliderFloat("Z", &Scale.z, 0, 10.f, format))
-		Engine::TransformSystem::SetScale(m_Entity.GetComponent<Engine::TransformComponent>(), Scale);
-	ImGui::PopID();
-	ImGui::Separator();
+	//// SCALE
+	//ImGui::Text("Scale");
+	//ImGui::PushID(3);
+	//if (ImGui::DragFloat("X", &m_Scale.x, 0.01f))
+	//	Engine::TransformSystem::SetScale(transform, m_Scale);
+	//ImGui::SameLine();
+	//if (ImGui::DragFloat("Y", &m_Scale.y, 0.01f))
+	//	Engine::TransformSystem::SetScale(transform, m_Scale);
+	//ImGui::SameLine();
+	//if (ImGui::DragFloat("Z", &m_Scale.z, 0.01f))
+	//	Engine::TransformSystem::SetScale(transform, m_Scale);
+	//ImGui::PopID();
 
-	ImGui::Separator();
-	ImGui::PushItemWidth(200.f);
-	//ImGui::ColorEdit3("Object color", glm::value_ptr(m_Entity.GetComponent<Engine::RendererComponent>().m_Color));
-	ImGui::Checkbox("Show Normals", &m_Entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
-	ImGui::Separator();
 
-	ImGui::End();
+	//// RESET TRANSFORMS
+	//if (ImGui::Button("Reset Transformations")) 
+	//{
+	//	m_Position *= 0.f;
+	//	m_Rotator *= 0.f;
+	//	m_Scale = { 1,1,1 };
+	//	m_SetScale = 1.f;
+	//	Engine::TransformSystem::ResetTransforms(transform);
+	//}
+	//ImGui::Separator();
 }

@@ -9,6 +9,7 @@
 
 #include <glm/glm.hpp>
 #include <utility>
+#include <iostream>
 
 namespace Engine
 {
@@ -27,7 +28,28 @@ namespace Engine
 		glm::mat4 m_Transform { 1.f };
 		float m_Speed{ 2.f };
 
+		glm::mat4 m_Transform	{ 1.f };
+
 		glm::vec3 GetPosition() const { return m_Transform[3]; }
+		glm::vec3 GetScale() const
+		{
+			float X = glm::length(m_Transform[0]);
+			float Y = glm::length(m_Transform[1]);
+			float Z = glm::length(m_Transform[2]);
+			return { X, Y, Z };
+		}
+		glm::vec3 GetRotator()
+		{
+			//float X = (glm::acos(m_Transform[1].y) *  glm::asin(m_Transform[1].z)) / glm::length(m_Transform[0]);
+			//float Y = (glm::acos(m_Transform[0].x) * -glm::asin(m_Transform[0].z))/ glm::length(m_Transform[1]);
+			//float Z = (glm::acos(m_Transform[0].x) *  glm::asin(m_Transform[0].y)) / glm::length(m_Transform[2]);
+			//float X = std::atan2(m_Transform[1].z, m_Transform[2].z);
+			//float Y = std::atan2(-m_Transform[0].z, sqrt(pow(m_Transform[1].z,2) + pow(m_Transform[2].z,2)));
+			//float Z = std::atan2(m_Transform[0].y, m_Transform[0].x);
+			
+			//return { X, Y, Z };
+			return { 0,0,0 };
+		}
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
@@ -64,6 +86,7 @@ namespace Engine
 		FlatMaterialComponent(const glm::vec4& color)
 			: m_Color(color) {}
 	};
+
 
 	struct TextureMaterialComponent
 	{
@@ -152,19 +175,47 @@ namespace Engine
 			: m_LightStrength(lightStrength), m_SpecularStrength(specularStrength) {}
 	};
 
+		enum PatrolType
+		{
+			// In Order of m_PatrolPath
+			Single,
+			Loop,
+			Reverse,
+		};
 	struct PathfindingComponent
 	{
-		std::shared_ptr<class PNode> m_StartNode;
-		std::shared_ptr<struct NodeGrid> m_Grid;
-		std::shared_ptr<class PNode> m_TargetNode;
-		std::shared_ptr<class PNode> m_IntermediateTargetNode;
+		// Start node and current grid
+		//std::shared_ptr<class PNode> m_StartNode;
+		//std::shared_ptr<struct NodeGrid> m_Grid;
+		//std::shared_ptr<class PNode> m_TargetNode;
+		//std::shared_ptr<class PNode> m_IntermediateTargetNode;
+		int m_Grid{};
+		int m_StartNode{};
+		int m_TargetNode{};
+		int m_IntermediateTargetNode{};
 
-		std::vector<std::shared_ptr<class PNode>> m_CurrentPath;	// reduntant TODO: remove
+		// Moving Through Path
+		//std::vector<std::shared_ptr<class PNode>> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
+		std::vector<int> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
 		std::shared_ptr<struct BSpline> m_SplinePath = std::make_shared<BSpline>();
 		float m_SplineMovement{};	// How far along the spline has the Entity gone?
-		bool bStartedPathfinding{};
+		bool bIsMovingAlongPath{};
 		bool bReachedTarget{};
 		bool bIsObstructed{};
+
+		// MovementSpeed
+		float m_SplineLength{};
+		float m_EntityPathSpeed{ 5.f };
+
+		// Patrol
+		bool bPatrolling{};
+			/* Only relevant for PatrolType::Reverse 
+				Checks if entity is currently going the reverse way of the path */
+		bool bReverse{};
+		PatrolType m_PatrolType = PatrolType::Loop;
+		std::vector<glm::vec3> m_PatrolPath;
+		int m_CurrentPatrolPoint{};
+		glm::vec3 m_PatrolPauseLocation;
 
 		PathfindingComponent() = default;
 		PathfindingComponent(const PathfindingComponent&) = default;

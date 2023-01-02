@@ -6,11 +6,34 @@
 
 namespace Engine
 {
+	void ImGuiSystem::LayerSelection(Application* app, std::vector<std::string>& layernames)
+	{
+		ImGui::Begin("Layer Selection");
+
+		static const char* currentLayer{ layernames[0].c_str() };
+
+		ImGui::PushItemWidth(200.f);
+		if (ImGui::BeginCombo("Layer Selection", currentLayer))
+		{
+			for (uint32_t i{}; i < app->GetLayerCount(); i++)
+			{
+				bool b{};
+				if (ImGui::Selectable(layernames[i].c_str(), &b)) {
+					currentLayer = layernames[i].c_str();
+					app->SetCurrentLayer(i);
+				}
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::End();
+	}
 	void ImGuiSystem::GuiEntitySettings(std::shared_ptr<Engine::Scene>& scene)
 	{
 		ImGui::Begin("Entity Settings");
 
 		int i = 0;
+		int id = 0;
 		std::vector<std::string> textureNames;
 		std::vector<std::string> skyboxNames;
 		std::vector<std::string> shaderNames = { "Flat", "Texture", "Phong" };
@@ -30,7 +53,6 @@ namespace Engine
 			ImGui::Separator();
 			auto& tag = (it)->second->GetComponent<Engine::TagComponent>().Tag;
 			ImGui::Text("%s", tag.c_str());
-
 			switch ((it)->second->GetComponent<Engine::MaterialComponent>().m_ShaderType)
 			{
 			case Engine::ShaderType::Flat:
@@ -164,7 +186,12 @@ namespace Engine
 				break;
 			}
 			}
+
+			GuiEntitySettings_Transform(id, *it->second);
+			id++;
 		}
+
+
 
 		ImGui::End();
 	}
@@ -271,5 +298,70 @@ namespace Engine
 			}
 			ImGui::EndCombo();
 		}
+	}
+	
+	void ImGuiSystem::GuiEntitySettings_Transform(int id, Entity& m_Entity)
+	{
+		ImGui::Text("-- Transformations --");
+
+		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+		ImGui::PushItemWidth(100.f);
+		ImGui::Separator();
+
+		/*static */glm::vec3 Position	= transform.GetPosition();
+		static glm::vec3 Rotator	= transform.GetRotator();
+		/*static */glm::vec3 Scale		= transform.GetScale();
+
+		// POSITION
+		ImGui::PushID(id + 1);
+		ImGui::Text("Position");
+		if (ImGui::DragFloat("X", &Position.x, 0.05f))
+			Engine::TransformSystem::SetWorldPosition(transform, Position);
+		ImGui::SameLine();
+		if (ImGui::DragFloat("Y", &Position.y, 0.05f))
+			Engine::TransformSystem::SetWorldPosition(transform, Position);
+		ImGui::SameLine();
+		if (ImGui::DragFloat("Z", &Position.z, 0.05f))
+			Engine::TransformSystem::SetWorldPosition(transform, Position);
+		ImGui::PopID();
+
+
+		// ROTATION
+		ImGui::PushID(id + 2);
+		ImGui::Text("Set Entity Rotation");
+		if (ImGui::DragFloat("Pitch", &Rotator.x, 0.1f))
+			Engine::TransformSystem::SetRotation(transform, Rotator);
+		ImGui::SameLine();
+		if (ImGui::DragFloat("Yaw", &Rotator.y, 0.1f))
+			Engine::TransformSystem::SetRotation(transform, Rotator);
+		ImGui::SameLine();
+		if (ImGui::DragFloat("Roll", &Rotator.z, 0.1f))
+			Engine::TransformSystem::SetRotation(transform, Rotator);
+		ImGui::PopID();
+
+
+		// SCALE
+		ImGui::PushID(id + 3);
+		ImGui::Text("Scale");
+		if (ImGui::DragFloat("X", &Scale.x, 0.01f))
+			Engine::TransformSystem::SetScale(transform, Scale);
+		ImGui::SameLine();
+		if (ImGui::DragFloat("Y", &Scale.y, 0.01f))
+			Engine::TransformSystem::SetScale(transform, Scale);
+		ImGui::SameLine();
+		if (ImGui::DragFloat("Z", &Scale.z, 0.01f))
+			Engine::TransformSystem::SetScale(transform, Scale);
+		ImGui::PopID();
+
+
+		// RESET TRANSFORMS
+		if (ImGui::Button("Reset Transformations"))
+		{
+			Position *= 0.f;
+			Rotator *= 0.f;
+			Scale = { 1,1,1 };
+			Engine::TransformSystem::ResetTransforms(transform);
+		}
+		ImGui::Separator();
 	}
 }

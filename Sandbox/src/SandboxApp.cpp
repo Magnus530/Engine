@@ -110,8 +110,8 @@ public:
 	Sandbox()
 	{
 		PushLayer(new MainLayer());
-		//PushLayer(new PathfindingLayer());
-		//PushLayer(new TransformExampleLayer());
+		PushLayer(new PathfindingLayer());
+		PushLayer(new TransformExampleLayer());
 		
 		SetCurrentLayer(0);
 		SetGuiLayerNames();
