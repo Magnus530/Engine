@@ -139,23 +139,11 @@ namespace Engine
 	struct BillboardMaterialComponent
 	{
 		std::string s;
-		//std::pair<std::string, std::shared_ptr<Texture2D>> m_Tex;
-
-		//glm::vec3 m_CamRight{ 0.f, 0.f, 0.f };
-		//glm::vec3 m_CamUp{ 0.f, 0.f, 0.f };
-		//glm::mat4 m_ProjViewMat{ 1 }; // proj * view
-		//glm::vec3 m_BillboardPos{ 0.f, 0.f, 0.f };
-		//glm::vec3 m_BillboardSize{ 1.f, 1.f, 1.f };
 
 		BillboardMaterialComponent() = default;
 		BillboardMaterialComponent(const BillboardMaterialComponent&) = default;
 		BillboardMaterialComponent(const std::string& ss)
 			: s(ss) {}
-		//BillboardMaterialComponent(const std::string name, const std::shared_ptr<Engine::Texture2D>& texture)
-		//{
-		//	m_Tex.first = name;
-		//	m_Tex.second = texture;
-		//}
 	};
 
 	struct LightComponent

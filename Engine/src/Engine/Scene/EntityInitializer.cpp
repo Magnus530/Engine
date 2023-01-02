@@ -141,12 +141,6 @@ namespace Engine
 				entity.AddComponent<PhongMaterialComponent>(glm::vec4{ color, 1.f }, tex.first, tex.second);
 				break;
 			}
-			//case Engine::ShaderType::Billboard:
-			//{
-			//	entity.AddComponent<MaterialComponent>(Engine::ShaderType::Billboard);
-			//	entity.AddComponent<BillboardMaterialComponent>(tex.first, tex.second);
-			//	break;
-			//}
 		}
 	}
 
