@@ -75,7 +75,7 @@ public:
 		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
 
 		m_Scene = std::make_shared<Engine::Scene>();
-		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_VA, m_Scene, glm::vec3(0.7, 0.4, 0.2));
+		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_VA, m_Scene, 0, glm::vec3(0.7, 0.4, 0.2));
 		m_Entity.AddComponent<Engine::PathfindingComponent>();
 
 		// Audio
@@ -558,7 +558,7 @@ public:
 	}
 	void CreateObstructor(glm::vec3 pos, float radius = 2.f)
 	{
-		Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "BeveledCube", m_VA, m_Scene, glm::vec3(0.7, 0.4, 0.2));
+		Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "BeveledCube", m_VA, m_Scene, 0, glm::vec3(0.7, 0.4, 0.2));
 
 		ent.AddComponent<Engine::ObstructionSphereComponent>();
 		auto& obs = ent.GetComponent<Engine::ObstructionSphereComponent>();

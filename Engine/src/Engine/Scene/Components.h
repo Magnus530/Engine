@@ -28,8 +28,6 @@ namespace Engine
 		glm::mat4 m_Transform { 1.f };
 		float m_Speed{ 2.f };
 
-		glm::mat4 m_Transform	{ 1.f };
-
 		glm::vec3 GetPosition() const { return m_Transform[3]; }
 		glm::vec3 GetScale() const
 		{
