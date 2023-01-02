@@ -1,5 +1,5 @@
 project "FMOD"
-	kind "StaticLib"
+	kind "Sharedlib"
 	language "C"
 	staticruntime "on"
 

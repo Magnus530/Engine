@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 
 #include "VertexArray.h"
-#include "../Objects/VisualObject.h"
 
 namespace Engine
 {
@@ -22,7 +21,11 @@ namespace Engine
 		virtual void Clear() = 0;
 
 		virtual void DrawIndexed(const std::shared_ptr<VertexArray>& vertexArray) = 0;
-		virtual void DrawPoint(const std::shared_ptr<VertexArray>& vertexArray) = 0;
+#ifdef E_DEBUG
+		virtual void DrawPoint(const std::shared_ptr<VertexArray>& vertexArray, float size) = 0;
+		virtual void DrawLine(const std::shared_ptr<VertexArray>& vertexArray) = 0;
+		virtual void DrawLineLoop(const std::shared_ptr<VertexArray>& vertexArray) = 0;
+#endif
 
 		inline static API GetAPI() { return s_API; }
 

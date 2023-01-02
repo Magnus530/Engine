@@ -18,7 +18,13 @@ private:
 	Engine::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Engine::Shader> m_Shader;
 
-	std::shared_ptr<Engine::VisualObject> m_Obj;
+	std::shared_ptr<Engine::VertexArray> m_CubeVA;
+	std::shared_ptr<Engine::VertexArray> m_MonkeyVA;
+
+	std::shared_ptr<Engine::Scene> m_Scene;
+	Engine::Entity m_Entity;
+
+	std::shared_ptr<Engine::AudioEngine> m_Audio;
 
 private: // Transform testing
 	//bool bSetWorldPosition{};
@@ -31,11 +37,14 @@ private: // Transform testing
 	bool bAddLocalRotation{};
 	float m_RotationStrength{ 0.f };
 
+	glm::vec3 m_Rotator{};
+
 	bool bAddScale{};
 	float m_ScaleStrength{ 0.f };
 	bool bSetScale{};
 	float m_SetScale{ 1.f };
+	glm::vec3 m_Scale{ 1.f };
 
 	glm::vec3 m_ObjColor{ 0.5f, 0.5f, 0.5f };
-	bool bShowCustomColor{};
+	bool bShowNormals{};
 };

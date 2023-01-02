@@ -11,7 +11,7 @@
 #include "Engine/Core/KeyCodes.h"
 #include "Engine/Core/MouseButtonCodes.h"
 
-
+#include "Engine/RayCast/RayCast.h"
 
 #include "Engine/ImGui/ImGuiLayer.h"
 
@@ -19,10 +19,16 @@
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Systems/TransformSystem.h"
+#include "Engine/Scene/Systems/PathfindingSystem.h"
+#include "Engine/Scene/Systems/LightSystem.h"
+#include "Engine/Scene/Systems/BillboardSystem.h"
+#include "Engine/Scene/EntityInitializer.h"
+#include "Engine/Core/ImGuiSystem.h"
 
 // ---------------Renderer---------------
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RenderCommand.h"
+#include "Engine/Renderer/TextureList.h"
 
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/Shader.h"
@@ -37,12 +43,10 @@
 
 // --------------Pathfinding---------------
 #include "Engine/Pathfinding/PNode.h"
+#include "Engine/Pathfinding/PathObstructionVolumes.h"
 
 // --------------Mesh Objects---------------
-#include "Engine/AssetLoaders/ObjLoader.h"
+#include "Engine/AssetInit/ObjLoader.h"
 
-// ---------------Entry Point---------------
-//#include "Engine/Core/EntryPoint.h"
-
-// ---------------Audio Engine---------------
+// --------------Audio Engine---------------
 #include "Engine/FMOD/AudioEngine.h"

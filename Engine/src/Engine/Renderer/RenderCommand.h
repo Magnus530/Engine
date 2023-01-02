@@ -32,7 +32,20 @@ namespace Engine
 		{
 			s_RendererAPI->DrawIndexed(vertexArray);
 		}
-
+#ifdef E_DEBUG
+		inline static void DrawPoint(const std::shared_ptr<VertexArray>& vertexArray, float size)
+		{
+			s_RendererAPI->DrawPoint(vertexArray, size);
+		}
+		inline static void DrawLine(const std::shared_ptr<VertexArray>& vertexArray)
+		{
+			s_RendererAPI->DrawLine(vertexArray);
+		}
+		inline static void DrawLineLoop(const std::shared_ptr<VertexArray>& vertexArray)
+		{						   
+			s_RendererAPI->DrawLineLoop(vertexArray);
+		}
+#endif
 	private:
 		static RendererAPI* s_RendererAPI;
 	};

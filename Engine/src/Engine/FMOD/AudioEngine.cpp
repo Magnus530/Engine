@@ -1,6 +1,11 @@
 #include "epch.h"
 #include "AudioEngine.h"
 
+#include "Engine/Core/Input.h"
+#include "Engine/Core/KeyCodes.h"
+
+#include <combaseapi.h>
+
 namespace Engine 
 {
 	//*********************** IMPLEMENTATION CODE*********************//
@@ -9,16 +14,16 @@ namespace Engine
 	//--------------------------------------------------------------
 	Implementation::Implementation()
 	{
+		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 		// Create a System studio object and initialize.
-		mpStudioSystem = nullptr;
 		AudioEngine::errorCheck(FMOD::Studio::System::create(&mpStudioSystem));
 		AudioEngine::errorCheck(mpStudioSystem->initialize(
-			32, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_PROFILE_ENABLE, nullptr));
+			32, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_3D_RIGHTHANDED, nullptr));
 
 		// Create a System object.
-		mpSystem = nullptr;
 		AudioEngine::errorCheck(mpStudioSystem->getCoreSystem(&mpSystem));
 		mpReverb = nullptr;
+
 		mnNextChannelId = 0;
 	}
 
@@ -71,7 +76,19 @@ namespace Engine
 	// neither do we ovverride the copy constructor and the assingment operator ( to communicate with the impl class)
 	
 	Implementation* sgpImplementation = nullptr;
+	std::shared_ptr<AudioEngine> AE{ nullptr };
 
+
+	AudioEngine::AudioEngine()
+	{
+		init();
+		AE->loadSound("assets/audio/Cartoon_song.wav", false, true, true);
+	}
+
+	AudioEngine::~AudioEngine()
+	{
+		shutdown();
+	}
 
 	//----------------------
 	// Initialize the engine
@@ -81,16 +98,46 @@ namespace Engine
 		sgpImplementation = new Implementation;
 	}
 
+	////add sounds quickly (making it public to get it in all funtions)
+	//std::string musicPath1 = "assets/audio/Cartoon_song.wav";
+	//std::string	oneShot1 = "assets/audio/sfx_sound.wav";
+	//if (Input::IsKeyPressed(E_KEY_Q))
+	//{
+	//	playSound("assets/audio/sfx_sound.wav", glm::vec3(), -6.f);
+	//	setChannelVolume("assets/audio/Cartoon_song.wav", 12.f);
+	//}
 	//------------------------------
 	// Update the engine properties
 	//------------------------------
 	void AudioEngine::update(float fTimeDeltaSeconds)
 	{
+		std::string musicPath1 = "assets/audio/Cartoon_song.wav";
+		std::string	oneShot1 = "assets/audio/sfx_sound.wav";
 		sgpImplementation->update(fTimeDeltaSeconds);
+		if (Input::IsKeyPressed(E_KEY_L))
+		{
+			sgpImplementation->mpSystem->createReverb3D(&sgpImplementation->mpReverb);
+			//FMOD_REVERB_PROPERTIES propHanger = FMOD_PRESET_HANGAR;
+
+			AE->setEnvironmentReverb(FMOD_PRESET_CONCERTHALL, glm::vec3(), 0.f, 10.f);
+			AE->playSound(musicPath1, glm::vec3(), -1.f);
+
+			//AE->setChannelVolume(musicPath1, 12.f);
+		}
+		if (Input::IsKeyPressed(E_KEY_K))
+		{
+			AE->playSound(oneShot1, glm::vec3());
+			//AE->setChannelVolume(musicPath1, -12.f);
+		}
+		if (Input::IsKeyPressed(E_KEY_SPACE))
+		{
+			AE->stopAllChannels();
+		}
 	}
 
 	void AudioEngine::shutdown()
 	{
+		//CoUninitialize();
 		delete sgpImplementation;
 	}
 
@@ -143,13 +190,13 @@ namespace Engine
 	//--------------------------------------------------------
 	void AudioEngine::loadSound(const std::string& strSoundName, bool bIs3d, bool bIsLooping, bool bIsStreaming)
 	{
-		FMOD_CREATESOUNDEXINFO exinfo;
-		memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
-		exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-		exinfo.numchannels = 2;
-		exinfo.defaultfrequency = 48000;
-		exinfo.length = exinfo.defaultfrequency * exinfo.numchannels * sizeof(signed short) * 5;
-		exinfo.format = FMOD_SOUND_FORMAT_PCM24;
+		//FMOD_CREATESOUNDEXINFO exinfo;
+		//memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
+		//exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+		//exinfo.numchannels = 2;
+		//exinfo.defaultfrequency = 48000;
+		//exinfo.length = exinfo.defaultfrequency * exinfo.numchannels * sizeof(signed short) * 5;
+		//exinfo.format = FMOD_SOUND_FORMAT_PCM24;
 
 		// check cache, if we allready have loaded the sound previously
 		auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);
@@ -239,7 +286,8 @@ namespace Engine
 			}
 
 			sgpImplementation->mChannels[nChannelId] = pChannel;
-			AudioEngine::errorCheck(pChannel->setVolume(dBToVolume(fVolumedB)));
+			this->fadeInChannel(nChannelId, fFadeInTime, dBToVolume(fVolumedB));
+			sgpImplementation->mSoundChannels[strSoundName] = pChannel;
 			AudioEngine::errorCheck(pChannel->setPaused(false));
 		}
 		return nChannelId;
@@ -605,9 +653,14 @@ namespace Engine
 		float maxdist = fMaxDistance;
 		AudioEngine::errorCheck(sgpImplementation->mpReverb->set3DAttributes(&pos, mindist, maxdist));
 	}
+/*
+	Channel::Channel(Implementation& tImplementation, int nSoundId, const AudioEngine::SoundDefinition& tSoundDefinition, const glm::vec3& vPosition, float fVolumedB)
+	{
+		
+
+	}
 
 	///TODO: WIP of changing states. Will make things easier
-	/*
 	void Channel::update(float fTimeDeltaSeconds)
 	{
 		switch(meState)
@@ -705,21 +758,39 @@ namespace Engine
 			break;
 	  }
 	}
+	*/
+	void Channel::updateChannelParameters()
+	{
+	}
+	bool Channel::shouldBeVirtual(bool bAllowOneShotVirtuals) const
+	{
+		return false;
+	}
+	bool Channel::isPlaying() const
+	{
+		return false;
+	}
+	float Channel::getVolumedB() const
+	{
+		return 0.0f;
+	}
+
+	/*
 	void AudioEngine::loadSound(int nSoundID)
 	{
-		if(soundIsLoaded(nSoundID))
+		if (soundIsLoaded(nSoundID))
 			return;
-	auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);
-	if(tFoundIt != sgpImplementation->mSounds.end())
-		return;
-	FMOD_MODE eMode= FMOD_NONBLOCKING;
-	eMode |= b3d ? (FMOD_3D | FMOD_3D_INVERSETAPEREDROLLOFF) : FMOD_2D;
-	eMode |= bLooping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
-	eMode |= bStream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
-	FMOD::Sound* pSound = nullptr;
-	AudioEngine::errorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
-	if(pSound)
-		sgpImplementation->mSounds[strSoundName] = pSound;
+		auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);
+		if (tFoundIt != sgpImplementation->mSounds.end())
+			return;
+		FMOD_MODE eMode = FMOD_NONBLOCKING;
+		eMode |= b3d ? (FMOD_3D | FMOD_3D_INVERSETAPEREDROLLOFF) : FMOD_2D;
+		eMode |= bLooping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF;
+		eMode |= bStream ? FMOD_CREATESTREAM : FMOD_CREATECOMPRESSEDSAMPLE;
+		FMOD::Sound* pSound = nullptr;
+		AudioEngine::errorCheck(sgpImplementation->mpSystem->createSound(strSoundName.c_str(), eMode, nullptr, &pSound));
+		if (pSound)
+			sgpImplementation->mSounds[strSoundName] = pSound;
 	}
-*/
+	*/
 }

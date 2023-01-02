@@ -34,9 +34,21 @@ namespace Engine
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
+
+	public:	// For Editor Gui Layer
+		uint32_t GetLayerCount() const { return m_LayerCount; }
+		std::vector<std::string> GetLayerNames() const;
+		Layer* GetLayerAtIndex(uint32_t index);
+		void SetCurrentLayer(uint32_t index);
+	protected:
+		void SetGuiLayerNames();
+	private:
+		uint32_t m_LayerCount{};
+		Layer* m_CurrentLayer{ nullptr };
 	private:
 		std::unique_ptr<Window> m_Window;
-		ImGuiLayer* m_ImGuiLayer = nullptr;
+		//ImGuiLayer* m_ImGuiLayer = nullptr;
+		class EditorGuiLayer* m_EditorGuiLayer = nullptr;	// Forandret typen Gui layer
 		bool m_Running = true;
 		bool m_Minimized = false;
 		LayerStack m_LayerStack;
@@ -45,6 +57,21 @@ namespace Engine
 		static Application* s_Instance;
 	};
 
+
 	// To be defined in client.
 	Application* CreateApplication();
+
+
+	class EditorGuiLayer : public ImGuiLayer
+	{
+	public:
+		void OnImGuiRender() override;
+
+	public:
+		void SetApplication(Application* app) { m_App = app; }
+		void SetLayerNames(std::vector<std::string> layernames) { m_LayerNames = layernames; }
+	private:
+		std::vector<std::string> m_LayerNames;
+		Application* m_App{ nullptr };
+	};
 }

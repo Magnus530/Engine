@@ -7,8 +7,8 @@
     <Filter Include="src\Engine">
       <UniqueIdentifier>{12A1320E-FE58-745B-6760-4DB753370F4C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Engine\AssetLoaders">
-      <UniqueIdentifier>{ABEE0D3F-1726-56D6-2030-BAF98CE67CCF}</UniqueIdentifier>
+    <Filter Include="src\Engine\AssetInit">
+      <UniqueIdentifier>{35EDAF9E-217C-3968-CA9A-4D63B6084A0E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Core">
       <UniqueIdentifier>{AA407579-16CC-E23D-1FDD-65328BE73E3E}</UniqueIdentifier>
@@ -22,17 +22,20 @@
     <Filter Include="src\Engine\ImGui">
       <UniqueIdentifier>{BC1B88A8-A814-A7FA-D146-8C7FBD9E8606}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Engine\Objects">
-      <UniqueIdentifier>{CB31A3A1-B715-64F7-2076-5E4A0C794E79}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\Engine\Pathfinding">
       <UniqueIdentifier>{0D4C45E0-F945-6E32-E2B2-0443CE4BD49E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\RayCast">
+      <UniqueIdentifier>{78813987-6465-FADC-CDC5-F42FB9C8E45E}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Renderer">
       <UniqueIdentifier>{F838018B-649A-DE98-ED07-254B59681558}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Scene">
       <UniqueIdentifier>{AF1338A9-9B0C-57FB-C43E-3C80B0963607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\Scene\Splines">
+      <UniqueIdentifier>{9CAC03A1-88D1-5221-B11C-38B19DA0513F}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Engine\Scene\Systems">
       <UniqueIdentifier>{B6A886B6-A2CD-D536-CB18-BBC6B79CD454}</UniqueIdentifier>
@@ -70,16 +73,19 @@
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Engine\Terrain">
-      <UniqueIdentifier>{36e57151-8446-447f-adc7-d762ad526e61}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\AssetLoaders\ObjLoader.h">
-      <Filter>src\Engine\AssetLoaders</Filter>
+    <ClInclude Include="src\Engine\AssetInit\ObjLoader.h">
+      <Filter>src\Engine\AssetInit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\AssetInit\PrimitiveShape.h">
+      <Filter>src\Engine\AssetInit</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\AssetInit\PrimitiveShapeFactory.h">
+      <Filter>src\Engine\AssetInit</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Application.h">
       <Filter>src\Engine\Core</Filter>
@@ -88,6 +94,9 @@
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\EntryPoint.h">
+      <Filter>src\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Core\ImGuiSystem.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Input.h">
@@ -132,17 +141,14 @@
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Objects\TransformObject.h">
-      <Filter>src\Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Objects\VisualObject.h">
-      <Filter>src\Engine\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Objects\vertex.h">
-      <Filter>src\Engine\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Pathfinding\PNode.h">
       <Filter>src\Engine\Pathfinding</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Pathfinding\PathObstructionVolumes.h">
+      <Filter>src\Engine\Pathfinding</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\RayCast\RayCast.h">
+      <Filter>src\Engine\RayCast</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Buffer.h">
       <Filter>src\Engine\Renderer</Filter>
@@ -168,6 +174,12 @@
     <ClInclude Include="src\Engine\Renderer\RenderCommand.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\RenderContext.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\RenderState.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\Renderer.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
@@ -180,7 +192,13 @@
     <ClInclude Include="src\Engine\Renderer\Texture.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\TextureList.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\vertex.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Components.h">
@@ -195,6 +213,15 @@
     <ClInclude Include="src\Engine\Scene\Scene.h">
       <Filter>src\Engine\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Splines\BSpline.h">
+      <Filter>src\Engine\Scene\Splines</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Systems\LightSystem.h">
+      <Filter>src\Engine\Scene\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Systems\PathfindingSystem.h">
+      <Filter>src\Engine\Scene\Systems</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Scene\Systems\TransformSystem.h">
       <Filter>src\Engine\Scene\Systems</Filter>
     </ClInclude>
@@ -202,6 +229,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLCubemap.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h">
@@ -1476,15 +1506,19 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Terrain\Terrain.h">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClInclude>
+    <ClInclude Include="src\Engine\Core\ImGuiSystem.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLCubemap.h" />
+    <ClInclude Include="src\Engine\Renderer\TextureList.h" />
+    <ClInclude Include="src\Engine\Scene\Systems\BillboardSystem.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Engine\AssetLoaders\ObjLoader.cpp">
-      <Filter>src\Engine\AssetLoaders</Filter>
+    <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
+      <Filter>src\Engine\AssetInit</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Core\Application.cpp">
+      <Filter>src\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Core\ImGuiSystem.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Core\Layer.cpp">
@@ -1505,17 +1539,11 @@
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp">
       <Filter>src\Engine\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Objects\TransformObject.cpp">
-      <Filter>src\Engine\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Objects\VisualObject.cpp">
-      <Filter>src\Engine\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Objects\vertex.cpp">
-      <Filter>src\Engine\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
       <Filter>src\Engine\Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\RayCast\RayCast.cpp">
+      <Filter>src\Engine\RayCast</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp">
       <Filter>src\Engine\Renderer</Filter>
@@ -1547,7 +1575,13 @@
     <ClCompile Include="src\Engine\Renderer\Texture.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\TextureList.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\vertex.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Entity.cpp">
@@ -1559,6 +1593,15 @@
     <ClCompile Include="src\Engine\Scene\Scene.cpp">
       <Filter>src\Engine\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Splines\BSpline.cpp">
+      <Filter>src\Engine\Scene\Splines</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Systems\LightSystem.cpp">
+      <Filter>src\Engine\Scene\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Systems\PathfindingSystem.cpp">
+      <Filter>src\Engine\Scene\Systems</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp">
       <Filter>src\Engine\Scene\Systems</Filter>
     </ClCompile>
@@ -1566,6 +1609,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLCubemap.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp">
@@ -1592,8 +1638,9 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Terrain\Terrain.cpp">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClCompile>
+    <ClCompile Include="src\Engine\Core\ImGuiSystem.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLCubemap.cpp" />
+    <ClCompile Include="src\Engine\Renderer\TextureList.cpp" />
+    <ClCompile Include="src\Engine\Scene\Systems\BillboardSystem.cpp" />
   </ItemGroup>
 </Project>

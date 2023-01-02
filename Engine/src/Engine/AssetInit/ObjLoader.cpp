@@ -4,8 +4,6 @@
 #include <iostream>
 #include <fstream>
 
-//#include <glad/glad.h>
-
 namespace Engine 
 {
     void ObjLoader::ReadFile(std::string filename, std::vector<Vertex>& vertices, std::vector<uint32_t>& indices)
