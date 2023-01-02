@@ -203,10 +203,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClInclude Include="src\Engine\Scene\EntityInitializer.h" />
     <ClInclude Include="src\Engine\Scene\Scene.h" />
     <ClInclude Include="src\Engine\Scene\Systems\TransformSystem.h" />
-    <ClInclude Include="src\Engine\Terrain\Point.h" />
-    <ClInclude Include="src\Engine\Terrain\Readers.h" />
     <ClInclude Include="src\Engine\Terrain\Terrain.h" />
-    <ClInclude Include="src\Engine\Terrain\Triangle.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
@@ -662,10 +659,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudio.dll $(TargetDir)</Co
     <ClCompile Include="src\Engine\Scene\EntityInitializer.cpp" />
     <ClCompile Include="src\Engine\Scene\Scene.cpp" />
     <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp" />
-    <ClCompile Include="src\Engine\Terrain\LAS_Reader.cpp" />
-    <ClCompile Include="src\Engine\Terrain\Point.cpp" />
     <ClCompile Include="src\Engine\Terrain\Terrain.cpp" />
-    <ClCompile Include="src\Engine\Terrain\Triangle.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp" />

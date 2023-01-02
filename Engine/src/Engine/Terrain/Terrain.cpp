@@ -1,29 +1,29 @@
-#include "epch.h"
-#include "Readers.h"
-#include "Terrain.h"
-/*
-Terrain::Terrain() {
+#include <iostream>
+#include <fstream>
 
-}
+#include <string>
+
+#include "epch.h"
+#include "Terrain.h"
 
 Terrain::Terrain(std::string filepath) {
-	char format_arr[4];
-	
-	int file_length = filepath.length();
-	for (int i = 3; i >= 0; i--) {
-		format_arr[i] = filepath[file_length];
-		file_length--;
-	}
-	
-	std::string format = format_arr;
-	
-	if (format_arr == ".las") {
-		LAS_read(filepath, vertices, colors,  uv);
-	}
+	float x{ 0 }, y{ 0 }, z{ 0 };
+
+	/*std::ifstream inn;
+	inn.open(filepath.c_str());
+	if (inn.is_open()) {
+		char tea;
+		int n;
+		inn >> n;
+		for (int i = 0; i < n; i++) {
+			inn >> tea;
+			inn >> tea;
+			inn >> tea;
+			inn >> tea;
+			inn >> tea;
+			inn >> tea;
+
+
+		}
+	}*/
 }
-
-Terrain::~Terrain() {
-
-}
-
-*/

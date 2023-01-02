@@ -22,6 +22,7 @@ namespace Engine {
 		Vertex(float x, float y, float z, float r = 1, float g = 1, float b = 1, float u = 1, float v = 1);
 		~Vertex();
 
+		void SetPosition(float x, float y, float z);
 		void SetNormal(float r, float g, float b);
 		void SetNormal(glm::vec3 normal);
 		void SetUV(glm::vec2 uv);

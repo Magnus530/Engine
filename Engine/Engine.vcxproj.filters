@@ -1476,16 +1476,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Terrain\Point.h">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Terrain\Readers.h">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\Terrain\Terrain.h">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Terrain\Triangle.h">
       <Filter>src\Engine\Terrain</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1601,16 +1592,7 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Terrain\LAS_Reader.cpp">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Terrain\Point.cpp">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\Terrain\Terrain.cpp">
-      <Filter>src\Engine\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Terrain\Triangle.cpp">
       <Filter>src\Engine\Terrain</Filter>
     </ClCompile>
   </ItemGroup>
