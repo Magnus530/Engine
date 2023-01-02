@@ -5,6 +5,7 @@
 
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/RayCast/RayCast.h"
+#include "Engine/Core/ImGuiSystem.h"
 
 #include <GLFW/glfw3.h>
 
@@ -147,25 +148,8 @@ namespace Engine
 	/************* Editor Gui Layer ***************/
 	void EditorGuiLayer::OnImGuiRender()
 	{
-		ImGui::Begin("Layer Selection");
-
-		static const char* currentLayer{ m_LayerNames[0].c_str() };
-
-		ImGui::PushItemWidth(200.f);
-		if (ImGui::BeginCombo("Layer Selection", currentLayer))
-		{
-			for (uint32_t i{}; i < m_App->GetLayerCount(); i++)
-			{
-				bool b{};
-				if (ImGui::Selectable(m_LayerNames[i].c_str(), &b)) {
-					currentLayer = m_LayerNames[i].c_str();
-					m_App->SetCurrentLayer(i);
-				}
-			}
-			ImGui::EndCombo();
-		}
-
-		ImGui::End();
+		std::shared_ptr<ImGuiSystem> gui = std::make_shared<ImGuiSystem>();
+		gui->LayerSelection(m_App, m_LayerNames);
 	}
 
 }

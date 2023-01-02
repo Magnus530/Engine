@@ -160,16 +160,33 @@ namespace Engine {
         case Engine::Reverse:
         {
             pathfinder.bReachedTarget = false;
-            pathfinder.bReverse ? pathfinder.m_CurrentPatrolPoint-- : pathfinder.m_CurrentPatrolPoint++;
-            if (pathfinder.m_CurrentPatrolPoint == pathfinder.m_PatrolPath.size())
-                pathfinder.m_CurrentPatrolPoint --;
-            else if (pathfinder.m_CurrentPatrolPoint < 0)
-                pathfinder.m_CurrentPatrolPoint = 0;
+            if (pathfinder.bReverse)
+            {
+                pathfinder.m_CurrentPatrolPoint--;
+                if (pathfinder.m_CurrentPatrolPoint < 0)
+                {
+                    pathfinder.m_CurrentPatrolPoint += 2;
+                    pathfinder.bReverse = false;
+                    break;
+                }
+            }
+            else
+            {
+                pathfinder.m_CurrentPatrolPoint++;
+                if (pathfinder.m_CurrentPatrolPoint == pathfinder.m_PatrolPath.size())
+                {
+                    pathfinder.m_CurrentPatrolPoint -= 2;
+                    pathfinder.bReverse = true;
+                    break;
+                }
+            }
             break;
         }
         default:
             break;
         }
+
+        pathfinder.m_CurrentPatrolPoint = std::clamp<int>(pathfinder.m_CurrentPatrolPoint, 0, pathfinder.m_PatrolPath.size() - 1);
         pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(0, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
         FindPath(pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
     }
@@ -187,6 +204,8 @@ namespace Engine {
         pathfinder.bIsMovingAlongPath = true;
         pathfinder.m_PatrolType = patroltype;
         pathfinder.m_StartNode = GetNodeClosestToPosition(0, currentPosition);
+
+        pathfinder.m_CurrentPatrolPoint = std::clamp<int>(pathfinder.m_CurrentPatrolPoint, 0, pathfinder.m_PatrolPath.size() - 1);
         pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(0, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
         FindPath(pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
     }

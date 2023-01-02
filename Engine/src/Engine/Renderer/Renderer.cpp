@@ -81,20 +81,36 @@ namespace Engine
 		RenderCommand::DrawIndexed(entity.GetComponent<RendererComponent>().m_VA);
 	}
 
-#ifdef E_DEBUG // Render call for DebugOnly objects 
-	void Renderer::Submit(const std::shared_ptr<VertexArray> va, glm::vec3 location, float scale, glm::vec3 color)
+#ifdef E_DEBUG 
+	void Renderer::DebugShader(const glm::mat4& transform, const glm::vec3& color)
 	{
 		auto flatShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_ShaderLibrary->Get("Flat"));
 		flatShader->Bind();
 		flatShader->UploadUniformMat4("u_ProjectionView", m_SceneData->ProjectionMatrix);
 		flatShader->UploadUniformMat4("u_ViewMatrix", m_SceneData->ViewMatrix);
-		flatShader->UploadUniformMat4("u_Transform", glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), location));
+		flatShader->UploadUniformMat4("u_Transform", transform);
 
 		flatShader->UploadUniformInt("u_CustomColor", 0);
 		flatShader->UploadUniformFloat3("u_Color", color);
-
+	}
+	// Render call for DebugOnly objects 
+	void Renderer::Submit(const std::shared_ptr<VertexArray> va, glm::vec3 location, float scale, glm::vec3 color)
+	{
+		DebugShader(glm::scale(glm::mat4(1.f), glm::vec3(scale)) * glm::translate(glm::mat4(1.f), location), color);
 		va->Bind();
 		RenderCommand::DrawIndexed(va);
+	}
+	void Renderer::Submit(const std::shared_ptr<VertexArray> va, ConvexPolygon& poly, glm::mat4 transform, glm::vec3 color)
+	{
+		DebugShader(transform, color);
+		va->Bind();
+		RenderCommand::DrawLineLoop(va);
+	}
+	void Renderer::SubmitPoint(const std::shared_ptr<VertexArray> va, glm::vec3 location, float size, glm::vec3 color)
+	{
+		DebugShader(glm::translate(glm::mat4(1.f), location), color);
+		va->Bind();
+		RenderCommand::DrawPoint(va, size);
 	}
 #endif
 	std::shared_ptr<Engine::Texture2D> Renderer::CreateTexture(const std::string name, const std::string filePath, const std::shared_ptr<Engine::Scene>& scene)

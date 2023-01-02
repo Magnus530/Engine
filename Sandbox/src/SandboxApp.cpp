@@ -101,9 +101,9 @@ class Sandbox : public Engine::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
+		PushLayer(new MainLayer());
 		PushLayer(new PathfindingLayer());
-		//PushLayer(new TransformExampleLayer());
+		PushLayer(new TransformExampleLayer());
 		
 		SetCurrentLayer(0);
 		SetGuiLayerNames();

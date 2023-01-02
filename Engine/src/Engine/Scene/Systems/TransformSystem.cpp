@@ -6,6 +6,10 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace Engine {
+	void TransformSystem::ResetTransforms(TransformComponent& comp)
+	{
+		comp.m_Transform = glm::mat4(1.f);
+	}
 	void TransformSystem::SetWorldPosition(TransformComponent& comp, glm::vec3 position)
 	{
 		glm::mat4 rot(glm::mat3(comp.m_Transform));
@@ -37,6 +41,34 @@ namespace Engine {
 		glm::vec3 scale = GetScale(comp);
 		SetScale(comp, 1.f);
 		comp.m_Transform = glm::rotate(comp.m_Transform, radians, rotationAxis);
+		SetScale(comp, scale);
+	}
+	glm::vec3 TransformSystem::GetForwardVector(const TransformComponent& comp)
+	{
+		return glm::vec3(comp.m_Transform[2]);
+	}
+	glm::vec3 TransformSystem::GetUpVector(const TransformComponent& comp)
+	{
+		return glm::vec3(comp.m_Transform[1]);
+	}
+	glm::vec3 TransformSystem::GetRightVector(const TransformComponent& comp)
+	{
+		return glm::vec3(comp.m_Transform[0]);
+	}
+	void TransformSystem::SetRotation(TransformComponent& comp, glm::vec3 Rotator)
+	{
+		glm::vec3 scale = GetScale(comp);
+		SetScale(comp, 1.f);
+
+		glm::mat4 rot(glm::mat3(comp.m_Transform));
+		comp.m_Transform *= glm::inverse(rot);
+
+		// xyz - Pitch, Yaw, Roll
+			// In order of - Yaw, Pitch, Roll
+		glm::mat4 newRot{ 1.f };
+		newRot = glm::rotate(newRot, Rotator.y, GetUpVector(comp)) * glm::rotate(newRot, Rotator.x, GetRightVector(comp)) * glm::rotate(newRot, Rotator.z, GetForwardVector(comp));
+		comp.m_Transform *= newRot;
+
 		SetScale(comp, scale);
 	}
 	void TransformSystem::RotateToPosition(TransformComponent& comp, glm::vec3 position)

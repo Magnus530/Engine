@@ -9,6 +9,7 @@
 
 #include <glm/glm.hpp>
 #include <utility>
+#include <iostream>
 
 namespace Engine
 {
@@ -27,6 +28,25 @@ namespace Engine
 		glm::mat4 m_Transform	{ 1.f };
 
 		glm::vec3 GetPosition() const { return m_Transform[3]; }
+		glm::vec3 GetScale() const
+		{
+			float X = glm::length(m_Transform[0]);
+			float Y = glm::length(m_Transform[1]);
+			float Z = glm::length(m_Transform[2]);
+			return { X, Y, Z };
+		}
+		glm::vec3 GetRotator()
+		{
+			//float X = (glm::acos(m_Transform[1].y) *  glm::asin(m_Transform[1].z)) / glm::length(m_Transform[0]);
+			//float Y = (glm::acos(m_Transform[0].x) * -glm::asin(m_Transform[0].z))/ glm::length(m_Transform[1]);
+			//float Z = (glm::acos(m_Transform[0].x) *  glm::asin(m_Transform[0].y)) / glm::length(m_Transform[2]);
+			//float X = std::atan2(m_Transform[1].z, m_Transform[2].z);
+			//float Y = std::atan2(-m_Transform[0].z, sqrt(pow(m_Transform[1].z,2) + pow(m_Transform[2].z,2)));
+			//float Z = std::atan2(m_Transform[0].y, m_Transform[0].x);
+			
+			//return { X, Y, Z };
+			return { 0,0,0 };
+		}
 
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
@@ -130,7 +150,7 @@ namespace Engine
 			: m_LightStrength(lightStrength), m_SpecularStrength(specularStrength) {}
 	};
 
-			enum PatrolType
+		enum PatrolType
 		{
 			// In Order of m_PatrolPath
 			Single,

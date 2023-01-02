@@ -24,6 +24,7 @@ private:
 	std::shared_ptr<Engine::VertexArray> m_VA;
 	std::shared_ptr<Engine::VertexArray> m_PlaneVA;
 	std::shared_ptr<Engine::VertexArray> m_BeveledCubeVA;
+	std::shared_ptr<Engine::VertexArray> m_FlagVA;
 	std::shared_ptr<Engine::Scene> m_Scene;
 	Engine::Entity m_Entity;
 	Engine::Entity m_Plane;
@@ -38,10 +39,22 @@ private:
 
 private: // Visual Aid & ImGui related elements
 	bool bRenderNodeGrid{ true };
+	bool bRenderPatrolPath{ true };
 	bool bShowShaderColor{ true };
 	int m_StartNode;
 	int m_TargetNode;
 	std::vector<int> m_BlockedNodes;
+	std::vector<glm::vec3> m_PatrolPoints;
+
+private: // Collision Visuals
+	Engine::ConvexPolygon m_Polygon;
+	std::shared_ptr<Engine::VertexArray> m_PolygonVA;
+
+
+	std::shared_ptr<Engine::VertexArray> m_PointVA;
+	std::shared_ptr<Engine::VertexArray> m_LineVA;
+	std::vector<glm::vec3> m_RayCastLines;
+	std::vector<glm::vec3> m_RayCastCollisionPoints;
 
 private: // Screen RayCasting
 	glm::vec2 mousePos;
@@ -52,22 +65,8 @@ public:
 	PathfindingLayer()
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		/* Sizeof */
-		E_CORE_TRACE("Sizeof: NodeGrid = {0}", sizeof(Engine::NodeGrid));
-		E_CORE_TRACE("Sizeof: PathObstructionSphereCollection = {0}", sizeof(Engine::PathObstructionSphereCollection));
-		E_CORE_TRACE("Sizeof: glm::vec3 = {0}", sizeof(glm::vec3));
-		E_CORE_TRACE("Sizeof: std::vector<int> = {0}", sizeof(std::vector<int>));
-		E_CORE_TRACE("Sizeof: std::vector<int>* = {0}", sizeof(std::vector<int>*));
-
 		/* Pathfinding */
 		Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), glm::vec3((int)20, 0, (int)20), 1);
-
-		//m_Shader = m_ShaderLibrary.Load("assets/shaders/Flat.glsl");
-		//m_Textureshader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
-		//m_Texture = Engine::Texture2D::Create("assets/textures/checkerboard.png");
-
-		//m_Textureshader->Bind();
-		//std::dynamic_pointer_cast<Engine::OpenGLShader>(m_Textureshader)->UploadUniformInt("u_Texture", 0);
 
 		/* Loading obj */
 		std::vector<Engine::Vertex> vertices;
@@ -96,6 +95,41 @@ public:
 		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, s� Initialiserer den for seg selv her
 			// Nodes
 		InitVertexArray("Plane", m_PlaneVA);
+			// Patrol Point
+		InitVertexArray("Flag", m_FlagVA);
+
+
+		std::vector<Engine::Vertex> verts;
+		verts.push_back(Engine::Vertex());
+		//	Point
+		InitVertexArray(m_PointVA, verts);
+		// Line
+		verts.push_back(Engine::Vertex());
+		InitVertexArray(m_LineVA, verts);
+
+		//	Collision Convex Polygon
+			// - PLANE
+		m_Polygon.m_Locations.push_back({-1, 0, 1});
+		m_Polygon.m_Locations.push_back({ 1, 0, 1});
+		m_Polygon.m_Locations.push_back({ 1, 0,-1});
+		m_Polygon.m_Locations.push_back({-1, 0,-1});
+		m_Polygon.m_Normals.push_back({ 0, 0, 1});
+		m_Polygon.m_Normals.push_back({ 1, 0, 0});
+		m_Polygon.m_Normals.push_back({ 0, 0,-1});
+		m_Polygon.m_Normals.push_back({-1, 0, 0});
+
+
+			// - MAKE CUBE
+		//m_Polygon.m_Locations.push_back({-1, 1, 1 });
+		//m_Polygon.m_Locations.push_back({ 1, 1, 1 });
+		//m_Polygon.m_Locations.push_back({ 1, 1,-1 });
+		//m_Polygon.m_Locations.push_back({-1, 1,-1 });
+		//m_Polygon.m_Normals.push_back({ 0, 0, 1 });
+		//m_Polygon.m_Normals.push_back({ 1, 0, 0 });
+		//m_Polygon.m_Normals.push_back({ 0, 0,-1 });
+		//m_Polygon.m_Normals.push_back({-1, 0, 0 });
+		//
+		InitVertexArray(m_PolygonVA, m_Polygon);
 	}
 
 	//----------------------------------------------------------------UPDATE-------------------------------------------------------------------------------------------------------------------------
@@ -132,7 +166,8 @@ public:
 		for (auto& it : m_Obstructors)
 			Engine::Renderer::Submit(it);
 		
-#ifdef E_DEBUG /* ------- RENDER NODEGRID -------- */
+#ifdef E_PATHNODE_DEBUG 
+		/* ------- RENDER NODEGRID -------- */
 		if (bRenderNodeGrid)
 		{
 			glm::vec4 nodeColor(0.1, 0.5, 0.1, 1);
@@ -164,7 +199,22 @@ public:
 			for (auto& it : pathfinder.m_SplinePath->m_Controlpoints)
 				Engine::Renderer::Submit(m_PlaneVA, glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0), scale, {1,1,1});
 		}
+
+		/* ----- RENDER PATROL POINTS ----- */
+		if (bRenderPatrolPath)
+			for (const auto& it : m_PatrolPoints)
+				Engine::Renderer::Submit(m_FlagVA, it, 1.f, { 1, 0.2, 0.3 });
+
+
+		/* ------ RENDER COLLISION POLYGON --------- */
+		Engine::Renderer::Submit(m_PolygonVA, m_Polygon, glm::translate(glm::mat4(1.f), {0, 0, 0}));
+
+		float scale = 0.02f;
+		for (const auto& pos : m_RayCastCollisionPoints)
+			Engine::Renderer::Submit(m_PlaneVA, glm::vec3(pos / scale) + glm::vec3(0, 0.05f, 0), scale, {1,0,0});
+			//Engine::Renderer::SubmitPoint(m_PointVA, pos, 100.f);
 #endif
+
 		// End Render Scene
 		Engine::Renderer::EndScene();
 	}
@@ -262,10 +312,38 @@ public:
 		glm::vec3 currentPos = transform.GetPosition() - glm::vec3(0, 0.5, 0);
 
 		if (ImGui::Button("Start\nPatrol", ImVec2(100, 100)))
-			Engine::PathfindingSystem::StartPatrol(pathfinder, currentPos);
+			Engine::PathfindingSystem::StartPatrol(pathfinder, currentPos, pathfinder.m_PatrolType);
+
 		ImGui::SameLine();
-		if (ImGui::Button("Clear Patrol Path", ImVec2(90, 40)))
+		if (ImGui::Button("Clear Patrol Path", ImVec2(90, 40))) {
 			Engine::PathfindingSystem::ClearPatrol(pathfinder);
+#ifdef E_PATHNODE_DEBUG
+			m_PatrolPoints.clear();
+#endif
+		}
+		ImGui::SameLine();
+		static char* charPatrolType{ "Loop" };
+		if (ImGui::BeginCombo("Patrol Type", charPatrolType))
+		{
+			bool b{};
+			if (ImGui::Selectable("Single", &b)) {
+				pathfinder.m_PatrolType = Engine::PatrolType::Single;
+				charPatrolType = "Single";
+			}
+			if (ImGui::Selectable("Loop", &b)) {
+				pathfinder.m_PatrolType = Engine::PatrolType::Loop;
+				charPatrolType = "Loop";
+			}
+			if (ImGui::Selectable("Reverse", &b)) {
+				pathfinder.m_PatrolType = Engine::PatrolType::Reverse;
+				charPatrolType = "Reverse";
+			}
+			ImGui::EndCombo();
+		}
+#ifdef E_PATHNODE_DEBUG
+		ImGui::SameLine();
+		ImGui::Checkbox("Show Patrol Points", &bRenderPatrolPath);
+#endif
 
 		static bool bPatrolpaused{};
 		if (ImGui::Button(bPatrolpaused ? "Resume Patrol" : "Exit Patrol", ImVec2(100, 70)))
@@ -278,7 +356,7 @@ public:
 			}
 			else
 			{
-				Engine::PathfindingSystem::ResumePatrol(pathfinder, currentPos);
+				Engine::PathfindingSystem::ResumePatrol(pathfinder, currentPos, pathfinder.m_PatrolType);
 				//Engine::PathfindingSystem::ResumeMovementAlongPath(pathfinder, currentPos);
 				bPatrolpaused = false;
 			}
@@ -342,7 +420,29 @@ public:
 			mousePos.y = event.GetY();
 		}
 
+		if (e.GetEventType() == Engine::EventType::KeyPressed)
+		{
+			Engine::KeyPressedEvent& ev = static_cast<Engine::KeyPressedEvent&>(e);
+			if (ev.GetKeyCode() == E_KEY_C)
+			{
+				glm::vec3 ray{};
+				Engine::RayCast::FromScreenPosition(ray, mousePos, m_PCameraController.GetCamera().GetProjectionMatrix(), m_PCameraController.GetCamera().GetViewMatrix());
+				glm::vec3 pos = m_PCameraController.GetCamera().GetPosition();
 
+				for (int i = 0; i < m_Polygon.m_Locations.size(); i++)
+				{
+					glm::vec3 Intersection{};
+					glm::vec3 planeVector = m_Polygon.m_Locations[i + 1 >= m_Polygon.m_Locations.size() ? 0 : i + 1] - m_Polygon.m_Locations[i];
+
+					//glm::vec3 point{};
+					//if (Engine::RayCast::IntersectWithAlignedPlane(point, m_Polygon.m_Normals[i], m_Polygon.m_Locations[i], ray, pos))
+						//m_RayCastCollisionPoints.push_back(point);
+					
+					if (Engine::RayCast::IntersectWithPlane(Intersection, m_Polygon.m_Normals[i], m_Polygon.m_Locations[i], planeVector, ray, pos))
+						m_RayCastCollisionPoints.push_back(Intersection);
+				}
+			}
+		}
 		if (e.GetEventType() == Engine::EventType::MouseButtonPressed && Engine::Input::IsMouseButtonPressed(E_MOUSE_BUTTON_LEFT) && Engine::Input::IsKeyPressed(E_KEY_LEFT_ALT))
 		{
 			// Set Patrol point
@@ -353,6 +453,10 @@ public:
 			if (Engine::RayCast::IntersectWithWAPlaneXZ(Intersection, ray, pos))
 			{
 				m_Entity.GetComponent<Engine::PathfindingComponent>().m_PatrolPath.push_back(Intersection);
+
+#ifdef E_PATHNODE_DEBUG
+				m_PatrolPoints.push_back(Intersection);
+#endif
 			}
 		}
 		else if (e.GetEventType() == Engine::EventType::MouseButtonPressed && Engine::Input::IsMouseButtonPressed(E_MOUSE_BUTTON_LEFT))
@@ -400,17 +504,62 @@ public:
 		ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
 		vertexarr->SetIndexBuffer(ObjIB);
 	}
+	void InitVertexArray(std::shared_ptr<Engine::VertexArray>& vertexarr, Engine::ConvexPolygon& poly)
+	{
+		std::vector<Engine::Vertex> vertices; 
+		std::vector<uint32_t> indices;
+
+		for (int i = 0; i < poly.m_Locations.size(); i++)
+		{
+			Engine::Vertex vert(poly.m_Locations[i], poly.m_Normals[i]);
+			vertices.push_back(vert);
+			indices.push_back(i);
+		}
+
+		vertexarr.reset(Engine::VertexArray::Create());
+		std::shared_ptr<Engine::VertexBuffer> ObjVB;
+		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), (uint32_t)vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
+		ObjVB->SetLayout
+		({
+			{ Engine::ShaderDataType::Float3, "a_Position" },
+			{ Engine::ShaderDataType::Float3, "a_Normal" },
+			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
+			});
+		vertexarr->AddVertexBuffer(ObjVB);
+
+		std::shared_ptr<Engine::IndexBuffer> ObjIB;
+		ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
+		vertexarr->SetIndexBuffer(ObjIB);
+	}
+	void InitVertexArray(std::shared_ptr<Engine::VertexArray>& vertexarr, std::vector<Engine::Vertex> vertices)
+	{
+		std::vector<uint32_t> indices;
+		for (int i = 0; i < vertices.size(); i++)
+			indices.push_back(i);
+
+		vertexarr.reset(Engine::VertexArray::Create());
+		std::shared_ptr<Engine::VertexBuffer> ObjVB;
+		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), (uint32_t)vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
+		ObjVB->SetLayout
+		({
+			{ Engine::ShaderDataType::Float3, "a_Position" },
+			{ Engine::ShaderDataType::Float3, "a_Normal" },
+			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
+			});
+		vertexarr->AddVertexBuffer(ObjVB);
+
+		std::shared_ptr<Engine::IndexBuffer> ObjIB;
+		ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
+		vertexarr->SetIndexBuffer(ObjIB);
+	}
 
 	void CreateObstructor() {
 		CreateObstructor(glm::vec3(0.f));
 	}
 	void CreateObstructor(glm::vec3 pos, float radius = 2.f)
 	{
-		//Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit("Obstructor " + std::to_string(m_Obstructors.size()-1), m_Scene);
-		//Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Obstructor " + std::to_string(m_Obstructors.size() - 1), m_VA, m_Scene, glm::vec3(0.7, 0.4, 0.2));
-		Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "BeveledCube"/* + std::to_string(m_Obstructors.size() - 1)*/, m_VA, m_Scene, glm::vec3(0.7, 0.4, 0.2));
+		Engine::Entity ent = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "BeveledCube", m_VA, m_Scene, glm::vec3(0.7, 0.4, 0.2));
 
-		//ent.AddComponent<Engine::RendererComponent>();
 		ent.AddComponent<Engine::ObstructionSphereComponent>();
 		auto& obs = ent.GetComponent<Engine::ObstructionSphereComponent>();
 		obs.m_radius = radius;
