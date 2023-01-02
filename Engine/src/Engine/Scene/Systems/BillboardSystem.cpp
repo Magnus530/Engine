@@ -1,19 +1,20 @@
 #include "epch.h"
 #include "Engine/Scene/Systems/BillboardSystem.h"
+#include "Engine/Scene/Systems/TransformSystem.h"
 
 namespace Engine
 {
-	void BillboardSystem::UpdateBillboard(Engine::BillboardMaterialComponent& bComp, Engine::PerspectiveCameraController& pCam)
+	void BillboardSystem::UpdateBillboard(Engine::Entity& entity, Engine::PerspectiveCameraController& pCam)
 	{
-		bComp.m_CamRight = pCam.GetCamera().right();
-		bComp.m_CamUp = pCam.GetCamera().up();
-		bComp.m_ProjViewMat = pCam.GetCamera().GetProjectionViewMatrix();
+		auto& tempTransform = entity.GetComponent<Engine::TransformComponent>();
 
+		glm::vec3 forward = glm::normalize(pCam.GetPos() - tempTransform.GetPosition());
 
-		// ta inn entity og se på camera med glm::lookat (entitypos, entitypos + entitydir, upvector til entity (0, 1, 0)) wrap matrise i glm::inverse gir en tansform
-		// matrix som erstatter transform i componenten.
-		// kamerapos - entitypos = glm::normalize(billboard rotation)
+		glm::mat4 tempMat = glm::inverse(glm::lookAt(tempTransform.GetPosition(), tempTransform.GetPosition() - forward, glm::vec3{0.f, 1.f, 0.f}));
+		
+		tempTransform.m_Transform = tempMat;
 
-		//lookat camera
+		//Engine::TransformSystem::RotateToPosition(tempTransform, pCam.GetPos());
+		
 	}
 }

@@ -15,7 +15,7 @@ namespace Engine
 	}
 
 	Engine::Entity EntityInitializer::EntityInit(const Engine::ShaderType& shaderType, std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
-		std::shared_ptr<Engine::Scene>& scene, const glm::vec3& color, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex)
+		std::shared_ptr<Engine::Scene>& scene, const bool& isBBoard, const glm::vec3& color, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex)
 	{
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
@@ -25,22 +25,12 @@ namespace Engine
 		std::shared_ptr<Engine::VertexBuffer> ObjVB;
 		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
 
-		if (shaderType == Engine::ShaderType::Billboard)
-		{
-			ObjVB->SetLayout
-			({
-				{ Engine::ShaderDataType::Float3, "a_Vertices" },
-			});
-		}
-		else
-		{
-			ObjVB->SetLayout
-			({
-				{ Engine::ShaderDataType::Float3, "a_Position" },
-				{ Engine::ShaderDataType::Float3, "a_Normal" },
-				{ Engine::ShaderDataType::Float2, "a_TexCoord" }
-			});
-		}
+		ObjVB->SetLayout
+		({
+			{ Engine::ShaderDataType::Float3, "a_Position" },
+			{ Engine::ShaderDataType::Float3, "a_Normal" },
+			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
+		});
 		vertexarr->AddVertexBuffer(ObjVB);
 
 		std::shared_ptr<Engine::IndexBuffer> ObjIB;
@@ -58,7 +48,7 @@ namespace Engine
 		}
 		Engine::Entity tempEntity = scene->CreateEntity(objname);
 		tempEntity.AddComponent<RendererComponent>(vertexarr);
-		MaterialInit(shaderType, tempEntity, color, tex);
+		MaterialInit(shaderType, tempEntity, isBBoard, color, tex);
 
 		std::shared_ptr<Engine::Entity> sharedEntity = std::make_shared<Engine::Entity>(tempEntity);
 		scene->m_Entities.insert({ objname, sharedEntity });
@@ -123,9 +113,14 @@ namespace Engine
 		return tempEntity;
 	}
 
-	void EntityInitializer::MaterialInit(const Engine::ShaderType& shaderType, Engine::Entity& entity,
+	void EntityInitializer::MaterialInit(const Engine::ShaderType& shaderType, Engine::Entity& entity, const bool& isBBoard,
 		const glm::vec3& color, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex)
 	{
+		if (isBBoard == true)
+		{
+			entity.AddComponent<BillboardMaterialComponent>("sss");
+		}
+
 		switch (shaderType)
 		{
 			case Engine::ShaderType::Flat:
@@ -146,12 +141,12 @@ namespace Engine
 				entity.AddComponent<PhongMaterialComponent>(glm::vec4{ color, 1.f }, tex.first, tex.second);
 				break;
 			}
-			case Engine::ShaderType::Billboard:
-			{
-				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Billboard);
-				entity.AddComponent<BillboardMaterialComponent>(tex.first, tex.second);
-				break;
-			}
+			//case Engine::ShaderType::Billboard:
+			//{
+			//	entity.AddComponent<MaterialComponent>(Engine::ShaderType::Billboard);
+			//	entity.AddComponent<BillboardMaterialComponent>(tex.first, tex.second);
+			//	break;
+			//}
 		}
 	}
 

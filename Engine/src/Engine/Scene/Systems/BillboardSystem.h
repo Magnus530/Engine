@@ -9,6 +9,6 @@ namespace Engine
 	class BillboardSystem
 	{
 	public:
-		static void UpdateBillboard(Engine::BillboardMaterialComponent& bComp, Engine::PerspectiveCameraController& pCam);
+		static void UpdateBillboard(Engine::Entity& entity, Engine::PerspectiveCameraController& pCam);
 	};
 }

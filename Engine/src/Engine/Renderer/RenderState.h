@@ -110,15 +110,15 @@ namespace Engine
 	public:
 		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
 		{
-			std::shared_ptr<Engine::Shader> billboardShader = shaderLibrary->Get("Billboard");
-			std::shared_ptr<Engine::OpenGLShader> billboardOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(billboardShader);
+			//std::shared_ptr<Engine::Shader> billboardShader = shaderLibrary->Get("Billboard");
+			//std::shared_ptr<Engine::OpenGLShader> billboardOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(billboardShader);
 
-			billboardShader->Bind();
-			entity.GetComponent<BillboardMaterialComponent>().m_Tex.second->Bind();
-			
-			billboardOpenGLShader->UploadUniformFloat3("CameraRight_worldspace", entity.GetComponent<BillboardMaterialComponent>().m_CamRight);
-			billboardOpenGLShader->UploadUniformFloat3("CameraUp_worldspace", entity.GetComponent<BillboardMaterialComponent>().m_CamUp);
-			billboardOpenGLShader->UploadUniformMat4("VP", entity.GetComponent<BillboardMaterialComponent>().m_ProjViewMat);
+			//billboardShader->Bind();
+			//entity.GetComponent<BillboardMaterialComponent>().m_Tex.second->Bind();
+			//
+			//billboardOpenGLShader->UploadUniformFloat3("CameraRight_worldspace", entity.GetComponent<BillboardMaterialComponent>().m_CamRight);
+			//billboardOpenGLShader->UploadUniformFloat3("CameraUp_worldspace", entity.GetComponent<BillboardMaterialComponent>().m_CamUp);
+			//billboardOpenGLShader->UploadUniformMat4("VP", entity.GetComponent<BillboardMaterialComponent>().m_ProjViewMat);
 		}
 	};
 }
