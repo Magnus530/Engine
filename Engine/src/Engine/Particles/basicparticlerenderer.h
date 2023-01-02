@@ -3,7 +3,9 @@
 
 #include <memory>
 //#include <QOpenGLFunctions_4_1_Core>
-#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <gl/GLU.h>
 
 //#include <QMatrix4x4>
 #include <glm/mat4x4.hpp>

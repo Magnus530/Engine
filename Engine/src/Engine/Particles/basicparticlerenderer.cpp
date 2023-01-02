@@ -1,13 +1,13 @@
 #include "epch.h"
 
+#include <glad/glad.h>
 #include "basicparticlerenderer.h"
 #include "basicparticles.h"
-
 #include <string>
-
 #include <assert.h>
 //#include "gl_includes.h"
-#include <gl/GLU.h>
+//#include <gl/GLU.h>
+
 
 
 namespace particles
@@ -26,6 +26,7 @@ namespace particles
         {
         //mMatrix.setToIdentity();
         mMatrix = glm::mat4(1.0);
+
         //initializeOpenGLFunctions();
 
             assert(sys != nullptr);
@@ -48,13 +49,6 @@ namespace particles
                          );
             glEnableVertexAttribArray(0);
 
-//            if (ogl_ext_ARB_vertex_attrib_binding)
-//            {
-//                glBindVertexBuffer(0, m_bufPos, 0, sizeof(float)* 4);
-//                glVertexAttribFormat(0, 4, GL_FLOAT, GL_FALSE, 0);
-//                glVertexAttribBinding(0, 0);
-//            }
-//            else
                 glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, (4)*sizeof(float), (void *)((0)*sizeof(float)));
 
 
@@ -63,20 +57,11 @@ namespace particles
 //            glBufferData(GL_ARRAY_BUFFER, sizeof(float)* 4 * count, nullptr, GL_STREAM_DRAW);
             glBufferData(GL_ARRAY_BUFFER, sizeof(float)* 4 * count, nullptr, GL_DYNAMIC_DRAW);
             glEnableVertexAttribArray(1);
-
-//            if (ogl_ext_ARB_vertex_attrib_binding)
-//            {
-//                glBindVertexBuffer(1, m_bufCol, 0, sizeof(float)* 4);
-//                glVertexAttribFormat(1, 4, GL_FLOAT, GL_FALSE, 0);
-//                glVertexAttribBinding(1, 1);
-//            }
-//            else
                 glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, (4)*sizeof(float), (void *)((0)*sizeof(float)));
 
             glBindVertexArray(0);
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
-/**/
         }
 
         void GLParticleRenderer::destroy()
@@ -117,7 +102,6 @@ namespace particles
         void GLParticleRenderer::render()
         {
             glPointSize(10);
-/**/
             glBindVertexArray(m_vao);
 
             const size_t count = m_system->numAliveParticles();
@@ -125,13 +109,5 @@ namespace particles
                 glDrawArrays(GL_POINTS, 0, count);
 
             glBindVertexArray(0);
-/**/
-
-            //  test
-/**
-            glBindVertexArray( m_vao );
-            glDrawArrays(GL_POINTS, 0, 3);
-            glBindVertexArray(0);
-/**/
         }
 }

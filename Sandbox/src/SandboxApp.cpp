@@ -43,6 +43,8 @@ public:
 
 		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
+
+		m_ParticleManager = new particles::BasicParticleManager(20000);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -67,6 +69,8 @@ public:
 		}
 
 		Engine::Renderer::EndScene();
+
+		m_ParticleManager->update(static_cast<float>(ts), m_PCameraController.GetCamera());
 	}
 
 	virtual void OnImGuiRender() override
@@ -94,6 +98,9 @@ private:
 	Engine::Entity m_PlaneEntity;
 	Engine::Entity m_LightEntity;
 	Engine::Entity m_SkyboxEntity;
+
+	//	Particles
+	particles::BasicParticleManager* m_ParticleManager;
 };
 
 class Sandbox : public Engine::Application

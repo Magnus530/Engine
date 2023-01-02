@@ -49,3 +49,6 @@
 
 // --------------Audio Engine---------------
 #include "Engine/FMOD/AudioEngine.h"
+
+// --------------Particles---------------
+#include "Engine/Particles/basicparticlemanager.h"
