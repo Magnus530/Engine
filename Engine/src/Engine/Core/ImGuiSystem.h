@@ -14,5 +14,6 @@ namespace Engine
 
 	private:
 		void GuiEntitySettings_Transform(int id, Entity& m_Entity);
+		void GuiEntitySettings_Pathfinding(int id, Entity& m_Entity);
 	};
 }

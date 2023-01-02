@@ -46,66 +46,7 @@ void TransformExampleLayer::OnUpdate(Engine::Timestep ts)
 
 void TransformExampleLayer::OnImGuiRender()
 {
-
 	// Transformation Demo
 	std::shared_ptr<Engine::ImGuiSystem> imGuiPtr = std::make_shared<Engine::ImGuiSystem>();
 	imGuiPtr->GuiEntitySettings(m_Scene);
-
-	//auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-	//ImGui::PushItemWidth(100.f);
-	//ImGui::Separator();
-
-	//// POSITION
-	//ImGui::PushID(1);
-	//ImGui::Text("Position");
-	//if (ImGui::DragFloat("X", &m_Position.x, 0.01f))
-	//	Engine::TransformSystem::SetWorldPosition(transform, m_Position);
-	//ImGui::SameLine();
-	//if (ImGui::DragFloat("Y", &m_Position.y, 0.01f))
-	//	Engine::TransformSystem::SetWorldPosition(transform, m_Position);
-	//ImGui::SameLine();
-	//if (ImGui::DragFloat("Z", &m_Position.z, 0.01f))
-	//	Engine::TransformSystem::SetWorldPosition(transform, m_Position);
-	//ImGui::PopID();
-
-	//static glm::vec3 Rotator = transform.GetRotator();
-
-	//// ROTATION
-	//ImGui::PushID(2);
-	//ImGui::Text("Set Entity Rotation");
-	//if (ImGui::DragFloat("Pitch", &Rotator.x, 0.01f))
-	//	Engine::TransformSystem::SetRotation(transform, Rotator);
-	//ImGui::SameLine();
-	//if (ImGui::DragFloat("Yaw", &Rotator.y, 0.01f))
-	//	Engine::TransformSystem::SetRotation(transform, Rotator);
-	//ImGui::SameLine();
-	//if (ImGui::DragFloat("Roll", &Rotator.z, 0.01f))
-	//	Engine::TransformSystem::SetRotation(transform, Rotator);
-	//ImGui::PopID();
-
-
-	//// SCALE
-	//ImGui::Text("Scale");
-	//ImGui::PushID(3);
-	//if (ImGui::DragFloat("X", &m_Scale.x, 0.01f))
-	//	Engine::TransformSystem::SetScale(transform, m_Scale);
-	//ImGui::SameLine();
-	//if (ImGui::DragFloat("Y", &m_Scale.y, 0.01f))
-	//	Engine::TransformSystem::SetScale(transform, m_Scale);
-	//ImGui::SameLine();
-	//if (ImGui::DragFloat("Z", &m_Scale.z, 0.01f))
-	//	Engine::TransformSystem::SetScale(transform, m_Scale);
-	//ImGui::PopID();
-
-
-	//// RESET TRANSFORMS
-	//if (ImGui::Button("Reset Transformations")) 
-	//{
-	//	m_Position *= 0.f;
-	//	m_Rotator *= 0.f;
-	//	m_Scale = { 1,1,1 };
-	//	m_SetScale = 1.f;
-	//	Engine::TransformSystem::ResetTransforms(transform);
-	//}
-	//ImGui::Separator();
 }

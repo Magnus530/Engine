@@ -188,6 +188,8 @@ namespace Engine
 			}
 
 			GuiEntitySettings_Transform(id, *it->second);
+			if (it->second->HasComponent<PathfindingComponent>())
+				GuiEntitySettings_Pathfinding(id, *it->second);
 			id++;
 		}
 
@@ -308,9 +310,9 @@ namespace Engine
 		ImGui::PushItemWidth(100.f);
 		ImGui::Separator();
 
-		/*static */glm::vec3 Position	= transform.GetPosition();
-		static glm::vec3 Rotator	= transform.GetRotator();
-		/*static */glm::vec3 Scale		= transform.GetScale();
+		glm::vec3 Position	= transform.GetPosition();
+		glm::vec3& Rotator	= transform.m_Rotator;
+		glm::vec3 Scale		= transform.GetScale();
 
 		// POSITION
 		ImGui::PushID(id + 1);
@@ -363,5 +365,65 @@ namespace Engine
 			Engine::TransformSystem::ResetTransforms(transform);
 		}
 		ImGui::Separator();
+	}
+	void ImGuiSystem::GuiEntitySettings_Pathfinding(int id, Entity& m_Entity)
+	{
+		ImGui::Separator();
+		// SPLINE SPEED ------------------------------------------------------------------------------------
+		ImGui::PushItemWidth(150.f);
+		ImGui::DragFloat("MovementSpeed", &m_Entity.GetComponent<Engine::PathfindingComponent>().m_EntityPathSpeed, 0.3f, 0.0f, 1000.f);
+
+
+		// PATROL ---------------------------------------------------------------
+		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
+		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
+		glm::vec3 currentPos = transform.GetPosition() - glm::vec3(0, 0.5, 0);
+
+		if (ImGui::Button("Start\nPatrol", ImVec2(100, 100)))
+			Engine::PathfindingSystem::StartPatrol(pathfinder, currentPos, pathfinder.m_PatrolType);
+
+		ImGui::SameLine();
+		if (ImGui::Button("Clear Patrol Path", ImVec2(90, 40))) {
+			Engine::PathfindingSystem::ClearPatrol(pathfinder);
+		}
+
+		ImGui::SameLine();
+		static char* charPatrolType{ "Loop" };
+		if (ImGui::BeginCombo("Patrol Type", charPatrolType))
+		{
+			bool b{};
+			if (ImGui::Selectable("Single", &b)) {
+				pathfinder.m_PatrolType = Engine::PatrolType::Single;
+				charPatrolType = "Single";
+			}
+			if (ImGui::Selectable("Loop", &b)) {
+				pathfinder.m_PatrolType = Engine::PatrolType::Loop;
+				charPatrolType = "Loop";
+			}
+			if (ImGui::Selectable("Reverse", &b)) {
+				pathfinder.m_PatrolType = Engine::PatrolType::Reverse;
+				charPatrolType = "Reverse";
+			}
+			ImGui::EndCombo();
+		}
+		static bool bPatrolpaused{};
+		if (ImGui::Button(bPatrolpaused ? "Resume Patrol" : "Exit Patrol", ImVec2(100, 70)))
+		{
+			if (!bPatrolpaused)
+			{
+				Engine::PathfindingSystem::PausePatrol(pathfinder, currentPos);
+				//Engine::PathfindingSystem::CancelMovementAlongPath(pathfinder);
+				bPatrolpaused = true;
+			}
+			else
+			{
+				Engine::PathfindingSystem::ResumePatrol(pathfinder, currentPos, pathfinder.m_PatrolType);
+				//Engine::PathfindingSystem::ResumeMovementAlongPath(pathfinder, currentPos);
+				bPatrolpaused = false;
+			}
+		}
+#ifdef E_PATHNODE_DEBUG
+		ImGui::Checkbox("Show Patrol Points", &pathfinder.bRenderPatrolPoints);
+#endif
 	}
 }
