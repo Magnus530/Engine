@@ -148,7 +148,7 @@ namespace Engine
 	{
 		Entity tempEntity = scene->CreateEntity(objname);
 		tempEntity.AddComponent<Engine::RendererComponent>(VertexArrayInit(mesh));
-		MaterialInit(shaderType, tempEntity, color, tex);
+		MaterialInit(shaderType, tempEntity, 0, color, tex);
 
 		tempEntity.AddComponent<ObstructionSphereComponent>(radius, id);
 
