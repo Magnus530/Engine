@@ -34,17 +34,18 @@ public:
 
 		//Create entities here
 
-		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Sky"));
+		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Forest"));
 
-		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 0.0f });
+		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 0.0f });
 		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
+		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
+		Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
 
-		m_ParticleManager = new particles::BasicParticleManager(20000);
+		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 0.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Chess"));
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -66,11 +67,14 @@ public:
 			{
 				Engine::LightSystem::UpdateLight((it)->second->GetComponent<Engine::PhongMaterialComponent>(), m_LightEntity, m_PCameraController);
 			}
+
+			if ((it)->second->HasComponent<Engine::BillboardMaterialComponent>())
+			{
+				Engine::BillboardSystem::UpdateBillboard(*(it)->second, m_PCameraController);
+			}
 		}
 
 		Engine::Renderer::EndScene();
-
-		m_ParticleManager->update(static_cast<float>(ts), m_PCameraController.GetCamera());
 	}
 
 	virtual void OnImGuiRender() override
@@ -98,9 +102,7 @@ private:
 	Engine::Entity m_PlaneEntity;
 	Engine::Entity m_LightEntity;
 	Engine::Entity m_SkyboxEntity;
-
-	//	Particles
-	particles::BasicParticleManager* m_ParticleManager;
+	Engine::Entity m_TempEntity;
 };
 
 class Sandbox : public Engine::Application
@@ -109,8 +111,8 @@ public:
 	Sandbox()
 	{
 		PushLayer(new MainLayer());
-		//PushLayer(new PathfindingLayer());
-		//PushLayer(new TransformExampleLayer());
+		PushLayer(new PathfindingLayer());
+		PushLayer(new TransformExampleLayer());
 		
 		SetCurrentLayer(0);
 		SetGuiLayerNames();

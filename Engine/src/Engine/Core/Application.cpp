@@ -5,6 +5,7 @@
 
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/RayCast/RayCast.h"
+#include "Engine/Core/ImGuiSystem.h"
 
 #include <GLFW/glfw3.h>
 
@@ -147,56 +148,8 @@ namespace Engine
 	/************* Editor Gui Layer ***************/
 	void EditorGuiLayer::OnImGuiRender()
 	{
-		ImGui::Begin("Layer Selection");
-
-		static const char* currentLayer{ m_LayerNames[0].c_str() };
-
-		ImGui::PushItemWidth(200.f);
-		if (ImGui::BeginCombo("Layer Selection", currentLayer))
-		{
-			for (uint32_t i{}; i < m_App->GetLayerCount(); i++)
-			{
-				bool b{};
-				if (ImGui::Selectable(m_LayerNames[i].c_str(), &b)) {
-					currentLayer = m_LayerNames[i].c_str();
-					m_App->SetCurrentLayer(i);
-				}
-			}
-			ImGui::EndCombo();
-		}
-
-		ImGui::End();
+		std::shared_ptr<ImGuiSystem> gui = std::make_shared<ImGuiSystem>();
+		gui->LayerSelection(m_App, m_LayerNames);
 	}
 
-	/*********************************** RAYCASTING *******************************************/
-	//RayCast::WindowSize* RayCast::m_WindowSize = new RayCast::WindowSize();
-
-	//void RayCast::OnWindowResize(unsigned int width, unsigned int height)
-	//{
-	//	m_WindowSize->X = width;
-	//	m_WindowSize->Y = height;
-	//}
-
-	//void RayCast::FromScreenPosition(glm::vec3& ray, glm::vec2 screenPosition, glm::mat4 projection, glm::mat4 view)
-	//{
-	//	glm::vec2 windowSize(m_WindowSize->X, m_WindowSize->Y);
-	//	// Raytrace from screen into the world https://antongerdelan.net/opengl/raycasting.html
-	//	// 1: 3D Normalised Device Coordinates
-	//	glm::vec3 ray_nds;
-	//	ray_nds.x = (2.f * screenPosition.x) / (windowSize.x) - 1.f;
-	//	ray_nds.y = 1.f - (2.f * screenPosition.y) / windowSize.y;
-	//	ray_nds.z = 1.f;
-
-	//	// 2: Homogenous Clip Coordinates
-	//	glm::vec4 ray_clip(ray_nds.x, ray_nds.y, -1.f, 1.f);
-
-	//	// 3: Eye(Camera) Coordinates
-	//	glm::vec4 ray_eye = glm::inverse(projection) * ray_clip;
-	//	ray_eye.z = -1.f; ray_eye.w = 0.f;
-
-	//	// 4: 4D World Coordinates
-	//	glm::vec3 ray_world = glm::inverse(view) * ray_eye;
-	//	glm::normalize(ray_world);
-	//	ray = ray_world;
-	//}
 }

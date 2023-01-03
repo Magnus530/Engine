@@ -74,21 +74,4 @@ namespace Engine
 		std::vector<std::string> m_LayerNames;
 		Application* m_App{ nullptr };
 	};
-
-	//class RayCast
-	//{
-	//public:
-	//	static void OnWindowResize(unsigned int width, unsigned int height);
-
-	//public:	// Raycast functions
-	//	static void FromScreenPosition(glm::vec3& ray, glm::vec2 screenPosition, glm::mat4 projection, glm::mat4 view);
-
-	//private:
-	//	struct WindowSize
-	//	{
-	//		unsigned int X = 1280;
-	//		unsigned int Y = 720;
-	//	};
-	//	static WindowSize* m_WindowSize;
-	//};
 }

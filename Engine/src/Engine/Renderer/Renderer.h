@@ -8,6 +8,9 @@
 #include "Engine/Renderer/Texture.h"
 #include "Platform/OpenGL/OpenGLCubemap.h"
 
+// Debug
+#include "Engine/RayCast/RayCast.h"
+
 namespace Engine
 {
 	class Renderer
@@ -21,6 +24,13 @@ namespace Engine
 
 		static void RenderInit();
 		static void Submit(Entity& entity);
+
+#ifdef E_DEBUG
+		static void DebugShader(const glm::mat4& transform, const glm::vec3& color);
+		static void Submit(const std::shared_ptr<VertexArray> va, glm::vec3 location, float scale = 1.f, glm::vec3 color = {0.f, .7f, .7f});
+		static void Submit(const std::shared_ptr<VertexArray> va, ConvexPolygon& poly, glm::mat4 transform, glm::vec3 color = { 1,1,1 });
+		static void SubmitPoint(const std::shared_ptr<VertexArray> va, glm::vec3 location, float size = 1.f, glm::vec3 color = { 1,1,1 });
+#endif
 
 		static std::shared_ptr<Engine::Texture2D> CreateTexture(const std::string name, const std::string filePath, const std::shared_ptr<Engine::Scene>& scene);
 		static std::shared_ptr<Engine::OpenGLCubemap> CreateSkybox(const std::string name, const std::string cubeArr[], const std::shared_ptr<Engine::Scene>& scene);

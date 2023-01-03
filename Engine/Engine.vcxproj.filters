@@ -73,12 +73,6 @@
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Engine\Particles">
-      <UniqueIdentifier>{299373ca-1912-4491-9e8a-b7ec08e96007}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Engine\Particles\shaderFiles">
-      <UniqueIdentifier>{840e85b1-9c4c-409f-ac9a-71c4d9971fd3}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
@@ -100,6 +94,9 @@
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\EntryPoint.h">
+      <Filter>src\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Core\ImGuiSystem.h">
       <Filter>src\Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\Input.h">
@@ -195,6 +192,9 @@
     <ClInclude Include="src\Engine\Renderer\Texture.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Renderer\TextureList.h">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Renderer\VertexArray.h">
       <Filter>src\Engine\Renderer</Filter>
     </ClInclude>
@@ -229,6 +229,9 @@
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\OpenGL\OpenGLCubemap.h">
       <Filter>src\Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h">
@@ -1506,30 +1509,16 @@
     <ClInclude Include="src\Engine\Core\ImGuiSystem.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLCubemap.h" />
     <ClInclude Include="src\Engine\Renderer\TextureList.h" />
-    <ClInclude Include="src\Engine\Particles\basicparticlegenerators.h">
-      <Filter>src\Engine\Particles</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Particles\basicparticlerenderer.h">
-      <Filter>src\Engine\Particles</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Particles\basicparticles.h">
-      <Filter>src\Engine\Particles</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Particles\basicparticlemanager.h">
-      <Filter>src\Engine\Particles</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Particles\particleshader.h">
-      <Filter>src\Engine\Particles</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Particles\particletexture.h">
-      <Filter>src\Engine\Particles</Filter>
-    </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Systems\BillboardSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
       <Filter>src\Engine\AssetInit</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Core\Application.cpp">
+      <Filter>src\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Core\ImGuiSystem.cpp">
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Core\Layer.cpp">
@@ -1586,6 +1575,9 @@
     <ClCompile Include="src\Engine\Renderer\Texture.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Renderer\TextureList.cpp">
+      <Filter>src\Engine\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp">
       <Filter>src\Engine\Renderer</Filter>
     </ClCompile>
@@ -1619,6 +1611,9 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\OpenGL\OpenGLCubemap.cpp">
+      <Filter>src\Platform\OpenGL</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLRendererAPI.cpp">
       <Filter>src\Platform\OpenGL</Filter>
     </ClCompile>
@@ -1646,31 +1641,6 @@
     <ClCompile Include="src\Engine\Core\ImGuiSystem.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLCubemap.cpp" />
     <ClCompile Include="src\Engine\Renderer\TextureList.cpp" />
-    <ClCompile Include="src\Engine\Particles\basicparticlegenerators.cpp">
-      <Filter>src\Engine\Particles</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Particles\basicparticlerenderer.cpp">
-      <Filter>src\Engine\Particles</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Particles\basicparticles.cpp">
-      <Filter>src\Engine\Particles</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Particles\basicparticlemanager.cpp">
-      <Filter>src\Engine\Particles</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Particles\particleshader.cpp">
-      <Filter>src\Engine\Particles</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Particles\particletexture.cpp">
-      <Filter>src\Engine\Particles</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\Engine\Particles\shaderFiles\ParticleShader.frag">
-      <Filter>src\Engine\Particles\shaderFiles</Filter>
-    </None>
-    <None Include="src\Engine\Particles\shaderFiles\ParticleShader.vert">
-      <Filter>src\Engine\Particles\shaderFiles</Filter>
-    </None>
+    <ClCompile Include="src\Engine\Scene\Systems\BillboardSystem.cpp" />
   </ItemGroup>
 </Project>
