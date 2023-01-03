@@ -19,7 +19,7 @@ namespace Engine {
 	{
 	public:
 		static void MakeKnotVector(BSpline& bSpline);
-		static glm::vec3 GetPositionAlongSpline(BSpline& bSpline, float t);
+		static glm::vec3 GetLocationAlongSpline(BSpline& bSpline, float t);
 
 		static float Bid(std::vector<float>& knotVector, float t, int it, int d);
 		static float Wid(std::vector<float>& knotVector, float t, int it, int d);

@@ -12,15 +12,15 @@ namespace Engine {
         const bool NoMovement = comp.m_StartNode == comp.m_TargetNode;
         if (NoMovement) return;
 
-        auto& grid = scene->m_PathfindingNodeGrids[0];
+        auto grid = scene->m_PathfindingNodeGrid.get();
         
         if (comp.bIsMovingAlongPath)
-            comp.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(scene, 0, currentPosition);
+            comp.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(scene, currentPosition);
         comp.bIsMovingAlongPath = true;    // In init or FindPath?
         //*** END Init Pathfinding ***
 
         // Bit reduntant for pathfinding component to have array of node pointers, when it only uses their locations
-        comp.m_CurrentPath = FindPathAStar(scene, 0, comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bIsObstructed);
+        comp.m_CurrentPath = FindPathAStar(scene, comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bIsObstructed);
         const bool NoMovIntermediate = comp.m_StartNode == comp.m_IntermediateTargetNode;
         if (NoMovIntermediate) {
             comp.bIsMovingAlongPath = false;
@@ -55,12 +55,12 @@ namespace Engine {
         glm::vec3 prevPos = currentPosition;
         for (float t{}; t < 1.f; t += 0.05)
         {
-            glm::vec3 pos = BSplineCreator::GetPositionAlongSpline(*comp.m_SplinePath, t);
+            glm::vec3 pos = BSplineCreator::GetLocationAlongSpline(*comp.m_SplinePath, t);
 
             float l = glm::length(pos - prevPos);
             comp.m_SplineLength += l;
 
-            prevPos = BSplineCreator::GetPositionAlongSpline(*comp.m_SplinePath, t);
+            prevPos = BSplineCreator::GetLocationAlongSpline(*comp.m_SplinePath, t);
         }
 	}
 
@@ -83,21 +83,20 @@ namespace Engine {
             //pathfinder.m_CurrentPatrolPoint += t - prevT;
         }
         else {  // Reached end of path
-            //t = 0.99f;
             t = 0.f;
             pathfinder.m_StartNode = pathfinder.m_TargetNode;
             pathfinder.bReachedTarget = true;
 
             if (pathfinder.bPatrolling) {
-                PatrolUpdate(scene, pathfinder, transform.GetPosition());
+                PatrolUpdate(scene, pathfinder, transform.GetLocation());
                 return;
             }
         }
         
         if (!pathfinder.bReachedTarget) 
         {
-            glm::vec3 previousPosition = transform.GetPosition();
-            glm::vec3 pos = BSplineCreator::GetPositionAlongSpline(*pathfinder.m_SplinePath, t);
+            glm::vec3 previousPosition = transform.GetLocation();
+            glm::vec3 pos = BSplineCreator::GetLocationAlongSpline(*pathfinder.m_SplinePath, t);
 
             glm::vec3 direction = pos - previousPosition;
             direction.y = 0.f;
@@ -112,7 +111,7 @@ namespace Engine {
     void PathfindingSystem::ResumeMovementAlongPath(Scene* scene, PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
     {
         pathfinder.bIsMovingAlongPath = true;
-        pathfinder.m_StartNode = GetNodeClosestToPosition(scene, 0, currentPosition);
+        pathfinder.m_StartNode = GetNodeClosestToPosition(scene, currentPosition);
         FindPath(scene, pathfinder, currentPosition);
     }
 
@@ -135,7 +134,7 @@ namespace Engine {
             // Sets next point in patrolpath
         pathfinder.bPatrolling = true;
         pathfinder.m_PatrolType = patroltype;
-        pathfinder.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(scene, 0, currentPosition);  // Kan også finne ut av hvilken punkt den er nærmest, og starte der. For å kunne restarte patrol
+        pathfinder.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(scene, currentPosition);  // Kan også finne ut av hvilken punkt den er nærmest, og starte der. For å kunne restarte patrol
         PatrolUpdate(scene, pathfinder, currentPosition);
     }
 
@@ -188,7 +187,7 @@ namespace Engine {
         }
 
         pathfinder.m_CurrentPatrolPoint = std::clamp<int>(pathfinder.m_CurrentPatrolPoint, 0, pathfinder.m_PatrolPath.size() - 1);
-        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(scene, 0, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
+        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(scene, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
         FindPath(scene, pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
     }
 
@@ -204,10 +203,10 @@ namespace Engine {
         pathfinder.bPatrolling = true;
         pathfinder.bIsMovingAlongPath = true;
         pathfinder.m_PatrolType = patroltype;
-        pathfinder.m_StartNode = GetNodeClosestToPosition(scene, 0, currentPosition);
+        pathfinder.m_StartNode = GetNodeClosestToPosition(scene, currentPosition);
 
         pathfinder.m_CurrentPatrolPoint = std::clamp<int>(pathfinder.m_CurrentPatrolPoint, 0, pathfinder.m_PatrolPath.size() - 1);
-        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(scene, 0, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
+        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(scene, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
         FindPath(scene, pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
     }
 
@@ -245,9 +244,9 @@ namespace Engine {
     }
 
     // INEFFICIENT - Needs a properly indexed nodegrid to improve search time
-    int PathfindingSystem::GetNodeClosestToPosition(Scene* scene, uint32_t gridIndex, glm::vec3 position)
+    int PathfindingSystem::GetNodeClosestToPosition(Scene* scene, glm::vec3 position)
     {
-        std::shared_ptr<NodeGrid> grid = NodeGridSystem::GetGridAtIndex(scene, gridIndex);
+        auto grid = scene->m_PathfindingNodeGrid.get();
     
         float length = glm::length(grid->m_NodeLocations->at(0) - position);
         int nodeIndex{ 0 };
@@ -263,10 +262,11 @@ namespace Engine {
         return nodeIndex;
     }
 
-    std::vector<int> PathfindingSystem::FindPathAStar(Scene* scene, int gridIndex, int startNode, int endNode, int& intermediateNode, bool* blocked)
+    std::vector<int> PathfindingSystem::FindPathAStar(Scene* scene, int startNode, int endNode, int& intermediateNode, bool* blocked)
     {
         std::vector<int> path;
-        auto& grid = scene->m_PathfindingNodeGrids[gridIndex];
+        //auto& grid = scene->m_PathfindingNodeGrids[gridIndex];
+        auto grid = scene->m_PathfindingNodeGrid.get();
         intermediateNode = -1;
 
         if (startNode == endNode)
@@ -344,7 +344,7 @@ namespace Engine {
             }
         }
         /* If a path was not found, find the path to the closestNode */
-        path = FindPathAStar(scene, gridIndex, startNode, closestNode, intermediateNode/*, &b*/);
+        path = FindPathAStar(scene, startNode, closestNode, intermediateNode/*, &b*/);
         *blocked = true;
         intermediateNode = closestNode;
         return path;
@@ -355,43 +355,40 @@ namespace Engine {
     /* Nodes, that potentially, are no longer obstructions */
     static std::vector<ObstructionUpdates> m_ObstructionUpdates;
 
-    std::shared_ptr<NodeGrid> NodeGridSystem::GetGridAtIndex(Scene* scene, uint32_t index)
+    //std::shared_ptr<NodeGrid> NodeGridSystem::GetGridAtIndex(Scene* scene, uint32_t index)
+    //{
+    //    return scene->m_PathfindingNodeGrids[0];
+    //}
+    glm::vec3 NodeGridSystem::GetNodeLocation(Scene* scene, int NodeIndex)
     {
-        return scene->m_PathfindingNodeGrids[0];
-    }
-    glm::vec3 NodeGridSystem::GetNodeLocation(Scene* scene, int gridIndex, int NodeIndex)
-    {
-        return scene->m_PathfindingNodeGrids[gridIndex]->m_NodeLocations->at(NodeIndex);
+        return scene->m_PathfindingNodeGrid->m_NodeLocations->at(NodeIndex);
     }
 
-    uint32_t NodeGridSystem::CreateObstructionSphere(Scene* scene, uint32_t gridIndex, float radius, glm::vec3 location)
+    uint32_t NodeGridSystem::CreateObstructionSphere(Scene* scene, float radius, glm::vec3 location)
     {
-        NodeGrid* grid = scene->m_PathfindingNodeGrids[gridIndex].get();
+        auto grid = scene->m_PathfindingNodeGrid.get();
         uint32_t sphereIndex = grid->m_ObstructionSpheres.CreateObstructionSphere(radius, location);
 
         // Set nodes within the sphere to Obstructions
-        UpdateObstructionSphere(scene, gridIndex, sphereIndex, radius, location);
+        UpdateObstructionSphere(scene, sphereIndex, radius, location);
         return sphereIndex;
     }
 
-    void NodeGridSystem::DeleteObstructionSphere(Scene* scene, uint32_t gridIndex, uint32_t sphereIndex)
+    void NodeGridSystem::DeleteObstructionSphere(Scene* scene, uint32_t sphereIndex)
     {
-        NodeGrid* grid = scene->m_PathfindingNodeGrids[gridIndex].get();
+        auto grid = scene->m_PathfindingNodeGrid.get();
         std::vector<int> nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
 
         ObstructionUpdates update;
         update.m_ObstructionSpheres.push_back(sphereIndex);
         update.m_PotensiallyFalseObstructionNodes = nodes;
         m_ObstructionUpdates.push_back(update);
-        //for (const auto it : nodes)
-            //m_PotentiallyFalseObstructions.push_back(it);
         grid->m_ObstructionSpheres.EraseSphere(sphereIndex);
     }   
 
-    void NodeGridSystem::UpdateObstructionSphere(Scene* scene, uint32_t gridIndex, uint32_t sphereIndex, float radius, glm::vec3 location)
+    void NodeGridSystem::UpdateObstructionSphere(Scene* scene, uint32_t sphereIndex, float radius, glm::vec3 location)
     {
-        //int intRadius = (int)(radius * PATH_FLOATTOINT);
-        NodeGrid* grid = scene->m_PathfindingNodeGrids[gridIndex].get();
+        auto grid = scene->m_PathfindingNodeGrid.get();
 
 
         // Create ObstructionUpdate and add nearby spheres to it
@@ -435,7 +432,7 @@ namespace Engine {
         m_ObstructionUpdates.push_back(update);
     }
 
-    void NodeGridSystem::UpdateFalseObstructionNodes(Scene* scene, uint32_t gridIndex)
+    void NodeGridSystem::UpdateFalseObstructionNodes(Scene* scene)
     {
         if (m_ObstructionUpdates.size() == 0) return;
         for (auto& it : m_ObstructionUpdates)
@@ -459,16 +456,15 @@ namespace Engine {
         // Set false nodes to false
         for (auto& it : m_ObstructionUpdates)
             for (auto& pot : it.m_PotensiallyFalseObstructionNodes)
-                scene->m_PathfindingNodeGrids[gridIndex]->m_NodeObstructionStatus->at(pot) = false;
+                scene->m_PathfindingNodeGrid->m_NodeObstructionStatus->at(pot) = false;
         m_ObstructionUpdates.clear();
     }
 
     void NodeGridSystem::CreateGridAtLocation(Scene* scene, glm::vec3 location, glm::ivec3 extent, int resolution, bool bDebugRenderEnabled)
     {
-        auto& nodegrids = scene->m_PathfindingNodeGrids;
-        nodegrids.push_back(std::make_shared<NodeGrid>(location, extent, resolution, extent.x * resolution * extent.z * resolution, bDebugRenderEnabled));
-        int GridIndex = nodegrids.size() - 1;
-        auto& grid = nodegrids[GridIndex];
+        scene->m_PathfindingNodeGrid.reset(new NodeGrid(location, extent, resolution, extent.x * resolution * extent.z * resolution, bDebugRenderEnabled));
+
+        auto grid = scene->m_PathfindingNodeGrid.get();
         int node{};
 
         int extent_X = (int)(extent.x);

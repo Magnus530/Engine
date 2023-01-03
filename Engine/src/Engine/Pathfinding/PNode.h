@@ -1,7 +1,7 @@
 #pragma once
 #include "glm/glm.hpp"
 
-#define E_PATHNODE_DEBUG (E_DEBUG || E_DEVELOPMENT)
+//#define E_PATHNODE_DEBUG (E_DEBUG || E_DEVELOPMENT)
 #define PATH_FLOATTOINT 1000
 
 namespace Engine {
@@ -18,7 +18,7 @@ namespace Engine {
 		std::vector<std::vector<int>> m_NeighborIndices;
 	};
 
-#ifdef E_PATHNODE_DEBUG
+#ifdef E_DEBUG
 	/* Additional ways of identifying and visualising nodes -- DEBUG ONLY */
 	struct NodesAdditional
 	{

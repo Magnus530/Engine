@@ -116,11 +116,11 @@ namespace Engine {
 
 		// 
 		//static std::shared_ptr<PNode> GetNodeClosestToPosition(uint32_t gridIndex, glm::vec3 position);
-		static int GetNodeClosestToPosition(Scene* scene, uint32_t gridIndex, glm::vec3 position);
+		static int GetNodeClosestToPosition(Scene* scene, glm::vec3 position);
 
 	private:
 		//static std::vector<std::shared_ptr<PNode>> FindPathAStar(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked = nullptr);
-		static std::vector<int> FindPathAStar(Scene* scene, int gridIndex, int startNode, int endNode, int& intermediateNode, bool* blocked = nullptr);
+		static std::vector<int> FindPathAStar(Scene* scene, int startNode, int endNode, int& intermediateNode, bool* blocked = nullptr);
 	};
 
 
@@ -147,16 +147,16 @@ namespace Engine {
 	public:
 		//static void CreateGrid();
 		static void CreateGridAtLocation(Scene* scene, glm::vec3 location, glm::ivec3 extent, int resolution, bool bDebugRenderEnabled = false);
-		static std::shared_ptr<NodeGrid> GetGridAtIndex(Scene* scene, uint32_t index);
+		//static std::shared_ptr<NodeGrid> GetGridAtIndex(Scene* scene, uint32_t index);
 
-		static glm::vec3 GetNodeLocation(Scene* scene, int gridIndex, int NodeIndex);
+		static glm::vec3 GetNodeLocation(Scene* scene, int NodeIndex);
 
 		//static std::shared_ptr<PNode> GetNodeAtIndexWithinGrid(uint32_t gridIndex, uint32_t nodeIndex);
 
-		static uint32_t CreateObstructionSphere(Scene* scene, uint32_t gridIndex, float radius, glm::vec3 location);
-		static void DeleteObstructionSphere(Scene* scene, uint32_t gridIndex, uint32_t sphereIndex);
-		static void UpdateObstructionSphere(Scene* scene, uint32_t gridIndex, uint32_t sphereIndex, float radius, glm::vec3 location);
-		static void UpdateFalseObstructionNodes(Scene* scene, uint32_t gridIndex);
+		static uint32_t CreateObstructionSphere(Scene* scene, float radius, glm::vec3 location);
+		static void DeleteObstructionSphere(Scene* scene, uint32_t sphereIndex);
+		static void UpdateObstructionSphere(Scene* scene, uint32_t sphereIndex, float radius, glm::vec3 location);
+		static void UpdateFalseObstructionNodes(Scene* scene);
 
 	private:
 		// Generate names for the nodes within a Node Grid

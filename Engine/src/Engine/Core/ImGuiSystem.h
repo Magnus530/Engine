@@ -14,7 +14,8 @@ namespace Engine
 		void ShaderSelect(std::shared_ptr<Engine::Entity>& entity, int& currShader, const char* comboPreview, std::vector<std::string>& names);
 
 	private:
-		void GuiEntitySettings_Transform(int id, Entity& m_Entity);
-		void GuiEntitySettings_Pathfinding(Scene* scene, int id, Entity& m_Entity);
+		void GuiEntitySettings_Transform	(Scene* scene, int& id, Entity& m_Entity);
+		void GuiEntitySettings_Pathfinding	(Scene* scene, int& id, Entity& m_Entity);
+		void GuiEntitySettings_Obstruction	(Scene* scene, int& id, Entity& m_Entity);
 	};
 }

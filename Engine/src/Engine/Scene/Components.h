@@ -33,7 +33,7 @@ namespace Engine
 		glm::mat4 m_Transform	{ 1.f };
 		glm::vec3 m_Rotator{ 0.f };	// Temporary method
 
-		glm::vec3 GetPosition() const { return m_Transform[3]; }
+		glm::vec3 GetLocation() const { return m_Transform[3]; }
 		glm::vec3 GetScale() const
 		{
 			float X = glm::length(m_Transform[0]);
@@ -179,13 +179,12 @@ namespace Engine
 		};
 	struct PathfindingComponent
 	{
-		int m_Grid{};
+		//int m_Grid{};
 		int m_StartNode{};
 		int m_TargetNode{};
 		int m_IntermediateTargetNode{};
 
 		// Moving Through Path
-		//std::vector<std::shared_ptr<class PNode>> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
 		std::vector<int> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
 		std::shared_ptr<struct BSpline> m_SplinePath = std::make_shared<BSpline>();
 		float m_SplineMovement{};	// How far along the spline has the Entity gone?
@@ -216,6 +215,8 @@ namespace Engine
 
 	struct ObstructionSphereComponent
 	{
+		ObstructionSphereComponent(float radius, uint32_t id)
+			: m_radius{radius}, m_ID{id}{}
 		float m_radius{ 2.f };
 		uint32_t m_ID{};
 	};

@@ -134,4 +134,41 @@ namespace Engine
 		entity.AddComponent<MaterialComponent>(Engine::ShaderType::Skybox);
 		entity.AddComponent<SkyboxMaterialComponent>(cubetex.first, cubetex.second);
 	}
+
+	Entity EntityInitializer::ObstructorEntityInit(const ShaderType shaderType, const std::string objname, const std::string mesh, float radius, uint32_t id, Scene* scene, glm::vec3 color, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex)
+	{
+		Entity tempEntity = scene->CreateEntity(objname);
+		tempEntity.AddComponent<Engine::RendererComponent>(VertexArrayInit(mesh));
+		MaterialInit(shaderType, tempEntity, color, tex);
+
+		tempEntity.AddComponent<ObstructionSphereComponent>(radius, id);
+
+		std::shared_ptr<Entity> sharedEntity = std::make_shared<Entity>(tempEntity);
+		scene->m_Entities.insert({ objname, sharedEntity });
+		return tempEntity;
+	}
+
+	std::shared_ptr<VertexArray> EntityInitializer::VertexArrayInit(const std::string obj)
+	{
+		std::vector<Vertex> vertices;
+		std::vector<uint32_t> indices;
+		Engine::ObjLoader::ReadFile(obj, vertices, indices);
+
+		std::shared_ptr<VertexArray> va;
+		va.reset(Engine::VertexArray::Create());
+		std::shared_ptr<Engine::VertexBuffer> ObjVB;
+		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
+		ObjVB->SetLayout
+		({
+			{ Engine::ShaderDataType::Float3, "a_Position" },
+			{ Engine::ShaderDataType::Float3, "a_Normal" },
+			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
+			});
+		va->AddVertexBuffer(ObjVB);
+
+		std::shared_ptr<Engine::IndexBuffer> ObjIB;
+		ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
+		va->SetIndexBuffer(ObjIB);
+		return va;
+	}
 }
