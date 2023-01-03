@@ -33,7 +33,30 @@ public:
 		Engine::TextureList::CreateTextures(m_ActiveScene);
 
 		//Create entities here
+		//if (MainLayer().m_ActiveScene && MainLayer().m_ActiveScene->m_AudioEngine)
+		//{
+		//	ImGui::Separator();
+		//	ImGui::Text("Sound Component");
 
+		//	//m_SoundEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sound Sources", m_SoundVA, m_ActiveScene, *m_ActiveScene->m_AudioEngine.find());
+		//	
+		//	if (ImGui::DragFloat("Volume"))
+		//	{
+
+		//	}
+		//	if (ImGui::DragFloat("Pitch"))
+		//	{
+
+		//	}
+		// 
+		//	//stopping
+		//	//starting
+		//	//looping
+		//	//not looping
+		//	//Reverb
+		//	//Not Reverb
+
+		//}
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Sky"));
 
 		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 0.0f });
@@ -87,9 +110,10 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 
-	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA;
+	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_SoundVA;
 
 	// Entities
+	Engine::Entity m_SoundEntity;
 	Engine::Entity m_CubeEntity;
 	Engine::Entity m_PlaneEntity;
 	Engine::Entity m_LightEntity;

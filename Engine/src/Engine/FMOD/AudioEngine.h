@@ -18,6 +18,7 @@
 #include <iostream>
 
 namespace Engine {
+    class Entity;
 
     //#define FMOD_VERSION 0x00020210
 
@@ -105,29 +106,37 @@ namespace Engine {
         typedef std::map<std::string, FMOD::Studio::EventInstance*> EventMap;   // Map of all FMOD Studio events
         typedef std::map<std::string, FMOD::Studio::Bank*> BankMap;             // Map of all fmod studio banks
 
+        //---------------
+        /* FMOD Others */
+        //---------------
+        template<class T> using Array = std::vector<T>;
+
+
         SoundMap mSounds;                                                       // Sound cache
         ChannelMap mChannels;                                                   // ChannelID cache
         SoundChannelMap mSoundChannels;                                         // reference of sounds and channels
 
         BankMap mBanks;                                                         // Audio bank cache
         EventMap mEvents;                                                       // Events cache
+
+        Array<FMOD::Geometry*> geometries;                                      // Geometry objects for occlusion
     };
 
     struct Channel
     {
         //Channel(Implementation& tImplementation, int nSoundId, const AudioEngine::SoundDefinition& tSoundDefinition,
         //    const glm::vec3& vPosition, float fVolumedB);
-        enum class State
-        {
-            INITIALIZE, TOPLAY, LOADING, PLAYING, STOPPING, STOPPED, VIRTUALIZING, VIRUTAL, DEVIRTUALIZE,
-        };
+        //enum class State
+        //{
+        //    INITIALIZE, TOPLAY, LOADING, PLAYING, STOPPING, STOPPED, VIRTUALIZING, VIRUTAL, DEVIRTUALIZE,
+        //};
         Implementation& mImplementation;
         FMOD::Channel* mpChannel = nullptr;
         int mSoundId;
         glm::vec3 mvPosition;
         float mfVolumedB = 0.0f;
         float mfSoundVolume = 0.0f;
-        State meState = State::INITIALIZE;
+        //State meState = State::INITIALIZE;
         bool mbStopRequested = false;
         //AudioFader mStopFader;
         //AudioFader mVirtualizeFader;
@@ -183,8 +192,8 @@ namespace Engine {
         void moveChannel3dPosition(int nChannelId, const glm::vec3& vVelocity);
 
         // Fades
-        void fadeOutChannel(int nChannelId, float fadeOutTime = 0.0f, float fadeOutVolume = 0.0f);
-        void fadeInChannel(int nChannelId, float fadeInTime = 0.0f, float fadeInVolume = 1.0f);
+        void fadeOutChannel(int nChannelId, float fadeOutTime = 1.0f, float fadeOutVolume = 0.0f);
+        void fadeInChannel(int nChannelId, float fadeInTime = 0.1f, float fadeInVolume = 1.0f);
 
         // Pitch and Frequency
         void setPitch(int nChannelId, float fPitch = 1.0f);
@@ -200,6 +209,32 @@ namespace Engine {
         bool getReverbState() const;
         FMOD_REVERB_PROPERTIES setReverbProperties(const ReverbProperties& reverbProp) const;
         void setEnvironmentReverb(const FMOD_REVERB_PROPERTIES reverbProperties, const glm::vec3 vPosition, float fMinDistance, float fMaxDistance);
+
+
+        //Occlusion
+        // Create a geometry object, return the ID
+        int createGeometry(int nMaxPolygons, int nMaxVertices,
+            const glm::vec3& vPosition,
+            const glm::vec3& vForward,
+            const glm::vec3& vUp,
+            const glm::vec3& vScale
+            );
+        // Create an occlusion Geometry object from an entity that contains a mesh, return the id
+        int createGeometry(Entity* ent);
+
+        // Add a polygon to the Geometry object
+        void addPolygon(int nGeometryId, float fDirectOcclusion, float fReverbOcclusion, bool isDoubleSided, int nVertices, const Implementation::Array<glm::vec3>& vVertices);
+
+        // Set whether a Geometry is active
+        void setGeometryActive(int nGeometryId, bool isActive);
+
+        // Place Geometry in world space
+        void orientGeometry(int nGeometryId, const glm::vec3& pos, const glm::vec3& forward, const glm::vec3& up, const glm::vec3& scale);
+
+        // Save/load Geometry object on disk
+        void saveGeometry(int nGeometryId, const std::string& filePath);
+        int loadGeometry(const std::string& filePath);
+
 
         //volume and misc
         static float dBToVolume(float dB) {
@@ -246,5 +281,4 @@ namespace Engine {
         //int registerSound(const SoundDefinition& tSoundDef, bool bLoad = true);
         //void unregisterSound(int nSoundId);
     };
-    //std::shared_ptr<AudioEngine> AE{ nullptr };
 }
