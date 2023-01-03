@@ -76,6 +76,9 @@
     <Filter Include="src\Engine\Particles">
       <UniqueIdentifier>{299373ca-1912-4491-9e8a-b7ec08e96007}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Particles\shaderFiles">
+      <UniqueIdentifier>{840e85b1-9c4c-409f-ac9a-71c4d9971fd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
@@ -1518,6 +1521,9 @@
     <ClInclude Include="src\Engine\Particles\particleshader.h">
       <Filter>src\Engine\Particles</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Particles\particletexture.h">
+      <Filter>src\Engine\Particles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1655,5 +1661,16 @@
     <ClCompile Include="src\Engine\Particles\particleshader.cpp">
       <Filter>src\Engine\Particles</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Particles\particletexture.cpp">
+      <Filter>src\Engine\Particles</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Engine\Particles\shaderFiles\ParticleShader.frag">
+      <Filter>src\Engine\Particles\shaderFiles</Filter>
+    </None>
+    <None Include="src\Engine\Particles\shaderFiles\ParticleShader.vert">
+      <Filter>src\Engine\Particles\shaderFiles</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -189,6 +189,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClInclude Include="src\Engine\Particles\basicparticlerenderer.h" />
     <ClInclude Include="src\Engine\Particles\basicparticles.h" />
     <ClInclude Include="src\Engine\Particles\particleshader.h" />
+    <ClInclude Include="src\Engine\Particles\particletexture.h" />
     <ClInclude Include="src\Engine\Pathfinding\PNode.h" />
     <ClInclude Include="src\Engine\Pathfinding\PathObstructionVolumes.h" />
     <ClInclude Include="src\Engine\RayCast\RayCast.h" />
@@ -660,6 +661,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClCompile Include="src\Engine\Particles\basicparticlerenderer.cpp" />
     <ClCompile Include="src\Engine\Particles\basicparticles.cpp" />
     <ClCompile Include="src\Engine\Particles\particleshader.cpp" />
+    <ClCompile Include="src\Engine\Particles\particletexture.cpp" />
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp" />
     <ClCompile Include="src\Engine\RayCast\RayCast.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
@@ -706,6 +708,10 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ProjectReference Include="vendor\imgui\ImGui.vcxproj">
       <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Engine\Particles\shaderFiles\ParticleShader.frag" />
+    <None Include="src\Engine\Particles\shaderFiles\ParticleShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
