@@ -24,6 +24,8 @@ namespace Engine
 
 		std::unordered_map<std::string, std::shared_ptr<Engine::OpenGLCubemap>> m_Skyboxes;
 
+		std::vector<std::shared_ptr<struct NodeGrid>> m_PathfindingNodeGrids;
+
 	private:
 		entt::registry m_Registry;
 

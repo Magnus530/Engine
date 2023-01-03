@@ -66,7 +66,6 @@ public:
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
 		/* Pathfinding */
-		Engine::NodeGridSystem::CreateGridAtLocation(glm::vec3(0,0,0), glm::vec3((int)20, 0, (int)20), 1);
 
 		/* Loading obj */
 		std::vector<Engine::Vertex> vertices;
@@ -78,11 +77,14 @@ public:
 		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_VA, m_Scene, glm::vec3(0.7, 0.4, 0.2));
 		m_Entity.AddComponent<Engine::PathfindingComponent>();
 
+		//Engine::NodeGridSystem::CreateGridAtLocation(m_Scene.get(), glm::vec3(0,0,0), glm::vec3((int)20, 0, (int)20), 1);
+
 		// Audio
 		m_Audio = std::make_shared<Engine::AudioEngine>();
 
 		/* Set m_Entity location to Pathfinding Node 1 */
-		glm::vec3 startPosition = Engine::NodeGridSystem::GetNodeLocation(0, 0);
+		//glm::vec3 startPosition = Engine::NodeGridSystem::GetNodeLocation(m_Scene.get(), 0, 0);
+		glm::vec3 startPosition{ 10, 0, 10 };
 		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition + glm::vec3(0, 0.5f, 0)); //Manually adding extra height
 		Engine::TransformSystem::RotateToDirectionVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(-1, 0, 1)));
 
@@ -155,8 +157,9 @@ public:
 		/*--------------------- PATHFINDING: Moving m_Entity along path -----------------------------*/
 		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
-		Engine::PathfindingSystem::MoveAlongPath(pathfinder, transform, ts);
-		Engine::NodeGridSystem::UpdateFalseObstructionNodes(0);
+		if (m_Scene->m_PathfindingNodeGrids.size() != 0)
+			Engine::PathfindingSystem::MoveAlongPath(m_Scene.get(), pathfinder, transform, ts);
+		Engine::NodeGridSystem::UpdateFalseObstructionNodes(m_Scene.get(), 0);
 
 
 		/* --------------------- RENDERING ------------------------ */
@@ -168,29 +171,32 @@ public:
 		
 #ifdef E_PATHNODE_DEBUG 
 		/* ------- RENDER NODEGRID -------- */
-		if (bRenderNodeGrid)
+		if (m_Scene->m_PathfindingNodeGrids.size() != 0)
 		{
-			glm::vec4 nodeColor(0.1, 0.5, 0.1, 1);
-			glm::vec4 startColor(1, 0, 0, 1);
-			glm::vec4 targetColor(0, 0, 1, 1);
-			glm::vec4 blockColor(0, 0, 0, 1);
-
 			float scale = 0.1f;
-			bool alteredColor{};
-			auto grid = Engine::NodeGridSystem::GetGridAtIndex(0);
-			for (size_t i{0}; i < grid->m_NodeLocations->size(); i++)
-			{
-				if (i == pathfinder.m_StartNode) {
-					Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, startColor);
-				}
-				else if (i == m_TargetNode) {
-					Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, targetColor);
-				}
-				else if (grid->m_NodeObstructionStatus->at(i)) {
-					Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, blockColor);
-				}
-				else {
-					Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, nodeColor);
+			if (m_Scene->m_PathfindingNodeGrids[0]->bRenderNodegrid)
+			{	
+				glm::vec4 nodeColor(0.1, 0.5, 0.1, 1);
+				glm::vec4 startColor(1, 0, 0, 1);
+				glm::vec4 targetColor(0, 0, 1, 1);
+				glm::vec4 blockColor(0, 0, 0, 1);
+
+				bool alteredColor{};
+				auto grid = Engine::NodeGridSystem::GetGridAtIndex(m_Scene.get(), 0);
+				for (size_t i{ 0 }; i < grid->m_NodeLocations->size(); i++)
+				{
+					if (i == pathfinder.m_StartNode) {
+						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, startColor);
+					}
+					else if (i == m_TargetNode) {
+						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, targetColor);
+					}
+					else if (grid->m_NodeObstructionStatus->at(i)) {
+						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, blockColor);
+					}
+					else {
+						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(grid->m_NodeLocations->at(i) / scale), scale, nodeColor);
+					}
 				}
 			}
 
@@ -260,74 +266,13 @@ public:
 		}
 		ImGui::Separator();
 
-		ImGui::Checkbox("Render Nodegrid", &bRenderNodeGrid);
-		ImGui::Separator();
+		//ImGui::Checkbox("Render Nodegrid", &bRenderNodeGrid);
+		//ImGui::Separator();
 		
 		std::shared_ptr<Engine::ImGuiSystem> imGuiPtr = std::make_shared<Engine::ImGuiSystem>();
 		imGuiPtr->GuiEntitySettings(m_Scene);
-
-//		// SPLINE SPEED ------------------------------------------------------------------------------------
-//		ImGui::PushItemWidth(150.f);
-//		ImGui::DragFloat("Monkey Movement Speed", &m_Entity.GetComponent<Engine::PathfindingComponent>().m_EntityPathSpeed, 0.2f, 0.0f, 1000.f, "%.1f");
-//		
-//
-//		// PATROL ---------------------------------------------------------------
-//		auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
-//		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-//		glm::vec3 currentPos = transform.GetPosition() - glm::vec3(0, 0.5, 0);
-//
-//		if (ImGui::Button("Start\nPatrol", ImVec2(100, 100)))
-//			Engine::PathfindingSystem::StartPatrol(pathfinder, currentPos, pathfinder.m_PatrolType);
-//
-//		ImGui::SameLine();
-//		if (ImGui::Button("Clear Patrol Path", ImVec2(90, 40))) {
-//			Engine::PathfindingSystem::ClearPatrol(pathfinder);
-//#ifdef E_PATHNODE_DEBUG
-//			m_PatrolPoints.clear();
-//#endif
-//		}
-//		ImGui::SameLine();
-//		static char* charPatrolType{ "Loop" };
-//		if (ImGui::BeginCombo("Patrol Type", charPatrolType))
-//		{
-//			bool b{};
-//			if (ImGui::Selectable("Single", &b)) {
-//				pathfinder.m_PatrolType = Engine::PatrolType::Single;
-//				charPatrolType = "Single";
-//			}
-//			if (ImGui::Selectable("Loop", &b)) {
-//				pathfinder.m_PatrolType = Engine::PatrolType::Loop;
-//				charPatrolType = "Loop";
-//			}
-//			if (ImGui::Selectable("Reverse", &b)) {
-//				pathfinder.m_PatrolType = Engine::PatrolType::Reverse;
-//				charPatrolType = "Reverse";
-//			}
-//			ImGui::EndCombo();
-//		}
-//#ifdef E_PATHNODE_DEBUG
-//		ImGui::SameLine();
-//		ImGui::Checkbox("Show Patrol Points", &bRenderPatrolPath);
-//#endif
-//
-//		static bool bPatrolpaused{};
-//		if (ImGui::Button(bPatrolpaused ? "Resume Patrol" : "Exit Patrol", ImVec2(100, 70)))
-//		{
-//			if (!bPatrolpaused)
-//			{
-//				Engine::PathfindingSystem::PausePatrol(pathfinder, currentPos);
-//				//Engine::PathfindingSystem::CancelMovementAlongPath(pathfinder);
-//				bPatrolpaused = true;
-//			}
-//			else
-//			{
-//				Engine::PathfindingSystem::ResumePatrol(pathfinder, currentPos, pathfinder.m_PatrolType);
-//				//Engine::PathfindingSystem::ResumeMovementAlongPath(pathfinder, currentPos);
-//				bPatrolpaused = false;
-//			}
-//		}
-
-
+		imGuiPtr->GuiPathfindingGridSettings(m_Scene);
+																																// ADD TO GUI
 		// ADJUST OBSTRTUCTION ENTITIES ------------------------------------------------------------------------------------
 		ImGui::Separator();
 		if (ImGui::Button("CREATE\nObstruction", ImVec2(100.f, 100.f)))
@@ -343,7 +288,7 @@ public:
 		for (size_t i{}; i < size; i++)
 		{
 			ImGui::Separator();
-			ImGui::PushID(i);
+			ImGui::PushID((int)i);
 			auto& obstruction = m_Obstructors[i].GetComponent<Engine::ObstructionSphereComponent>();
 			auto& transform = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
 
@@ -365,7 +310,7 @@ public:
 				ID = ImGui::GetActiveID();
 				
 				Engine::TransformSystem::SetWorldPosition(transform, pos);
-				Engine::NodeGridSystem::UpdateObstructionSphere(0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
+				Engine::NodeGridSystem::UpdateObstructionSphere(m_Scene.get(), 0, obstruction.m_ID, obstruction.m_radius, transform.GetPosition());
 			}
 			ImGui::PopID();
 			ImGui::Separator();
@@ -422,6 +367,7 @@ public:
 		}
 		else if (e.GetEventType() == Engine::EventType::MouseButtonPressed && Engine::Input::IsMouseButtonPressed(E_MOUSE_BUTTON_LEFT))
 		{
+			if (m_Scene->m_PathfindingNodeGrids.size() == 0) return;
 			// Start Pathfinding - Find raycasted point on XZ plane - Node closest to location
 			glm::vec3 ray{};
 			Engine::RayCast::FromScreenPosition(ray, mousePos, m_PCameraController.GetCamera().GetProjectionMatrix(), m_PCameraController.GetCamera().GetViewMatrix());
@@ -430,12 +376,12 @@ public:
 			if (Engine::RayCast::IntersectWithWAPlaneXZ(Intersection, ray, pos)) 
 			{
 				auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
-				m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, transform.GetPosition());
-				m_TargetNode = Engine::PathfindingSystem::GetNodeClosestToPosition(0, Intersection);
+				m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(m_Scene.get(), 0, transform.GetPosition());
+				m_TargetNode = Engine::PathfindingSystem::GetNodeClosestToPosition(m_Scene.get(), 0, Intersection);
 
 				auto& pathfinder = m_Entity.GetComponent<Engine::PathfindingComponent>();
 				pathfinder.m_TargetNode = m_TargetNode;
-				Engine::PathfindingSystem::FindPath(pathfinder, transform.GetPosition() - glm::vec3(0, 0.5f, 0));
+				Engine::PathfindingSystem::FindPath(m_Scene.get(), pathfinder, transform.GetPosition() - glm::vec3(0, 0.5f, 0));
 			}
 		}
 
@@ -526,7 +472,7 @@ public:
 		obs.m_radius = radius;
 		auto& t = ent.GetComponent<Engine::TransformComponent>();
 		Engine::TransformSystem::SetWorldPosition(t, pos);
-		obs.m_ID = Engine::NodeGridSystem::CreateObstructionSphere(0, obs.m_radius, t.GetPosition());
+		obs.m_ID = Engine::NodeGridSystem::CreateObstructionSphere(m_Scene.get(), 0, obs.m_radius, t.GetPosition());
 		
 		m_Obstructors.push_back(ent);
 	}
@@ -534,7 +480,7 @@ public:
 	{
 		size_t size = m_Obstructors.size();
 		if (size == 0) return;
-		Engine::NodeGridSystem::DeleteObstructionSphere(0, size - 1);
+		Engine::NodeGridSystem::DeleteObstructionSphere(m_Scene.get(), 0, (uint32_t)size - 1);
 		m_Obstructors.erase(--m_Obstructors.end());
 	}
 };

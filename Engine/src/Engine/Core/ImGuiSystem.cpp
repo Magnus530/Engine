@@ -4,6 +4,8 @@
 #include "imgui.h"
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Engine/Scene/Systems/PathfindingSystem.h"
+
 namespace Engine
 {
 	void ImGuiSystem::LayerSelection(Application* app, std::vector<std::string>& layernames)
@@ -189,11 +191,67 @@ namespace Engine
 
 			GuiEntitySettings_Transform(id, *it->second);
 			if (it->second->HasComponent<PathfindingComponent>())
-				GuiEntitySettings_Pathfinding(id, *it->second);
+				GuiEntitySettings_Pathfinding(scene.get(), id, *it->second);
+
 			id++;
 		}
 
 
+
+		ImGui::End();
+	}
+
+	void ImGuiSystem::GuiPathfindingGridSettings(std::shared_ptr<Engine::Scene>& scene)
+	{
+		ImGui::Begin("Pathfinding Node Grid Creation");
+
+		if (ImGui::Button("Create\nPathfinding Grid", ImVec2(80, 80)))
+			NodeGridSystem::CreateGridAtLocation(scene.get(), glm::vec3{ 0,0,0 }, glm::vec3{ 10, 0, 10 }, 1);
+			//scene->m_PathfindingNodeGrids.push_back(std::make_shared<NodeGrid>(glm::vec3{ 0,0,0 }, glm::vec3{ 10,1,10 }));
+
+		int id{1000};
+		//for (auto& it : scene->m_PathfindingNodeGrids)
+		for (int i = 0; i < scene->m_PathfindingNodeGrids.size(); i++)
+		{
+			ImGui::PushItemWidth(75.f);
+			id++;
+			glm::vec3& Location = scene->m_PathfindingNodeGrids[i]->m_Location;
+			ImGui::PushID(id);
+			ImGui::Text("Position");
+			ImGui::DragFloat("X", &Location.x, 0.05f);
+			ImGui::SameLine();
+			ImGui::DragFloat("Y", &Location.y, 0.05f);
+			ImGui::SameLine();
+			ImGui::DragFloat("Z", &Location.z, 0.05f);
+			ImGui::PopID();
+
+			id++;
+			glm::ivec3& Extent = scene->m_PathfindingNodeGrids[i]->m_Extent;
+			ImGui::PushID(id);
+			ImGui::Text("Extent");
+			ImGui::DragInt("X", &Extent.x, 0.05f);
+			ImGui::SameLine();
+			ImGui::DragInt("Y", &Extent.y, 0.05f);
+			ImGui::SameLine();
+			ImGui::DragInt("Z", &Extent.z, 0.05f);
+			ImGui::PopID();
+
+			int& Resolution = scene->m_PathfindingNodeGrids[i]->Resolution;
+			ImGui::DragInt("Grid Resolution", &Resolution, 0.5f, 1, 10);
+
+			ImGui::Checkbox("Render Nodegrid", &scene->m_PathfindingNodeGrids[i]->bRenderNodegrid);
+
+			if (ImGui::Button("Update\nPathfindingGrid", ImVec2(80, 80)))
+			{
+				glm::vec3 l = Location;
+				glm::ivec3 e = Extent;
+				int r = Resolution;
+				bool b = scene->m_PathfindingNodeGrids[i]->bRenderNodegrid;
+
+				scene->m_PathfindingNodeGrids.clear();
+				NodeGridSystem::CreateGridAtLocation(scene.get(), l, e, r, b);
+			}
+		}
 
 		ImGui::End();
 	}
@@ -304,27 +362,25 @@ namespace Engine
 	
 	void ImGuiSystem::GuiEntitySettings_Transform(int id, Entity& m_Entity)
 	{
-		ImGui::Text("-- Transformations --");
-
 		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		ImGui::PushItemWidth(100.f);
 		ImGui::Separator();
 
-		glm::vec3 Position	= transform.GetPosition();
+		glm::vec3 Location	= transform.GetPosition();
 		glm::vec3& Rotator	= transform.m_Rotator;
 		glm::vec3 Scale		= transform.GetScale();
 
 		// POSITION
 		ImGui::PushID(id + 1);
 		ImGui::Text("Position");
-		if (ImGui::DragFloat("X", &Position.x, 0.05f))
-			Engine::TransformSystem::SetWorldPosition(transform, Position);
+		if (ImGui::DragFloat("X", &Location.x, 0.05f))
+			Engine::TransformSystem::SetWorldPosition(transform, Location);
 		ImGui::SameLine();
-		if (ImGui::DragFloat("Y", &Position.y, 0.05f))
-			Engine::TransformSystem::SetWorldPosition(transform, Position);
+		if (ImGui::DragFloat("Y", &Location.y, 0.05f))
+			Engine::TransformSystem::SetWorldPosition(transform, Location);
 		ImGui::SameLine();
-		if (ImGui::DragFloat("Z", &Position.z, 0.05f))
-			Engine::TransformSystem::SetWorldPosition(transform, Position);
+		if (ImGui::DragFloat("Z", &Location.z, 0.05f))
+			Engine::TransformSystem::SetWorldPosition(transform, Location);
 		ImGui::PopID();
 
 
@@ -359,14 +415,14 @@ namespace Engine
 		// RESET TRANSFORMS
 		if (ImGui::Button("Reset Transformations"))
 		{
-			Position *= 0.f;
+			Location *= 0.f;
 			Rotator *= 0.f;
 			Scale = { 1,1,1 };
 			Engine::TransformSystem::ResetTransforms(transform);
 		}
 		ImGui::Separator();
 	}
-	void ImGuiSystem::GuiEntitySettings_Pathfinding(int id, Entity& m_Entity)
+	void ImGuiSystem::GuiEntitySettings_Pathfinding(Scene* scene, int id, Entity& m_Entity)
 	{
 		ImGui::Separator();
 		// SPLINE SPEED ------------------------------------------------------------------------------------
@@ -380,7 +436,7 @@ namespace Engine
 		glm::vec3 currentPos = transform.GetPosition() - glm::vec3(0, 0.5, 0);
 
 		if (ImGui::Button("Start\nPatrol", ImVec2(100, 100)))
-			Engine::PathfindingSystem::StartPatrol(pathfinder, currentPos, pathfinder.m_PatrolType);
+			Engine::PathfindingSystem::StartPatrol(scene, pathfinder, currentPos, pathfinder.m_PatrolType);
 
 		ImGui::SameLine();
 		if (ImGui::Button("Clear Patrol Path", ImVec2(90, 40))) {
@@ -411,13 +467,13 @@ namespace Engine
 		{
 			if (!bPatrolpaused)
 			{
-				Engine::PathfindingSystem::PausePatrol(pathfinder, currentPos);
+				Engine::PathfindingSystem::PausePatrol(scene, pathfinder, currentPos);
 				//Engine::PathfindingSystem::CancelMovementAlongPath(pathfinder);
 				bPatrolpaused = true;
 			}
 			else
 			{
-				Engine::PathfindingSystem::ResumePatrol(pathfinder, currentPos, pathfinder.m_PatrolType);
+				Engine::PathfindingSystem::ResumePatrol(scene, pathfinder, currentPos, pathfinder.m_PatrolType);
 				//Engine::PathfindingSystem::ResumeMovementAlongPath(pathfinder, currentPos);
 				bPatrolpaused = false;
 			}

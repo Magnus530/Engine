@@ -43,9 +43,9 @@ namespace Engine
 		}
 		glm::vec3 GetRotator()
 		{
-			float X = std::atan2(m_Transform[1].z, m_Transform[2].z);
-			float Y = std::atan2(-m_Transform[0].z, sqrt(pow(m_Transform[1].z,2) + pow(m_Transform[2].z,2)));
-			float Z = std::atan2(m_Transform[0].y, m_Transform[0].x);
+			float X = (float)std::atan2(m_Transform[1].z, m_Transform[2].z);
+			float Y = (float)std::atan2(-m_Transform[0].z, sqrt(pow(m_Transform[1].z,2) + pow(m_Transform[2].z,2)));
+			float Z = (float)std::atan2(m_Transform[0].y, m_Transform[0].x);
 			
 			//return { X, Y, Z };
 
