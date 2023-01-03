@@ -104,7 +104,6 @@ namespace Engine
 			: m_Color(color) {}
 	};
 
-
 	struct TextureMaterialComponent
 	{
 		//uint8_t data[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
@@ -153,6 +152,16 @@ namespace Engine
 			m_CubeTex.first = name;
 			m_CubeTex.second = texture;
 		}
+	};
+
+	struct BillboardMaterialComponent
+	{
+		std::string s;
+
+		BillboardMaterialComponent() = default;
+		BillboardMaterialComponent(const BillboardMaterialComponent&) = default;
+		BillboardMaterialComponent(const std::string& ss)
+			: s(ss) {}
 	};
 
 	struct LightComponent

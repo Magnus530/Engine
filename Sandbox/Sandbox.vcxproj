@@ -169,6 +169,10 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
       <Project>{DBC7D3B0-C769-FE86-B024-12DB9C6585D7}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\Billboard.glsl" />
+    <None Include="assets\shaders\Skybox.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

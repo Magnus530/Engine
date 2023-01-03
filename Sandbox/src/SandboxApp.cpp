@@ -34,19 +34,22 @@ public:
 
 		//Create entities here
 
-		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Sky"));
+		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Forest"));
 
-		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, glm::vec3{ 1.0f, 1.0f, 0.0f });
+		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 0.0f });
 		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, glm::vec3{ 0.0f, 0.0f, 1.0f });
+		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
 
 		m_Player = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_PlayerVA, m_ActiveScene, glm::vec3(0.7, 0.4, 0.2));
 		m_Player.AddComponent<Engine::PathfindingComponent>();
 
+		Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
+
+		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 0.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Chess"));
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -67,6 +70,11 @@ public:
 			if ((it)->second->HasComponent<Engine::PhongMaterialComponent>())
 			{
 				Engine::LightSystem::UpdateLight((it)->second->GetComponent<Engine::PhongMaterialComponent>(), m_LightEntity, m_PCameraController);
+			}
+
+			if ((it)->second->HasComponent<Engine::BillboardMaterialComponent>())
+			{
+				Engine::BillboardSystem::UpdateBillboard(*(it)->second, m_PCameraController);
 			}
 		}
 		Pathfinding_Update(ts);
@@ -189,6 +197,7 @@ private:
 	Engine::Entity m_PlaneEntity;
 	Engine::Entity m_LightEntity;
 	Engine::Entity m_SkyboxEntity;
+	Engine::Entity m_TempEntity;
 	Engine::Entity m_Player;
 
 	// Mouse position on screen
