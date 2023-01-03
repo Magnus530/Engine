@@ -8,12 +8,6 @@ namespace Engine
 {
 	EntityInitializer* EntityInitializer::m_Instance = new EntityInitializer;
 
-	Engine::Entity EntityInitializer::EntityInit(const std::string objname, std::shared_ptr<Engine::Scene>& scene)
-	{
-		Engine::Entity tempEntity = scene->CreateEntity(objname);
-		return tempEntity;
-	}
-
 	Engine::Entity EntityInitializer::EntityInit(const Engine::ShaderType& shaderType, std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
 		std::shared_ptr<Engine::Scene>& scene, const bool& isBBoard, const glm::vec3& color, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex)
 	{

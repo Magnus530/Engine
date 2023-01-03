@@ -85,7 +85,6 @@ namespace Engine
 			: m_Color(color) {}
 	};
 
-
 	struct TextureMaterialComponent
 	{
 		//uint8_t data[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
