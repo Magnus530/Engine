@@ -183,8 +183,18 @@
 		}
 
 		for (int i = 0; i < mVertices.size(); i++) {
-			float colour = mVertices[i].GetY() / yMax;
-			mVertices[i].SetNormal(colour, colour, colour);
+			float colour;
+			colour = mVertices[i].GetY() / yMax;
+			float r{ 0 }, g{ 0 }, b{ 0 };
+			if (mVertices[i].GetY() < 0) {
+				g = 1 - (colour * (-1));
+				b = (colour * (-1));
+			}
+			else {
+				g = 1 - colour;
+				r = colour;
+			}
+			mVertices[i].SetNormal(r, g, b);
 		}
 	}
 
