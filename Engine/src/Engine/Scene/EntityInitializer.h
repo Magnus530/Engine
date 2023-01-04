@@ -28,7 +28,6 @@ namespace Engine
 
 		static EntityInitializer& GetInstance() { return *m_Instance; }
 
-		static Engine::Entity EntityInit(const std::string objname, std::shared_ptr<Engine::Scene>& scene);
 		static Engine::Entity EntityInit(const Engine::ShaderType& shaderType, std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr, 
 			std::shared_ptr<Engine::Scene>& scene, const bool& isBBoard = 0, const glm::vec3& color = { 1.f, 1.f, 1.f }, 
 			std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex = std::make_pair("White", Engine::Texture2D::Create("assets/textures/white.png")));
@@ -43,10 +42,15 @@ namespace Engine
 		// For Skybox
 		static void MaterialInit(Engine::Entity& entity, std::pair<std::string, std::shared_ptr<Engine::OpenGLCubemap>> cubetex);
 
+		static Entity ObstructorEntityInit(const ShaderType shaderType, const std::string objname, const std::string mesh, float radius, uint32_t id, Scene* scene, glm::vec3 color = glm::vec3{1,1,1}, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex = std::make_pair("White", Engine::Texture2D::Create("assets/textures/white.png")));
+
+
+		static std::shared_ptr<VertexArray> VertexArrayInit(const std::string obj);
 	protected:
 		EntityInitializer() = default;
 
 	private:
 		static EntityInitializer* m_Instance;
+
 	};
 }

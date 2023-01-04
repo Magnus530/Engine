@@ -7,9 +7,14 @@
 #include "Engine/Renderer/Shader.h"
 #include "Platform/OpenGL/OpenGLCubemap.h"
 
-#include <glm/glm.hpp>
 #include <utility>
 #include <iostream>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+# define M_PI           3.14159265358979323846 
+
 
 namespace Engine
 {
@@ -25,10 +30,10 @@ namespace Engine
 
 	struct TransformComponent
 	{
-		glm::mat4 m_Transform { 1.f };
-		float m_Speed{ 2.f };
+		glm::mat4 m_Transform	{ 1.f };
+		glm::vec3 m_Rotator{ 0.f };	// Temporary method
 
-		glm::vec3 GetPosition() const { return m_Transform[3]; }
+		glm::vec3 GetLocation() const { return m_Transform[3]; }
 		glm::vec3 GetScale() const
 		{
 			float X = glm::length(m_Transform[0]);
@@ -38,15 +43,29 @@ namespace Engine
 		}
 		glm::vec3 GetRotator()
 		{
-			//float X = (glm::acos(m_Transform[1].y) *  glm::asin(m_Transform[1].z)) / glm::length(m_Transform[0]);
-			//float Y = (glm::acos(m_Transform[0].x) * -glm::asin(m_Transform[0].z))/ glm::length(m_Transform[1]);
-			//float Z = (glm::acos(m_Transform[0].x) *  glm::asin(m_Transform[0].y)) / glm::length(m_Transform[2]);
-			//float X = std::atan2(m_Transform[1].z, m_Transform[2].z);
-			//float Y = std::atan2(-m_Transform[0].z, sqrt(pow(m_Transform[1].z,2) + pow(m_Transform[2].z,2)));
-			//float Z = std::atan2(m_Transform[0].y, m_Transform[0].x);
+			float X = (float)std::atan2(m_Transform[1].z, m_Transform[2].z);
+			float Y = (float)std::atan2(-m_Transform[0].z, sqrt(pow(m_Transform[1].z,2) + pow(m_Transform[2].z,2)));
+			float Z = (float)std::atan2(m_Transform[0].y, m_Transform[0].x);
 			
 			//return { X, Y, Z };
-			return { 0,0,0 };
+
+			//glm::quat q = glm::toQuat(m_Transform);
+			//// Pitch
+			//float sinP = sqrt(1 + 2 * (q.w * q.x - q.y * q.z));
+			//float cosP = sqrt(1 - 2 * (q.w * q.x - q.y * q.z));
+			//float X = std::atan2(sinP, cosP) - M_PI / 2;
+
+			//// Yaw
+			//float sinY = 2 * (q.w * q.z + q.x * q.y);
+			//float cosY = 2 * (q.y * q.y + q.z * q.z);
+			//float Y = std::atan2(sinY, cosY) - M_PI / 2;
+
+			//// Roll
+			//float sinR = 2 * (q.w * q.x + q.y * q.z);
+			//float cosR = 2 * (q.x * q.x + q.y * q.y);
+			//float Z = std::atan2(sinR, cosR) - M_PI / 2;
+
+			return { X,Y,Z };
 		}
 
 		TransformComponent() = default;
@@ -85,7 +104,6 @@ namespace Engine
 			: m_Color(color) {}
 	};
 
-
 	struct TextureMaterialComponent
 	{
 		//uint8_t data[] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
@@ -117,6 +135,20 @@ namespace Engine
 		PhongMaterialComponent(const PhongMaterialComponent&) = default;
 		PhongMaterialComponent(const glm::vec4& color, const std::string name, const std::shared_ptr<Texture2D>& texture)
 			: m_Color(color) 
+		{
+			m_Tex.first = name;
+			m_Tex.second = texture;
+		}
+	};
+
+	struct ParticleMaterialComponent
+	{
+		std::pair<std::string, std::shared_ptr<Texture2D>> m_Tex;
+		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		ParticleMaterialComponent() = default;
+		ParticleMaterialComponent(const ParticleMaterialComponent&) = default;
+		ParticleMaterialComponent(const glm::vec4& color, const std::string name, const std::shared_ptr<Texture2D>& texture)
+			: m_Color(color)
 		{
 			m_Tex.first = name;
 			m_Tex.second = texture;
@@ -170,18 +202,12 @@ namespace Engine
 		};
 	struct PathfindingComponent
 	{
-		// Start node and current grid
-		//std::shared_ptr<class PNode> m_StartNode;
-		//std::shared_ptr<struct NodeGrid> m_Grid;
-		//std::shared_ptr<class PNode> m_TargetNode;
-		//std::shared_ptr<class PNode> m_IntermediateTargetNode;
-		int m_Grid{};
+		//int m_Grid{};
 		int m_StartNode{};
 		int m_TargetNode{};
 		int m_IntermediateTargetNode{};
 
 		// Moving Through Path
-		//std::vector<std::shared_ptr<class PNode>> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
 		std::vector<int> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
 		std::shared_ptr<struct BSpline> m_SplinePath = std::make_shared<BSpline>();
 		float m_SplineMovement{};	// How far along the spline has the Entity gone?
@@ -202,6 +228,9 @@ namespace Engine
 		std::vector<glm::vec3> m_PatrolPath;
 		int m_CurrentPatrolPoint{};
 		glm::vec3 m_PatrolPauseLocation;
+#ifdef E_DEBUG
+		bool bRenderPatrolPoints{};
+#endif
 
 		PathfindingComponent() = default;
 		PathfindingComponent(const PathfindingComponent&) = default;
@@ -209,6 +238,8 @@ namespace Engine
 
 	struct ObstructionSphereComponent
 	{
+		ObstructionSphereComponent(float radius, uint32_t id)
+			: m_radius{radius}, m_ID{id}{}
 		float m_radius{ 2.f };
 		uint32_t m_ID{};
 	};

@@ -5,6 +5,8 @@
 #include "Engine/Core/Timestep.h"
 #include "Engine/Renderer/Texture.h"
 
+#include <glm/glm.hpp>
+
 namespace Engine
 {
 	class Entity;
@@ -24,9 +26,33 @@ namespace Engine
 
 		std::unordered_map<std::string, std::shared_ptr<Engine::OpenGLCubemap>> m_Skyboxes;
 
+		// Pathfinding
+		std::shared_ptr<struct NodeGrid> m_PathfindingNodeGrid;
+		std::vector<std::string> m_Obstructions;
+		void CreateObstruction(float radius = 2.f, glm::vec3 location = glm::vec3(0.f));
+		void UpdateObstructionsToNewGrid();
+		void DeleteObstruction();
+
 	private:
 		entt::registry m_Registry;
 
 		friend class Entity;
+
 	};
+
+#ifdef E_DEBUG
+	class SceneMiscData
+	{
+	public:
+	private:
+
+	};
+//#include "Engine/Scene/Systems/PathfindingSystem.h"
+//#include "Engine/Renderer/Renderer.h"
+//#include "Engine/Renderer/VertexArray.h"
+//#include "Engine/Scene/Components.h"
+//	inline std::shared_ptr<Engine::VertexArray> m_PlaneVA;
+//
+//	inline void RenderPathfindingNodeGrid(Scene* scene, PathfindingComponent& pathfinder);
+#endif
 }

@@ -38,7 +38,7 @@ namespace Engine {
 		bspline.m_KnotVector = knots;
 	}
 
-	glm::vec3 BSplineCreator::GetPositionAlongSpline(BSpline& bSpline, float t)
+	glm::vec3 BSplineCreator::GetLocationAlongSpline(BSpline& bSpline, float t)
 	{
 		if (bSpline.m_Controlpoints.size() == 0) {
 			return glm::vec3();

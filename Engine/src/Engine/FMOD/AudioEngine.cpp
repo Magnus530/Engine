@@ -6,7 +6,7 @@
 
 #include <combaseapi.h>
 
-namespace Engine 
+namespace Engine
 {
 	//*********************** IMPLEMENTATION CODE*********************//
 	//--------------------------------------------------------------
@@ -74,7 +74,7 @@ namespace Engine
 	// static methodes because we want to init one instance only (as a singleton)
 	// we don't provide to this class an instance of the implementation or a pointer to it
 	// neither do we ovverride the copy constructor and the assingment operator ( to communicate with the impl class)
-	
+
 	Implementation* sgpImplementation = nullptr;
 	std::shared_ptr<AudioEngine> AE{ nullptr };
 
@@ -106,6 +106,7 @@ namespace Engine
 	//	playSound("assets/audio/sfx_sound.wav", glm::vec3(), -6.f);
 	//	setChannelVolume("assets/audio/Cartoon_song.wav", 12.f);
 	//}
+
 	//------------------------------
 	// Update the engine properties
 	//------------------------------
@@ -114,24 +115,40 @@ namespace Engine
 		std::string musicPath1 = "assets/audio/Cartoon_song.wav";
 		std::string	oneShot1 = "assets/audio/sfx_sound.wav";
 		sgpImplementation->update(fTimeDeltaSeconds);
-		if (Input::IsKeyPressed(E_KEY_L))
+		if (Input::IsKeyPressed(E_KEY_LEFT_CONTROL)) 
 		{
-			sgpImplementation->mpSystem->createReverb3D(&sgpImplementation->mpReverb);
-			//FMOD_REVERB_PROPERTIES propHanger = FMOD_PRESET_HANGAR;
-
-			AE->setEnvironmentReverb(FMOD_PRESET_CONCERTHALL, glm::vec3(), 0.f, 10.f);
-			AE->playSound(musicPath1, glm::vec3(), -1.f);
-
-			//AE->setChannelVolume(musicPath1, 12.f);
+			if (Input::IsKeyPressed(E_KEY_R))
+			{
+				AE->setEnvironmentReverb(FMOD_PRESET_OFF, glm::vec3(), 0.f, 0.1f);
+				//std::cout << "Audio reverb stopped";
+			}
 		}
-		if (Input::IsKeyPressed(E_KEY_K))
+		else
 		{
-			AE->playSound(oneShot1, glm::vec3());
-			//AE->setChannelVolume(musicPath1, -12.f);
-		}
-		if (Input::IsKeyPressed(E_KEY_SPACE))
-		{
-			AE->stopAllChannels();
+			if (Input::IsKeyPressed(E_KEY_R))
+			{
+				sgpImplementation->mpSystem->createReverb3D(&sgpImplementation->mpReverb);
+				//FMOD_REVERB_PROPERTIES propHanger = FMOD_PRESET_HANGAR;
+				AE->setEnvironmentReverb(FMOD_PRESET_FOREST, glm::vec3(), 0.f, 10.f);
+				//std::cout << "Audio reverb start";
+			}
+
+			if (Input::IsKeyPressed(E_KEY_L))
+			{
+				AE->playSound(musicPath1, glm::vec3(), -1.f);
+
+				//AE->setChannelVolume(musicPath1, 12.f);
+			}
+			if (Input::IsKeyPressed(E_KEY_K))
+			{
+				AE->playSound(oneShot1, glm::vec3());
+				//AE->setChannelVolume(musicPath1, -12.f);
+			}
+			if (Input::IsKeyPressed(E_KEY_SPACE))
+			{
+				AE->stopAllChannels();
+			}
+
 		}
 	}
 
@@ -166,7 +183,7 @@ namespace Engine
 		if (pBank)
 			sgpImplementation->mBanks[strBankName] = pBank; // assign bank to bankmap
 	}
-	
+
 	//-------------------------
 	// Load FMOD studio events
 	//-------------------------
@@ -215,7 +232,7 @@ namespace Engine
 		if (pSound)
 			sgpImplementation->mSounds[strSoundName] = pSound;
 	}
-	
+
 	//----------------------------
 	// Unload sounds in the cache
 	//----------------------------
@@ -230,7 +247,7 @@ namespace Engine
 		AudioEngine::errorCheck(tFoundIt->second->release());					// check for errors and unload sound
 		sgpImplementation->mSounds.erase(tFoundIt);								// erase from the cache
 	}
-	
+
 	void AudioEngine::unLoadEvent(const std::string& strEventName)
 	{
 		//check cache for sound events
@@ -240,17 +257,17 @@ namespace Engine
 		AudioEngine::errorCheck(tFoundIt->second->release()); // check for errors and unload events
 		sgpImplementation->mEvents.erase(tFoundIt); // erase from the cache
 	}
-	
+
 	void AudioEngine::unLoadBank(const std::string& strBankName)
 	{
 		// check cache for sound banks
 		auto tFoundIt = sgpImplementation->mBanks.find(strBankName);
 		if (tFoundIt != sgpImplementation->mBanks.end())
 			return;
-		AudioEngine::errorCheck(tFoundIt->second->unload()); // check for errors and unload banks
-		sgpImplementation->mBanks.erase(tFoundIt); // erase from the cache
+		AudioEngine::errorCheck(tFoundIt->second->unload());	// check for errors and unload banks
+		sgpImplementation->mBanks.erase(tFoundIt);			// erase from the cache
 	}
-	
+
 	// PLAYBACK
 	// ----------------------------------------------------------------
 	// Play sounds that have been loaded correctly
@@ -258,7 +275,7 @@ namespace Engine
 	// sound is initially paused to avoid the sound popping in abruptly
 	// returns the channel ID of playing sound
 	// ----------------------------------------------------------------
-	int AudioEngine::playSound(const std::string& strSoundName, const glm::vec3& vPos, float fVolumedB,float fFadeInTime)
+	int AudioEngine::playSound(const std::string& strSoundName, const glm::vec3& vPos, float fVolumedB, float fFadeInTime)
 	{
 		int nChannelId = sgpImplementation->mnNextChannelId++;  // report next unused / free channelID
 		// assign it to current channel and increase the counter
@@ -307,7 +324,7 @@ namespace Engine
 		}
 		AudioEngine::errorCheck(tFoundIt->second->start());
 	}
-	
+
 	// stop playback
 
 	//----------------------------
@@ -328,7 +345,7 @@ namespace Engine
 				this->fadeOutChannel(tFoundIt->first, fFadeOutTime, 0);
 		}
 	}
-	
+
 	//------------
 	// Stop Events
 	//------------
@@ -350,7 +367,7 @@ namespace Engine
 		for (auto [name, channel] : sgpImplementation->mChannels)
 			AudioEngine::errorCheck(channel->stop());
 	}
-	
+
 	//------------------------------------------------
 	// Return true if the channel is currently playing
 	//------------------------------------------------
@@ -397,12 +414,12 @@ namespace Engine
 		FMOD_VECTOR position = vectorToFmod(vPosition);
 		FMOD_VECTOR forward = vectorToFmod(vLook);
 		FMOD_VECTOR up = vectorToFmod(vUp);
-		FMOD_VECTOR velocity = velocityToFmod(0,0,0);
+		FMOD_VECTOR velocity = velocityToFmod(0, 0, 0);
 		AudioEngine::errorCheck(sgpImplementation->mpSystem->set3DListenerAttributes(0, &position, &velocity, &forward, &up));
 	}
-	
-	// parameters 
-
+	//-----------
+	// parameters
+	//-----------
 	void AudioEngine::setChannel3dPosition(int nChannelId, const glm::vec3& vPosition)
 	{
 		auto tFoundIt = sgpImplementation->mChannels.find(nChannelId);
@@ -411,7 +428,7 @@ namespace Engine
 		FMOD_VECTOR position = vectorToFmod(vPosition);
 		AudioEngine::errorCheck(tFoundIt->second->set3DAttributes(&position, nullptr));
 	}
-	
+
 	//------------------------------------
 	// Set the volume of the sound channel
 	//------------------------------------
@@ -422,7 +439,7 @@ namespace Engine
 			return;
 		AudioEngine::errorCheck(tFoundIt->second->setVolume(dBToVolume(fVolumedB)));
 	}
-	
+
 	//------------
 	// Play Events
 	//------------
@@ -653,13 +670,73 @@ namespace Engine
 		float maxdist = fMaxDistance;
 		AudioEngine::errorCheck(sgpImplementation->mpReverb->set3DAttributes(&pos, mindist, maxdist));
 	}
+
+	int AudioEngine::createGeometry(int nMaxPolygons, int nMaxVertices, const glm::vec3& vPosition, const glm::vec3& vForward, const glm::vec3& vUp, const glm::vec3& vScale)
+	{
+		return 0;
+	}
+
+	int AudioEngine::createGeometry(Entity* ent)
+	{
+		return 0;
+	}
+
+	void AudioEngine::addPolygon(int nGeometryId, float fDirectOcclusion, float fReverbOcclusion, bool isDoubleSided, int nVertices, const Implementation::Array<glm::vec3>& vVertices)
+	{
+	}
+
+	void AudioEngine::setGeometryActive(int nGeometryId, bool isActive)
+	{
+	}
+
+	void AudioEngine::orientGeometry(int nGeometryId, const glm::vec3& pos, const glm::vec3& forward, const glm::vec3& up, const glm::vec3& scale)
+	{
+	}
+
+	void AudioEngine::saveGeometry(int nGeometryId, const std::string& filePath)
+	{
+	}
+
+	int AudioEngine::loadGeometry(const std::string& filePath)
+	{
+		return 0;
+	}
+
+	void Channel::updateChannelParameters()
+	{
+	}
+	bool Channel::shouldBeVirtual(bool bAllowOneShotVirtuals) const
+	{
+		return false;
+	}
+	bool Channel::isPlaying() const
+	{
+		return false;
+	}
+	float Channel::getVolumedB() const
+	{
+		return 0.0f;
+	}
+}
 /*
-	Channel::Channel(Implementation& tImplementation, int nSoundId, const AudioEngine::SoundDefinition& tSoundDefinition, const glm::vec3& vPosition, float fVolumedB)
+	int AudioEngine::playSound(int nSoundID, const glm::vec3& vPos, float fVolumedB)
+	{
+		int nChannelId = sgpImplementation->mnNextChannelId++;
+		auto tSoundIt = sgpImplementation->mSounds.find(nSoundID);
+		if(tSoundIt == sgpImplementation->mSounds.end())
+			return nChannelId;
+		sgpImplementation->mSoundChannels[nChannelId] = make_unique<sgpImplementation::Chann;
+	}
+
+	Channel::Channel(Implementation& mImplementation, 
+		int nSoundId, 
+		const AudioEngine::SoundDefinition& tSoundDefinition, 
+		const glm::vec3& vPosition, float fVolumedB)
 	{
 		
 
 	}
-
+	#define SILENCE_dB -80.f
 	///TODO: WIP of changing states. Will make things easier
 	void Channel::update(float fTimeDeltaSeconds)
 	{
@@ -697,7 +774,7 @@ namespace Engine
 				meState=State::PLAYING;
 				FMOD_VECTOR position = AudioEngine::vectorToFmod(mvPosition);
 				mpChannel->set3DAttributes(&position, nullptr);
-				mpChannel->setVolume(dBToVolume(getVolumedB()));
+				mpChannel->setVolume(Engine::AudioEngine::dBToVolume(getVolumedB()));
 				mpChannel->setPaused(false);
 			}
 			else
@@ -758,24 +835,6 @@ namespace Engine
 			break;
 	  }
 	}
-	*/
-	void Channel::updateChannelParameters()
-	{
-	}
-	bool Channel::shouldBeVirtual(bool bAllowOneShotVirtuals) const
-	{
-		return false;
-	}
-	bool Channel::isPlaying() const
-	{
-		return false;
-	}
-	float Channel::getVolumedB() const
-	{
-		return 0.0f;
-	}
-
-	/*
 	void AudioEngine::loadSound(int nSoundID)
 	{
 		if (soundIsLoaded(nSoundID))
@@ -792,5 +851,7 @@ namespace Engine
 		if (pSound)
 			sgpImplementation->mSounds[strSoundName] = pSound;
 	}
-	*/
+	
 }
+
+*/

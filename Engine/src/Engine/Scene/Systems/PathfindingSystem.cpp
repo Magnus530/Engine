@@ -1,25 +1,26 @@
 ﻿#include "epch.h"
 #include "PathfindingSystem.h"
+#include "Engine/Scene/Scene.h"
 
 namespace Engine {
-    static std::vector<std::shared_ptr<NodeGrid>> m_NodeGrids;
+    //static std::vector<std::shared_ptr<NodeGrid>> m_NodeGrids;
 
     //************************************************************************ PATHFINDING SYSTEM **********************************************************************************//
-	void PathfindingSystem::FindPath(PathfindingComponent& comp, const glm::vec3 currentPosition)
+	void PathfindingSystem::FindPath(Scene* scene, PathfindingComponent& comp, const glm::vec3 currentPosition)
 	{
         //** Init Pathfinding
         const bool NoMovement = comp.m_StartNode == comp.m_TargetNode;
         if (NoMovement) return;
 
-        auto& grid = m_NodeGrids[0];
+        auto grid = scene->m_PathfindingNodeGrid.get();
         
         if (comp.bIsMovingAlongPath)
-            comp.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(0, currentPosition);
+            comp.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(scene, currentPosition);
         comp.bIsMovingAlongPath = true;    // In init or FindPath?
         //*** END Init Pathfinding ***
 
         // Bit reduntant for pathfinding component to have array of node pointers, when it only uses their locations
-        comp.m_CurrentPath = FindPathAStar(0, comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bIsObstructed);
+        comp.m_CurrentPath = FindPathAStar(scene, comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bIsObstructed);
         const bool NoMovIntermediate = comp.m_StartNode == comp.m_IntermediateTargetNode;
         if (NoMovIntermediate) {
             comp.bIsMovingAlongPath = false;
@@ -54,20 +55,20 @@ namespace Engine {
         glm::vec3 prevPos = currentPosition;
         for (float t{}; t < 1.f; t += 0.05)
         {
-            glm::vec3 pos = BSplineCreator::GetPositionAlongSpline(*comp.m_SplinePath, t);
+            glm::vec3 pos = BSplineCreator::GetLocationAlongSpline(*comp.m_SplinePath, t);
 
             float l = glm::length(pos - prevPos);
             comp.m_SplineLength += l;
 
-            prevPos = BSplineCreator::GetPositionAlongSpline(*comp.m_SplinePath, t);
+            prevPos = BSplineCreator::GetLocationAlongSpline(*comp.m_SplinePath, t);
         }
 	}
 
-    void PathfindingSystem::PathMovement(PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime)
+    void PathfindingSystem::PathMovement(Scene* scene, PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime)
     {
     }
 
-    void PathfindingSystem::MoveAlongPath(PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime)
+    void PathfindingSystem::MoveAlongPath(Scene* scene, PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime)
     {
         if (!pathfinder.bIsMovingAlongPath) return;
         if (pathfinder.bReachedTarget) return;
@@ -82,21 +83,20 @@ namespace Engine {
             //pathfinder.m_CurrentPatrolPoint += t - prevT;
         }
         else {  // Reached end of path
-            //t = 0.99f;
             t = 0.f;
             pathfinder.m_StartNode = pathfinder.m_TargetNode;
             pathfinder.bReachedTarget = true;
 
             if (pathfinder.bPatrolling) {
-                PatrolUpdate(pathfinder, transform.GetPosition());
+                PatrolUpdate(scene, pathfinder, transform.GetLocation());
                 return;
             }
         }
         
         if (!pathfinder.bReachedTarget) 
         {
-            glm::vec3 previousPosition = transform.GetPosition();
-            glm::vec3 pos = BSplineCreator::GetPositionAlongSpline(*pathfinder.m_SplinePath, t);
+            glm::vec3 previousPosition = transform.GetLocation();
+            glm::vec3 pos = BSplineCreator::GetLocationAlongSpline(*pathfinder.m_SplinePath, t);
 
             glm::vec3 direction = pos - previousPosition;
             direction.y = 0.f;
@@ -108,24 +108,24 @@ namespace Engine {
         }
     }
 
-    void PathfindingSystem::ResumeMovementAlongPath(PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
+    void PathfindingSystem::ResumeMovementAlongPath(Scene* scene, PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
     {
         pathfinder.bIsMovingAlongPath = true;
-        pathfinder.m_StartNode = GetNodeClosestToPosition(0, currentPosition);
-        FindPath(pathfinder, currentPosition);
+        pathfinder.m_StartNode = GetNodeClosestToPosition(scene, currentPosition);
+        FindPath(scene, pathfinder, currentPosition);
     }
 
-    void PathfindingSystem::CancelMovementAlongPath(PathfindingComponent& pathfinder)
+    void PathfindingSystem::CancelMovementAlongPath(Scene* scene, PathfindingComponent& pathfinder)
     {
         pathfinder.bIsMovingAlongPath = false;
         pathfinder.m_CurrentPath.clear();
     }
 
-    void PathfindingSystem::MoveAlongPatrol(PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime)
+    void PathfindingSystem::MoveAlongPatrol(Scene* scene, PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime)
     {
     }
 
-    void PathfindingSystem::StartPatrol(PathfindingComponent& pathfinder, const glm::vec3 currentPosition, PatrolType patroltype/* = PatrolType::Loop*/)
+    void PathfindingSystem::StartPatrol(Scene* scene, PathfindingComponent& pathfinder, const glm::vec3 currentPosition, PatrolType patroltype/* = PatrolType::Loop*/)
     {
         if (pathfinder.m_PatrolPath.size() < 2)
             return;
@@ -134,11 +134,11 @@ namespace Engine {
             // Sets next point in patrolpath
         pathfinder.bPatrolling = true;
         pathfinder.m_PatrolType = patroltype;
-        pathfinder.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(0, currentPosition);  // Kan også finne ut av hvilken punkt den er nærmest, og starte der. For å kunne restarte patrol
-        PatrolUpdate(pathfinder, currentPosition);
+        pathfinder.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(scene, currentPosition);  // Kan også finne ut av hvilken punkt den er nærmest, og starte der. For å kunne restarte patrol
+        PatrolUpdate(scene, pathfinder, currentPosition);
     }
 
-    void PathfindingSystem::PatrolUpdate(PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
+    void PathfindingSystem::PatrolUpdate(Scene* scene, PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
     {
         switch (pathfinder.m_PatrolType)
         {
@@ -187,27 +187,27 @@ namespace Engine {
         }
 
         pathfinder.m_CurrentPatrolPoint = std::clamp<int>(pathfinder.m_CurrentPatrolPoint, 0, pathfinder.m_PatrolPath.size() - 1);
-        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(0, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
-        FindPath(pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
+        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(scene, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
+        FindPath(scene, pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
     }
 
-    void PathfindingSystem::PausePatrol(PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
+    void PathfindingSystem::PausePatrol(Scene* scene, PathfindingComponent& pathfinder, const glm::vec3 currentPosition)
     {
         pathfinder.bPatrolling = false;
         pathfinder.m_PatrolPauseLocation = currentPosition;
-        CancelMovementAlongPath(pathfinder);
+        CancelMovementAlongPath(scene, pathfinder);
     }
 
-    void PathfindingSystem::ResumePatrol(PathfindingComponent& pathfinder, const glm::vec3 currentPosition, PatrolType patroltype)
+    void PathfindingSystem::ResumePatrol(Scene* scene, PathfindingComponent& pathfinder, const glm::vec3 currentPosition, PatrolType patroltype)
     {
         pathfinder.bPatrolling = true;
         pathfinder.bIsMovingAlongPath = true;
         pathfinder.m_PatrolType = patroltype;
-        pathfinder.m_StartNode = GetNodeClosestToPosition(0, currentPosition);
+        pathfinder.m_StartNode = GetNodeClosestToPosition(scene, currentPosition);
 
         pathfinder.m_CurrentPatrolPoint = std::clamp<int>(pathfinder.m_CurrentPatrolPoint, 0, pathfinder.m_PatrolPath.size() - 1);
-        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(0, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
-        FindPath(pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
+        pathfinder.m_TargetNode = PathfindingSystem::GetNodeClosestToPosition(scene, pathfinder.m_PatrolPath[pathfinder.m_CurrentPatrolPoint]);
+        FindPath(scene, pathfinder, currentPosition - glm::vec3(0, 0.5f, 0));
     }
 
     void PathfindingSystem::AddPatrolPath(PathfindingComponent& pathfinder, std::vector<glm::vec3> patrolpath)
@@ -244,43 +244,37 @@ namespace Engine {
     }
 
     // INEFFICIENT - Needs a properly indexed nodegrid to improve search time
-    //std::shared_ptr<PNode> PathfindingSystem::GetNodeClosestToPosition(uint32_t gridIndex, glm::vec3 position)
-    int PathfindingSystem::GetNodeClosestToPosition(uint32_t gridIndex, glm::vec3 position)
+    int PathfindingSystem::GetNodeClosestToPosition(Scene* scene, glm::vec3 position)
     {
-        std::shared_ptr<NodeGrid> grid = NodeGridSystem::GetGridAtIndex(gridIndex);
+        auto grid = scene->m_PathfindingNodeGrid.get();
     
-        //float length = glm::length(grid->m_Nodes[0]->m_Data->m_Position - position);
         float length = glm::length(grid->m_NodeLocations->at(0) - position);
         int nodeIndex{ 0 };
-        //std::shared_ptr<PNode> node = grid->m_Nodes[0];
     
         for (size_t i{}; i < grid->m_NodeLocations->size(); i++)
         {
-            //float l = glm::length(grid->m_Nodes[i]->m_Data->m_Position - position);
             float l = glm::length(grid->m_NodeLocations->at(i) - position);
             if (l < length) {
                 length = l;
-                //node = grid->m_Nodes[i];
                 nodeIndex = i;
             }
         }
         return nodeIndex;
     }
 
-    std::vector<int> PathfindingSystem::FindPathAStar(int gridIndex, int startNode, int endNode, int& intermediateNode, bool* blocked)
+    std::vector<int> PathfindingSystem::FindPathAStar(Scene* scene, int startNode, int endNode, int& intermediateNode, bool* blocked)
     {
         std::vector<int> path;
-        auto& grid = m_NodeGrids[gridIndex];
+        //auto& grid = scene->m_PathfindingNodeGrids[gridIndex];
+        auto grid = scene->m_PathfindingNodeGrid.get();
         intermediateNode = -1;
 
         if (startNode == endNode)
             return path;
 
 
-        //std::shared_ptr<PNode> closestNode{ start };     // If node is closed off, go to the closest one in, air length
         int closestNode{ startNode };     // If node is closed off, go to the closest one in, air length
         grid->NodeInitValues(closestNode, endNode);
-        //closestNode->InitValues(end.get());
         std::vector<int> tosearch;
         tosearch.push_back(startNode);
         std::vector<int> processed;
@@ -289,22 +283,18 @@ namespace Engine {
         {
             int current = tosearch[0];
             grid->NodeInitValues(current, endNode);
-            //current->InitValues(end.get());
 
             /* Choosing node to process from the insearch array */
             for (auto& it : tosearch)
             {
                 if (it == current) { continue; }
                 grid->NodeInitValues(it, endNode);
-                //it->InitValues(/*start.get(), */end.get());
-                //if (it->m_DistanceValues->F < current->m_DistanceValues->F || it->m_DistanceValues->F == current->m_DistanceValues->F && it->m_DistanceValues->H < current->m_DistanceValues->H)
                 auto& d = grid->m_NodeDN->m_DistanceValues;
                 if (d[it].F < d[current].F || d[it].F == d[current].F && d[it].H < d[current].H)
                     current = it;
             }
 
             /* Setting closest node */
-            //if (closestNode->GetDistanceToNode(end.get()) > current->GetDistanceToNode(end.get()))
             if (grid->GetNodeDistanceToNode(closestNode, endNode) > grid->GetNodeDistanceToNode(current, endNode))
                 closestNode = current;
 
@@ -314,7 +304,6 @@ namespace Engine {
                 int currentTile = endNode;
                 while (currentTile != startNode) {
                     path.push_back(currentTile);
-                    //currentTile = currentTile->m_Connection;
                     currentTile = grid->m_NodePathConnection->at(currentTile);
                 }
                 return path;
@@ -322,44 +311,32 @@ namespace Engine {
 
             /* Removes the chosen node from tosearch and adds it to processed */
             processed.push_back(current);
-            //std::vector<std::shared_ptr<PNode>>::iterator it = std::find(tosearch.begin(), tosearch.end(), current);
             auto it = std::find(tosearch.begin(), tosearch.end(), current);
             if (it != tosearch.end()) {
                 tosearch.erase(it);
             }
 
             /* Processes chosen node */
-            //for (size_t t{}; t < current->m_Neighbors->neighbors.size(); t++)
-            //for (auto& i : grid->m_NodeDN->m_NeighborIndices)
             size_t t{ 0 };
             for (t = 0; t < grid->m_NodeDN->m_NeighborIndices[current].size() - 1; t++)
             {
-                //if (*it == -1) continue;
-
-                //std::shared_ptr<PNode> neighbor = current->m_Neighbors->neighbors[t];
                 int neighbor = grid->m_NodeDN->m_NeighborIndices[current][t];
                 auto& it = std::find(tosearch.begin(), tosearch.end(), neighbor);
                 bool inSearch = (it != tosearch.end());
 
-                //if (neighbor->IsObstruction()) { continue; }
                 if (grid->m_NodeObstructionStatus->at(neighbor)) { continue; }
 
                 it = std::find(processed.begin(), processed.end(), neighbor);
                 if (it != processed.end()) { continue; }
 
-                //int CostToNeighbor = current->m_DistanceValues->G + current->GetDistanceToNode(neighbor.get());
                 int CostToNeighbor = grid->m_NodeDN->m_DistanceValues[current].G + grid->GetNodeDistanceToNode(current, endNode);
 
-                //if (!inSearch || CostToNeighbor < neighbor->m_DistanceValues->G)
                 if (!inSearch || CostToNeighbor < grid->m_NodeDN->m_DistanceValues[neighbor].G)
                 {
-                    //neighbor->SetG(CostToNeighbor);
-                    //neighbor->m_Connection = current;
                     grid->m_NodeDN->m_DistanceValues[neighbor].G = CostToNeighbor;
                     grid->m_NodePathConnection->at(neighbor) = current;
 
                     if (!inSearch) {
-                        //neighbor->SetH(end.get());
                         grid->m_NodeDN->m_DistanceValues[neighbor].H = grid->GetNodeDistanceToNode(neighbor, endNode);
                         tosearch.push_back(neighbor);
                     }
@@ -367,165 +344,51 @@ namespace Engine {
             }
         }
         /* If a path was not found, find the path to the closestNode */
-        //bool b{};
-        path = FindPathAStar(gridIndex, startNode, closestNode, intermediateNode/*, &b*/);
+        path = FindPathAStar(scene, startNode, closestNode, intermediateNode/*, &b*/);
         *blocked = true;
         intermediateNode = closestNode;
         return path;
     }
 
-	//std::vector<std::shared_ptr<PNode>> PathfindingSystem::FindPathAStar(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked)
-    //std::vector<int> FindPathAStar(int gridIndex, int startNode, int endNode, int& intermediateNode, bool* blocked)
-    //{
-    //    std::vector<int> path;
-    //    auto& grid = m_NodeGrids[gridIndex];
-    //    intermediateNode = -1;
-    //    
-    //    if (startNode == endNode)
-    //        return path;
-    //
-    //
-    //    //std::shared_ptr<PNode> closestNode{ start };     // If node is closed off, go to the closest one in, air length
-    //    int closestNode{ startNode };     // If node is closed off, go to the closest one in, air length
-    //    grid->NodeInitValues(closestNode, endNode);
-    //    //closestNode->InitValues(end.get());
-    //    std::vector<int> tosearch;
-    //    tosearch.push_back(startNode);
-    //    std::vector<int> processed;
-    //
-    //    while (tosearch.size() > 0)
-    //    {
-    //        int current = tosearch[0];
-    //        grid->NodeInitValues(current, endNode);
-    //        //current->InitValues(end.get());
-    //
-    //        /* Choosing node to process from the insearch array */
-    //        for (auto& it : tosearch)
-    //        {
-    //            if (it == current) { continue; }
-    //            grid->NodeInitValues(it, endNode);
-    //            //it->InitValues(/*start.get(), */end.get());
-    //            //if (it->m_DistanceValues->F < current->m_DistanceValues->F || it->m_DistanceValues->F == current->m_DistanceValues->F && it->m_DistanceValues->H < current->m_DistanceValues->H)
-    //            auto& d = grid->m_NodeDN->m_DistanceValues;
-    //            if (d[it].F < d[current].F || d[it].F == d[current].F && d[it].H < d[current].H)
-    //                current = it;
-    //        }
-    //
-    //        /* Setting closest node */
-    //        //if (closestNode->GetDistanceToNode(end.get()) > current->GetDistanceToNode(end.get()))
-    //        if (grid->GetNodeDistanceToNode(closestNode, endNode) > grid->GetNodeDistanceToNode(current, endNode))
-    //            closestNode = current;
-    //
-    //        /* FOUND PATH: Setting Path */
-    //        if (current == endNode) {
-    //            /* Går bakover fra Target til Start */
-    //            int currentTile = endNode;
-    //            while (currentTile != startNode) {
-    //                path.push_back(currentTile);
-    //                //currentTile = currentTile->m_Connection;
-    //                currentTile = grid->m_NodePathConnection->at(currentTile);
-    //            }
-    //            return path;
-    //        }
-    //
-    //        /* Removes the chosen node from tosearch and adds it to processed */
-    //        processed.push_back(current);
-    //        //std::vector<std::shared_ptr<PNode>>::iterator it = std::find(tosearch.begin(), tosearch.end(), current);
-    //        auto it = std::find(tosearch.begin(), tosearch.end(), current);
-    //        if (it != tosearch.end()) {
-    //            tosearch.erase(it);
-    //        }
-    //
-    //        /* Processes chosen node */
-    //        //for (size_t t{}; t < current->m_Neighbors->neighbors.size(); t++)
-    //        //for (auto& i : grid->m_NodeDN->m_NeighborIndices)
-    //        for (size_t t{}; t < grid->m_NodeDN->m_NeighborIndices.size(); t++)
-    //        {
-    //            //if (*it == -1) continue;
-    //
-    //            //std::shared_ptr<PNode> neighbor = current->m_Neighbors->neighbors[t];
-    //            int neighbor = grid->m_NodeDN->m_NeighborIndices[current][t];
-    //            auto& it = std::find(tosearch.begin(), tosearch.end(), neighbor);
-    //            bool inSearch = (it != tosearch.end());
-    //
-    //            //if (neighbor->IsObstruction()) { continue; }
-    //            if (grid->m_NodeObstructionStatus->at(*it)) { continue; }
-    //
-    //            it = std::find(processed.begin(), processed.end(), neighbor);
-    //            if (it != processed.end()) { continue; }
-    //
-    //            //int CostToNeighbor = current->m_DistanceValues->G + current->GetDistanceToNode(neighbor.get());
-    //            int CostToNeighbor = grid->m_NodeDN->m_DistanceValues[current].G + grid->GetNodeDistanceToNode(current, endNode);
-    //
-    //            //if (!inSearch || CostToNeighbor < neighbor->m_DistanceValues->G)
-    //            if (!inSearch || CostToNeighbor < grid->m_NodeDN->m_DistanceValues[neighbor].G)
-    //            {
-    //                //neighbor->SetG(CostToNeighbor);
-    //                //neighbor->m_Connection = current;
-    //                grid->m_NodeDN->m_DistanceValues[neighbor].G = CostToNeighbor;
-    //                grid->m_NodePathConnection->at(neighbor) = current;
-    //
-    //                if (!inSearch) {
-    //                    //neighbor->SetH(end.get());
-    //                    grid->m_NodeDN->m_DistanceValues[neighbor].H = grid->GetNodeDistanceToNode(neighbor, endNode);
-    //                    tosearch.push_back(neighbor);
-    //                }
-    //            }
-    //        }
-    //    }
-    //    /* If a path was not found, find the path to the closestNode */
-    //    bool b{};
-    //    path = FindPathAStar(gridIndex, startNode, closestNode, intermediateNode, &b);
-    //    *blocked = true;
-    //    intermediateNode = closestNode;
-    //    return path;
-    //}
-
-
-
     //************************************************************************* NODE GRID SYSTEM ***************************************************************************************************//
 
     /* Nodes, that potentially, are no longer obstructions */
-    //static std::vector<int> m_PotentiallyFalseObstructions;  // TODO: make separate object. Created on Updating ObstructionComponent 
     static std::vector<ObstructionUpdates> m_ObstructionUpdates;
 
-    std::shared_ptr<NodeGrid> NodeGridSystem::GetGridAtIndex(uint32_t index)
+    //std::shared_ptr<NodeGrid> NodeGridSystem::GetGridAtIndex(Scene* scene, uint32_t index)
+    //{
+    //    return scene->m_PathfindingNodeGrids[0];
+    //}
+    glm::vec3 NodeGridSystem::GetNodeLocation(Scene* scene, int NodeIndex)
     {
-        return m_NodeGrids[0];
-    }
-    glm::vec3 NodeGridSystem::GetNodeLocation(int gridIndex, int NodeIndex)
-    {
-        return m_NodeGrids[gridIndex]->m_NodeLocations->at(NodeIndex);
+        return scene->m_PathfindingNodeGrid->m_NodeLocations->at(NodeIndex);
     }
 
-    uint32_t NodeGridSystem::CreateObstructionSphere(uint32_t gridIndex, float radius, glm::vec3 location)
+    uint32_t NodeGridSystem::CreateObstructionSphere(Scene* scene, float radius, glm::vec3 location)
     {
-        NodeGrid* grid = m_NodeGrids[gridIndex].get();
+        auto grid = scene->m_PathfindingNodeGrid.get();
         uint32_t sphereIndex = grid->m_ObstructionSpheres.CreateObstructionSphere(radius, location);
 
         // Set nodes within the sphere to Obstructions
-        UpdateObstructionSphere(gridIndex, sphereIndex, radius, location);
+        UpdateObstructionSphere(scene, sphereIndex, radius, location);
         return sphereIndex;
     }
 
-    void NodeGridSystem::DeleteObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex)
+    void NodeGridSystem::DeleteObstructionSphere(Scene* scene, uint32_t sphereIndex)
     {
-        NodeGrid* grid = m_NodeGrids[gridIndex].get();
+        auto grid = scene->m_PathfindingNodeGrid.get();
         std::vector<int> nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
 
         ObstructionUpdates update;
         update.m_ObstructionSpheres.push_back(sphereIndex);
         update.m_PotensiallyFalseObstructionNodes = nodes;
         m_ObstructionUpdates.push_back(update);
-        //for (const auto it : nodes)
-            //m_PotentiallyFalseObstructions.push_back(it);
         grid->m_ObstructionSpheres.EraseSphere(sphereIndex);
     }   
 
-    void NodeGridSystem::UpdateObstructionSphere(uint32_t gridIndex, uint32_t sphereIndex, float radius, glm::vec3 location)
+    void NodeGridSystem::UpdateObstructionSphere(Scene* scene, uint32_t sphereIndex, float radius, glm::vec3 location)
     {
-        //int intRadius = (int)(radius * PATH_FLOATTOINT);
-        NodeGrid* grid = m_NodeGrids[gridIndex].get();
+        auto grid = scene->m_PathfindingNodeGrid.get();
 
 
         // Create ObstructionUpdate and add nearby spheres to it
@@ -552,31 +415,7 @@ namespace Engine {
             }
         nodes.clear();
 
-        // Old version
-        //for (size_t i{}; i < nodes.size(); i++)
-        //{
-        //    int distance = (int)(glm::length(location - grid->m_NodeLocations->at(i)) * PATH_FLOATTOINT);
-        //    if (distance > intRadius) {
-        //        if (std::find(m_PotentiallyFalseObstructions.begin(), m_PotentiallyFalseObstructions.end(), i) == m_PotentiallyFalseObstructions.end())
-        //            m_PotentiallyFalseObstructions.push_back(nodes[i]);
-        //    }
-        //}
-        
-        // Remove Nodes outside of obstruction sphere
-
-        // Set nodes within the sphere to Obstructions
-        //for (size_t i{}; i < grid->m_NodeLocations->size(); i++)
-        //{
-        //    int distance = (int)(glm::length(location - grid->m_NodeLocations->at(i)) * PATH_FLOATTOINT);
-        //    if (distance <= intRadius) 
-        //    {
-        //        grid->m_NodeObstructionStatus->at(i) = true;
-        //        nodes.push_back(i);
-        //        //update.m_CurrentSphereNodes.push_back(i);
-        //        update.AddNode_Current(i);
-        //    }
-        //}
-
+        // Re add all nodes within the ObstructionUpdates ObstructionSpheres
         for (size_t i{}; i < grid->m_NodeLocations->size(); i++)
             for (const auto& it : update.m_ObstructionSpheres)
                 {
@@ -593,7 +432,7 @@ namespace Engine {
         m_ObstructionUpdates.push_back(update);
     }
 
-    void NodeGridSystem::UpdateFalseObstructionNodes(uint32_t gridIndex)
+    void NodeGridSystem::UpdateFalseObstructionNodes(Scene* scene)
     {
         if (m_ObstructionUpdates.size() == 0) return;
         for (auto& it : m_ObstructionUpdates)
@@ -617,48 +456,16 @@ namespace Engine {
         // Set false nodes to false
         for (auto& it : m_ObstructionUpdates)
             for (auto& pot : it.m_PotensiallyFalseObstructionNodes)
-                m_NodeGrids[gridIndex]->m_NodeObstructionStatus->at(pot) = false;
+                scene->m_PathfindingNodeGrid->m_NodeObstructionStatus->at(pot) = false;
         m_ObstructionUpdates.clear();
-
-        // Old Version
-        //if (m_PotentiallyFalseObstructions.size() == 0) return;
-        //auto& nodeGrids = m_NodeGrids[gridIndex];
-        //std::vector<int> nodesToCheck;
-        //
-        //// Get every node index the obstruction spheres hold
-        //for (const auto& it : nodeGrids->m_ObstructionSpheres.GetSphereCollections())
-        //    for (const auto& it2 : it.m_nodes)
-        //        nodesToCheck.push_back(it2);
-        //
-        //// Remove nodes 
-        //int i{ 0 };
-        //for (i = 0; i < m_PotentiallyFalseObstructions.size(); i++)
-        //{
-        //    for (const auto& it : nodesToCheck)
-        //    {
-        //        if (m_PotentiallyFalseObstructions.size() == 0) break;
-        //        if (m_PotentiallyFalseObstructions[i] == it)
-        //        {
-        //            m_PotentiallyFalseObstructions.erase(std::next(m_PotentiallyFalseObstructions.begin(), i));
-        //            i--;
-        //            if (i < 0) i = 0;
-        //        }
-        //    }
-        //}
-        //
-        //// Set node block status to false 
-        //for (auto& obs : m_PotentiallyFalseObstructions) {
-        //    m_NodeGrids[gridIndex]->m_NodeObstructionStatus->at(obs) = false;
-        //}
-        //m_PotentiallyFalseObstructions.clear();
     }
 
-    void NodeGridSystem::CreateGridAtLocation(glm::vec3 location, glm::vec3 extent, int resolution)
+    void NodeGridSystem::CreateGridAtLocation(Scene* scene, glm::vec3 location, glm::ivec3 extent, int resolution, bool bDebugRenderEnabled)
     {
+        scene->m_PathfindingNodeGrid.reset(new NodeGrid(location, extent, resolution, extent.x * resolution * extent.z * resolution, bDebugRenderEnabled));
+
+        auto grid = scene->m_PathfindingNodeGrid.get();
         int node{};
-        m_NodeGrids.push_back(std::make_shared<NodeGrid>(location, extent, extent.x * resolution * extent.z * resolution));
-        int GridIndex = m_NodeGrids.size() - 1;
-        auto& grid = m_NodeGrids[GridIndex];
 
         int extent_X = (int)(extent.x);
         int extent_Z = (int)(extent.z);
@@ -773,16 +580,4 @@ namespace Engine {
             }
         }
     }
-
-    //void NodeGridSystem::GenerateNodeNamesForGrid(std::shared_ptr<NodeGrid> grid)
-    //{
-    //    std::string baseName = "PNode ";
-    //    uint32_t i{};
-    //    for (auto& it : grid->m_Nodes) {
-    //        i++;
-    //        std::string name = baseName + std::to_string(i);
-    //        it->m_Data->m_Name = name;
-    //    }
-    //}
-
 }

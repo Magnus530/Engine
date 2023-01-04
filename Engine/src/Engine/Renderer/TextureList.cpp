@@ -48,6 +48,8 @@ namespace Engine
 		Engine::Renderer::CreateTexture("Chess", "assets/textures/checkerboard.png", scene);
 		Engine::Renderer::CreateTexture("Wolf", "assets/textures/wolf.png", scene);
 		Engine::Renderer::CreateTexture("White", "assets/textures/white.png", scene);
+		Engine::Renderer::CreateTexture("Corner", "assets/textures/corner.png", scene);
+		Engine::Renderer::CreateTexture("Leaf", "assets/textures/leave.jpg", scene);
 
 		Engine::Renderer::CreateSkybox("Sky", skyFaces, scene);
 		Engine::Renderer::CreateSkybox("Forest", forestFaces, scene);
