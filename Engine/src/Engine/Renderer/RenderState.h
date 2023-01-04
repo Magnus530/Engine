@@ -104,4 +104,24 @@ namespace Engine
 			entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->Bind(entity.GetComponent<SkyboxMaterialComponent>().m_CubeTex.second->m_CubemapTexture);
 		}
 	};
+
+	class ParticleShaderState : public RenderState
+	{
+	public:
+		void InitShader(Entity& entity, std::shared_ptr<Engine::ShaderLibrary> shaderLibrary, Engine::Renderer::SceneData* sceneData) override
+		{
+			std::shared_ptr<Engine::Shader> particleShader = shaderLibrary->Get("Particle");
+			std::shared_ptr<Engine::OpenGLShader> particleOpenGLShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(particleShader);
+
+			particleShader->Bind();
+			particleOpenGLShader->UploadUniformMat4("u_ProjectionView", sceneData->ProjectionMatrix);
+			particleOpenGLShader->UploadUniformMat4("u_ViewMatrix", sceneData->ViewMatrix);
+			particleOpenGLShader->UploadUniformMat4("u_Transform", entity.GetComponent<Engine::TransformComponent>().m_Transform);
+
+			particleOpenGLShader->UploadUniformInt("u_CustomColor", entity.GetComponent<Engine::RendererComponent>().m_bCustomColor);
+			particleOpenGLShader->UploadUniformFloat3("u_Color", glm::vec3(entity.GetComponent<Engine::ParticleMaterialComponent>().m_Color));
+
+			entity.GetComponent<ParticleMaterialComponent>().m_Tex.second->Bind();
+		}
+	};
 }

@@ -101,7 +101,7 @@ namespace particles
 
         void GLParticleRenderer::render()
         {
-            glPointSize(10);
+            glPointSize(20);
             glBindVertexArray(m_vao);
 
             const size_t count = m_system->numAliveParticles();

@@ -6,8 +6,6 @@
 #include "basicparticlegenerators.h"
 #include "basicparticlerenderer.h"
 #include "Engine/Renderer/Camera.h"
-class Shader;
-class Texture;
 namespace particles{
     class BasicParticleManager
     {
@@ -17,14 +15,6 @@ namespace particles{
     private:
         particles::GLParticleRenderer* p_Render;
         particles::ParticleSystem* p_System;
-
-        Shader *mShaderProgram{nullptr};
-        Texture* mTexture{ nullptr };
-
-        GLint mMatrixUniform{-1};
-        GLint vMatrixUniform{-1};
-        GLint pMatrixUniform{-1};
-        GLint mTextureUniform{-1};
     };
 }
 #endif // BASICPARTICLEMANAGER_H

@@ -42,9 +42,9 @@ namespace particles
         class BasicColorGen : public ParticleGenerator
         {
         public:
-            glm::vec4 m_minStartCol{ 0.0, 0.0, 1.0, 1.0 };
-            glm::vec4 m_maxStartCol{ 0.0, 0.0, 1.0, 1.0 };
-            glm::vec4 m_minEndCol{ 0.7, 0.7, 1.0, 1.0};
+            glm::vec4 m_minStartCol{ 1.0, 1.0, 1.0, 1.0 };
+            glm::vec4 m_maxStartCol{ 1.0, 0.0, 1.0, 1.0 };
+            glm::vec4 m_minEndCol{ 0.7, 0.7, 1.0, 1.0 };
             glm::vec4 m_maxEndCol{ 0.9, 0.9, 1.0, 1.0 };
         public:
             BasicColorGen() { }

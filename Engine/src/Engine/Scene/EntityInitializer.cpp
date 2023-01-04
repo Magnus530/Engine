@@ -135,6 +135,12 @@ namespace Engine
 				entity.AddComponent<PhongMaterialComponent>(glm::vec4{ color, 1.f }, tex.first, tex.second);
 				break;
 			}
+			case Engine::ShaderType::Particle:
+			{
+				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Particle);
+				entity.AddComponent<ParticleMaterialComponent>(glm::vec4{ color, 1.f }, tex.first, tex.second);
+				break;
+			}
 		}
 	}
 

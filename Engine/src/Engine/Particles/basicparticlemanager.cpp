@@ -3,24 +3,14 @@
 #include <glad/glad.h>
 
 #include "basicparticlemanager.h"
-#include "particleshader.h"
-#include "particletexture.h"
+
+#include "Engine/Renderer/Renderer.h"
+#include "Platform/OpenGL/OpenGLShader.h"
 namespace particles{
     BasicParticleManager::BasicParticleManager(size_t maxCount)
     {
-        //initializeOpenGLFunctions();
-        //mShaderProgram = new Shader("assets/shaders/ParticleShader.vert", "assets/shaders/ParticleShader.frag");
-        mShaderProgram = new Shader("Engine/src/Engine/Particles/shaderFiles/ParticleShader.vert", "Engine/src/Engine/Particles/shaderFiles/ParticleShader.frag");
-        //"assets/shaders/Flat.glsl"
-        mMatrixUniform = glGetUniformLocation( mShaderProgram->getProgram(), "mMatrix" );
-        pMatrixUniform = glGetUniformLocation( mShaderProgram->getProgram(), "pMatrix" );
-        vMatrixUniform = glGetUniformLocation( mShaderProgram->getProgram(), "vMatrix" );
-        mTextureUniform = glGetUniformLocation(mShaderProgram->getProgram(), "textureSampler");
-
-        mTexture = new Texture("ParticleAssets/leave.bmp");
-        //Set the textures loaded to a texture unit (also called a texture slot)
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, mTexture->id());
+        //  Force activate old OpenGL code that should be active by default
+        glEnable(0x8861);
 
         p_System = new particles::ParticleSystem(maxCount);
 
@@ -42,12 +32,6 @@ namespace particles{
 
     void BasicParticleManager::update(double dt, Engine::Camera& camera)
     {
-        glUseProgram(mShaderProgram->getProgram());
-        glUniformMatrix4fv( vMatrixUniform, 1, GL_FALSE, glm::value_ptr(camera.GetProjectionMatrix()));
-        glUniformMatrix4fv( pMatrixUniform, 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
-        glUniformMatrix4fv( mMatrixUniform, 1, GL_FALSE, glm::value_ptr(p_Render->mMatrix));
-        glUniform1i(mTextureUniform, 1);
-
         p_System->update(dt);
         p_Render->update();
         p_Render->render();

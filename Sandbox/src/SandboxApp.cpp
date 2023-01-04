@@ -36,16 +36,22 @@ public:
 
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Forest"));
 
-		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 0.0f });
+		m_ParticleSourceEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Particle, "Source", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Leaf"));
+		Engine::TransformSystem::SetWorldPosition(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
+
+		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Sphere", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 0.0f });
 		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
+		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Corner"));
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
 		Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
 
-		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 0.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Chess"));
+		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 0.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Leaf"));
+		
+		m_ParticleManager = new particles::BasicParticleManager(20000);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -71,6 +77,11 @@ public:
 			if ((it)->second->HasComponent<Engine::BillboardMaterialComponent>())
 			{
 				Engine::BillboardSystem::UpdateBillboard(*(it)->second, m_PCameraController);
+			}
+
+			if ((it)->second->HasComponent<Engine::ParticleMaterialComponent>())
+			{
+				m_ParticleManager->update(static_cast<float>(ts), m_PCameraController.GetCamera());
 			}
 		}
 
@@ -103,6 +114,9 @@ private:
 	Engine::Entity m_LightEntity;
 	Engine::Entity m_SkyboxEntity;
 	Engine::Entity m_TempEntity;
+	Engine::Entity m_ParticleSourceEntity;
+
+	particles::BasicParticleManager* m_ParticleManager;
 };
 
 class Sandbox : public Engine::Application
