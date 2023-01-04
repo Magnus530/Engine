@@ -147,6 +147,12 @@ namespace Engine
 				entity.AddComponent<ParticleMaterialComponent>(glm::vec4{ color, 1.f }, tex.first, tex.second);
 				break;
 			}
+			case Engine::ShaderType::Terrain:
+			{
+				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Terrain);
+				entity.AddComponent<TerrainMaterialComponent>(glm::vec4{ color, 1.f });
+				break;
+			}
 		}
 	}
 
