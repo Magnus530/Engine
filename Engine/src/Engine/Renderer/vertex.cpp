@@ -76,6 +76,12 @@ namespace Engine {
 		return { m_uv[0], m_uv[1] };
 	}
 
+	void Vertex::SetPosition(float x, float y, float z) {
+		m_xyz[0] = x;
+		m_xyz[1] = y;
+		m_xyz[2] = z;
+	}
+
 	void Vertex::SetNormal(float r, float g, float b) {
 		m_normals[0] = r;
 		m_normals[1] = g;
