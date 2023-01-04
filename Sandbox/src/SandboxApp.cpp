@@ -39,6 +39,11 @@ public:
 		//	ImGui::Text("Sound Component");
 
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Forest"));
+
+		m_ParticleSourceEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Particle, "Source", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Leaf"));
+		Engine::TransformSystem::SetWorldPosition(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
+
 		//	//m_SoundEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sound Sources", m_SoundVA, m_ActiveScene, *m_ActiveScene->m_AudioEngine.find());
 		//	
 		//	if (ImGui::DragFloat("Volume"))
@@ -74,6 +79,8 @@ public:
 		Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
 
 		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 0.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Chess"));
+
+		m_ParticleManager = new particles::BasicParticleManager(20000);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -99,6 +106,11 @@ public:
 			if ((it)->second->HasComponent<Engine::BillboardMaterialComponent>())
 			{
 				Engine::BillboardSystem::UpdateBillboard(*(it)->second, m_PCameraController);
+			}
+
+			if ((it)->second->HasComponent<Engine::ParticleMaterialComponent>())
+			{
+				m_ParticleManager->update(static_cast<float>(ts), m_PCameraController.GetCamera());
 			}
 		}
 		Pathfinding_Update(ts);
@@ -224,6 +236,9 @@ private:
 	Engine::Entity m_SkyboxEntity;
 	Engine::Entity m_TempEntity;
 	Engine::Entity m_Player;
+	Engine::Entity m_ParticleSourceEntity;
+
+	particles::BasicParticleManager* m_ParticleManager;
 
 	// Mouse position on screen
 	glm::vec2 mousePos;
