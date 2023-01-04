@@ -11,15 +11,13 @@ namespace Engine {
         //** Init Pathfinding
         const bool NoMovement = comp.m_StartNode == comp.m_TargetNode;
         if (NoMovement) return;
-
         auto grid = scene->m_PathfindingNodeGrid.get();
-        
         if (comp.bIsMovingAlongPath)
             comp.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(scene, currentPosition);
         comp.bIsMovingAlongPath = true;    // In init or FindPath?
-        //*** END Init Pathfinding ***
 
-        // Bit reduntant for pathfinding component to have array of node pointers, when it only uses their locations
+
+        // 
         comp.m_CurrentPath = FindPathAStar(scene, comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bIsObstructed);
         const bool NoMovIntermediate = comp.m_StartNode == comp.m_IntermediateTargetNode;
         if (NoMovIntermediate) {
@@ -33,7 +31,6 @@ namespace Engine {
         comp.m_SplinePath->m_Controlpoints.push_back(currentPosition);
         for (auto it = comp.m_CurrentPath.end(); it != comp.m_CurrentPath.begin();)
             comp.m_SplinePath->m_Controlpoints.push_back(grid->m_NodeLocations->at(*--it));
-            //comp.m_SplinePath->m_Controlpoints.push_back((*--it)->m_Data->m_Position);
 
         
         // In case of only having two control points. Create a third in between, or else the spline functions doesn't work.
@@ -101,8 +98,6 @@ namespace Engine {
             glm::vec3 direction = pos - previousPosition;
             direction.y = 0.f;
 
-            // tmp method
-            // Transforming the Entity should NOT be done here. This function should instead just give a intended position along the path
             TransformSystem::SetWorldPosition(transform, pos + glm::vec3(0,0.5f,0));   // Manually adding extra height
             TransformSystem::RotateToDirectionVector(transform, glm::normalize(direction));
         }
@@ -243,7 +238,6 @@ namespace Engine {
         pathfinder.m_PatrolPath.clear();
     }
 
-    // INEFFICIENT - Needs a properly indexed nodegrid to improve search time
     int PathfindingSystem::GetNodeClosestToPosition(Scene* scene, glm::vec3 position)
     {
         auto grid = scene->m_PathfindingNodeGrid.get();
@@ -265,7 +259,6 @@ namespace Engine {
     std::vector<int> PathfindingSystem::FindPathAStar(Scene* scene, int startNode, int endNode, int& intermediateNode, bool* blocked)
     {
         std::vector<int> path;
-        //auto& grid = scene->m_PathfindingNodeGrids[gridIndex];
         auto grid = scene->m_PathfindingNodeGrid.get();
         intermediateNode = -1;
 
@@ -352,13 +345,9 @@ namespace Engine {
 
     //************************************************************************* NODE GRID SYSTEM ***************************************************************************************************//
 
-    /* Nodes, that potentially, are no longer obstructions */
+    // Vector of Obstruction Updates. Cleared each frame after ObstructionUpdate
     static std::vector<ObstructionUpdates> m_ObstructionUpdates;
 
-    //std::shared_ptr<NodeGrid> NodeGridSystem::GetGridAtIndex(Scene* scene, uint32_t index)
-    //{
-    //    return scene->m_PathfindingNodeGrids[0];
-    //}
     glm::vec3 NodeGridSystem::GetNodeLocation(Scene* scene, int NodeIndex)
     {
         return scene->m_PathfindingNodeGrid->m_NodeLocations->at(NodeIndex);
@@ -473,14 +462,15 @@ namespace Engine {
         float xzRatio = 2.f * ((float)extent_X / (float)extent_Z);
         float step = 1.f / (float)resolution;
 
+        // Creating Nodes at a given location in within the extent of the Grid 
         for (float x{}; x < extent_X; x += step)
-        {
             for (float z{}; z < extent_Z; z+=step)
             {
                 glm::vec3 loc = glm::vec3(location.x + (x) - ((float)extent_X/2.f), 0, location.z + (z) - ((float)extent_Z/2.f));
                 grid->AddNode(loc);
             }
-        }
+
+        // Adding Node Neighbours 
         int ext_X = extent_X * resolution;
         int ext_Z = extent_Z * resolution;
         for (int x{}; x < ext_X; x++)
