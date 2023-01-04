@@ -73,12 +73,12 @@ namespace Engine {
 	}
 	void TransformSystem::RotateToPosition(TransformComponent& comp, glm::vec3 position)
 	{
-		glm::vec3 direction = position - comp.GetPosition();
+		glm::vec3 direction = position - comp.GetLocation();
 		RotateToDirectionVector(comp, direction);
 	}
 	void TransformSystem::RotateToPosition2D(TransformComponent& comp, glm::vec3 position)
 	{
-		glm::vec3 direction = position - comp.GetPosition();
+		glm::vec3 direction = position - comp.GetLocation();
 		direction.y = 0.f;
 		RotateToDirectionVector(comp, direction);
 	}
