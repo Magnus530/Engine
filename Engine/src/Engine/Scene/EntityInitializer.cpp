@@ -3,6 +3,7 @@
 #include "Engine/AssetInit/PrimitiveShapeFactory.h"
 #include "Engine/Scene/Components.h"
 #include "Platform/OpenGL/OpenGLCubemap.h"
+#include "../Terrain/Terrain.h"
 
 namespace Engine
 {
@@ -20,7 +21,12 @@ namespace Engine
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
 
-		Engine::ObjLoader::ReadFile(objname, vertices, indices);
+		if (objname == "Terrain") {
+			Terrain T;
+			T.init(vertices, indices);
+		}else{
+			Engine::ObjLoader::ReadFile(objname, vertices, indices);
+		}
 		vertexarr.reset(Engine::VertexArray::Create());
 		std::shared_ptr<Engine::VertexBuffer> ObjVB;
 		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats

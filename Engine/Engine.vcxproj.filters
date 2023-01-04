@@ -73,6 +73,9 @@
     <Filter Include="vendor\stb_image">
       <UniqueIdentifier>{0DA0BA59-F998-D9AB-22CB-BE300E23B9B7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Terrain">
+      <UniqueIdentifier>{bfb77239-415f-4472-b1c0-ba62ba161c5c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine.h">
@@ -1510,6 +1513,12 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLCubemap.h" />
     <ClInclude Include="src\Engine\Renderer\TextureList.h" />
     <ClInclude Include="src\Engine\Scene\Systems\BillboardSystem.h" />
+    <ClInclude Include="src\Engine\Terrain\Terrain.h">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Terrain\Triangle.h">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1642,5 +1651,11 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLCubemap.cpp" />
     <ClCompile Include="src\Engine\Renderer\TextureList.cpp" />
     <ClCompile Include="src\Engine\Scene\Systems\BillboardSystem.cpp" />
+    <ClCompile Include="src\Engine\Terrain\Terrain.cpp">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Terrain\Triangle.cpp">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
