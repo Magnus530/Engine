@@ -41,14 +41,14 @@ public:
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{0.0f, 0.0f, 1.0f});
-		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
-		Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
+		//m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{0.0f, 0.0f, 1.0f});
+		//Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
+		//Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
 
 		//m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 0.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Chess"));
-		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Terrain", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 0.0f, 1.0f });
-		Engine::TransformSystem::SetScale(m_TempEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
-		Engine::TransformSystem::SetRotation(m_TempEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
+
+		m_Terrain = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Terrain", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -106,6 +106,7 @@ private:
 	Engine::Entity m_LightEntity;
 	Engine::Entity m_SkyboxEntity;
 	Engine::Entity m_TempEntity;
+	Engine::Entity m_Terrain;
 };
 
 class Sandbox : public Engine::Application

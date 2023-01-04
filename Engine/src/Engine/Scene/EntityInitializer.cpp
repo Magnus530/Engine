@@ -30,7 +30,7 @@ namespace Engine
 		vertexarr.reset(Engine::VertexArray::Create());
 		std::shared_ptr<Engine::VertexBuffer> ObjVB;
 		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
-
+		
 		ObjVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },
