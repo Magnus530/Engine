@@ -42,7 +42,9 @@ namespace Engine
 		// For Skybox
 		static void MaterialInit(Engine::Entity& entity, std::pair<std::string, std::shared_ptr<Engine::OpenGLCubemap>> cubetex);
 
-		static Entity ObstructorEntityInit(const ShaderType shaderType, const std::string objname, const std::string mesh, float radius, uint32_t id, Scene* scene, glm::vec3 color = glm::vec3{1,1,1}, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex = std::make_pair("White", Engine::Texture2D::Create("assets/textures/white.png")));
+		static Entity ObstructorEntityInit(const ShaderType shaderType, const std::string objname, const std::string mesh, float radius,
+			uint32_t id, Scene* scene, glm::vec3 color = glm::vec3{1,1,1}, 
+			std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex = std::make_pair("White", Engine::Texture2D::Create("assets/textures/white.png")));
 
 
 		static std::shared_ptr<VertexArray> VertexArrayInit(const std::string obj);
