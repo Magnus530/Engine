@@ -120,7 +120,7 @@ namespace Engine
 			if (Input::IsKeyPressed(E_KEY_R))
 			{
 				AE->setEnvironmentReverb(FMOD_PRESET_OFF, glm::vec3(), 0.f, 0.1f);
-				std::cout << "Audio reverb stopped";
+				//std::cout << "Audio reverb stopped";
 			}
 		}
 		else
@@ -130,7 +130,7 @@ namespace Engine
 				sgpImplementation->mpSystem->createReverb3D(&sgpImplementation->mpReverb);
 				//FMOD_REVERB_PROPERTIES propHanger = FMOD_PRESET_HANGAR;
 				AE->setEnvironmentReverb(FMOD_PRESET_FOREST, glm::vec3(), 0.f, 10.f);
-				std::cout << "Audio reverb start";
+				//std::cout << "Audio reverb start";
 			}
 
 			if (Input::IsKeyPressed(E_KEY_L))

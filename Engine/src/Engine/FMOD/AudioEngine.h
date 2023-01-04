@@ -16,6 +16,8 @@
 #include <map>
 #include <math.h> // to changeoctave & changesemitone
 #include <iostream>
+#include "Engine/FMOD/AudioListener.h"
+#include "Engine/FMOD/AudioGeometry.h"
 
 namespace Engine {
     class Entity;

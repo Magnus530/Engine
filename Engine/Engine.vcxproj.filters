@@ -138,6 +138,15 @@
     <ClInclude Include="src\Engine\FMOD\AudioEngine.h">
       <Filter>src\Engine\FMOD</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\FMOD\AudioGeometry.h">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\FMOD\AudioListener.h">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\FMOD\AudioOcclusion.h">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
     </ClInclude>
@@ -1506,15 +1515,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\FMOD\AudioListener.h">
-      <Filter>src\Engine\FMOD</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\FMOD\AudioSource.h">
-      <Filter>src\Engine\FMOD</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\FMOD\AudioOcclusion.h">
-      <Filter>src\Engine\FMOD</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1536,6 +1536,12 @@
       <Filter>src\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\FMOD\AudioGeometry.cpp">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\FMOD\AudioListener.cpp">
       <Filter>src\Engine\FMOD</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp">
@@ -1642,15 +1648,6 @@
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\FMOD\AudioListener.cpp">
-      <Filter>src\Engine\FMOD</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\FMOD\AudioSource.cpp">
-      <Filter>src\Engine\FMOD</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\FMOD\AudioOcclusion.cpp">
-      <Filter>src\Engine\FMOD</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

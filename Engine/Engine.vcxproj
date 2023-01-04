@@ -162,9 +162,6 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Engine\FMOD\AudioListener.h" />
-    <ClInclude Include="src\Engine\FMOD\AudioOcclusion.h" />
-    <ClInclude Include="src\Engine\FMOD\AudioSource.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Engine\AssetInit\ObjLoader.h" />
     <ClInclude Include="src\Engine\AssetInit\PrimitiveShape.h" />
@@ -186,6 +183,9 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClInclude Include="src\Engine\Events\KeyEvent.h" />
     <ClInclude Include="src\Engine\Events\MouseEvent.h" />
     <ClInclude Include="src\Engine\FMOD\AudioEngine.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioGeometry.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioListener.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioOcclusion.h" />
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Engine\Pathfinding\PNode.h" />
     <ClInclude Include="src\Engine\Pathfinding\PathObstructionVolumes.h" />
@@ -644,9 +644,6 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Engine\FMOD\AudioListener.cpp" />
-    <ClCompile Include="src\Engine\FMOD\AudioOcclusion.cpp" />
-    <ClCompile Include="src\Engine\FMOD\AudioSource.cpp" />
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp" />
     <ClCompile Include="src\Engine\Core\Application.cpp" />
     <ClCompile Include="src\Engine\Core\ImGuiSystem.cpp" />
@@ -654,6 +651,8 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClCompile Include="src\Engine\Core\LayerStack.cpp" />
     <ClCompile Include="src\Engine\Core\Log.cpp" />
     <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp" />
+    <ClCompile Include="src\Engine\FMOD\AudioGeometry.cpp" />
+    <ClCompile Include="src\Engine\FMOD\AudioListener.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp" />

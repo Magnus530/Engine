@@ -1,6 +1,6 @@
 #pragma once
 #include "glm/glm.hpp"
-#include "glad/glad.h"
+//#include "glad/glad.h"
 
 namespace Engine {
 
@@ -16,7 +16,6 @@ namespace Engine {
 		};
 		//Geometry ID assigned to this obstacle by the AudioEngine
 		int geometryID;
-
 		// Shape of the geometry 
 		Shape shape;
 
@@ -27,20 +26,11 @@ namespace Engine {
 		float directOcclusion;
 		float reverbOcclusion;
 		template<class T> using Array = std::vector<T>;
-		virtual void generatingBoundingBox(const Array<glm::vec3>& verts, glm::mat4 transformation) = 0;
-		virtual void generatingPlane(glm::vec3 _v1, glm::vec3 _v2, glm::vec3 _v3, glm::vec3 _v4, glm::mat4 transformation) = 0;
-	};
+		virtual bool generatingBoundingBox(const Array<glm::vec3>& verts, glm::mat4 transformation) = 0;
+		virtual bool generatingPlane(glm::vec3 _v1, glm::vec3 _v2, glm::vec3 _v3, glm::vec3 _v4, glm::mat4 transformation) = 0;
 
-	class AudioGeometry : public AudioOcclusion {
-	public:
-		AudioGeometry();
-
-
-		bool generatedBoundingBox(const Array<glm::vec3>& verts, glm::mat4 transformation = glm::mat4(1.f)) override;
-		bool generatedPlane(glm::vec3 _v1, glm::vec3 _v2, glm::vec3 _v3, glm::vec3 _v4, glm::mat4 transformation) override;
-
-	private: 
-		bool generateIndicesFromTirangles(const Array<glm::vec3>& _faces);
+		Array<float> vertices;
+		Array<uint32_t> indices;
+		Array<glm::ivec3> faces;
 	};
 }
-
