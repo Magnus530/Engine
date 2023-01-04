@@ -40,6 +40,7 @@ namespace Engine
 		std::shared_ptr<Shader> phongShader = m_ShaderLibrary->Load("assets/shaders/Phong.glsl");
 		std::shared_ptr<Shader> skyboxShader = m_ShaderLibrary->Load("assets/shaders/Skybox.glsl");
 		std::shared_ptr<Shader> particleShader = m_ShaderLibrary->Load("assets/shaders/Particle.glsl");
+		std::shared_ptr<Shader> TerrainShader = m_ShaderLibrary->Load("assets/shaders/Terrain.glsl");
 	}
 
 	void Renderer::Submit(Entity& entity)
@@ -80,6 +81,13 @@ namespace Engine
 			{
 				Engine::ParticleShaderState* particleStatePtr = new Engine::ParticleShaderState;
 				contextPtr = std::make_shared<Engine::RenderContext>(particleStatePtr, entity, m_ShaderLibrary, m_SceneData);
+				contextPtr->InitShader();
+				break;
+			}
+			case Engine::ShaderType::Terrain:
+			{
+				Engine::TerrainShaderState* TerrainStatePtr = new Engine::TerrainShaderState;
+				contextPtr = std::make_shared<Engine::RenderContext>(TerrainStatePtr, entity, m_ShaderLibrary, m_SceneData);
 				contextPtr->InitShader();
 				break;
 			}
