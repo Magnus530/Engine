@@ -31,6 +31,7 @@ namespace Engine
 
 		ImGui::End();
 	}
+
 	void ImGuiSystem::GuiEntitySettings(std::shared_ptr<Engine::Scene>& scene)
 	{
 		ImGui::Begin("Entity Settings");
@@ -199,69 +200,6 @@ namespace Engine
 			id++;
 		}
 
-
-
-		ImGui::End();
-	}
-
-	void ImGuiSystem::GuiPathfindingGridSettings(std::shared_ptr<Engine::Scene>& scene)
-	{
-		ImGui::Begin("Pathfinding Node Grid Creation");
-
-
-		int id{std::numeric_limits<int>::max()};
-		ImGui::PushItemWidth(75.f);
-		id--;
-		ImVec2 ButtonSize(130, 80);
-		if (!scene->m_PathfindingNodeGrid.get()) {
-			if (ImGui::Button("Create\nPathfinding Grid", ButtonSize))
-				NodeGridSystem::CreateGridAtLocation(scene.get(), glm::vec3{ 0,0,0 }, glm::vec3{ 10, 0, 10 }, 1);
-		}
-		else
-		{
-			glm::vec3& Location = scene->m_PathfindingNodeGrid->m_Location;
-			glm::ivec3& Extent = scene->m_PathfindingNodeGrid->m_Extent;
-			int& Resolution = scene->m_PathfindingNodeGrid->Resolution;
-
-			if (ImGui::Button("Update\nPathfindingGrid", ButtonSize))
-			{
-				glm::vec3 l = Location;
-				glm::ivec3 e = Extent;
-				int r = Resolution;
-				bool b = scene->m_PathfindingNodeGrid->bRenderNodegrid;
-
-				NodeGridSystem::CreateGridAtLocation(scene.get(), l, e, r, b);
-				scene->UpdateObstructionsToNewGrid();
-			}
-			ImGui::PushID(id--);
-			ImGui::Text("Extent");
-			ImGui::DragInt("X", &Extent.x, 0.05f);
-			ImGui::SameLine();
-			ImGui::DragInt("Y", &Extent.y, 0.05f);
-			ImGui::SameLine();
-			ImGui::DragInt("Z", &Extent.z, 0.05f);
-			ImGui::PopID();
-
-			ImGui::PushID(id--);
-			ImGui::DragInt("Grid Resolution", &Resolution, 0.5f, 1, 10);
-			ImGui::PopID();
-
-			ImGui::PushID(id--);
-			ImGui::Checkbox("Render Nodegrid", &scene->m_PathfindingNodeGrid->bRenderNodegrid);
-			ImGui::PopID();
-
-			ImGui::Separator();
-
-			if (ImGui::Button("Create\nObstruction", ButtonSize))
-			{
-				scene->CreateObstruction();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Delete\nObstruction", ButtonSize - ImVec2(0, 30)))
-			{
-				scene->DeleteObstruction();
-			}
-		}
 		ImGui::End();
 	}
 
@@ -367,6 +305,66 @@ namespace Engine
 			}
 			ImGui::EndCombo();
 		}
+	}
+
+	void ImGuiSystem::GuiPathfindingGridSettings(std::shared_ptr<Engine::Scene>& scene)
+	{
+		ImGui::Begin("Pathfinding Node Grid Creation");
+
+		int id{ std::numeric_limits<int>::max() };
+		ImGui::PushItemWidth(75.f);
+		id--;
+		ImVec2 ButtonSize(130, 80);
+		if (!scene->m_PathfindingNodeGrid.get()) {
+			if (ImGui::Button("Create\nPathfinding Grid", ButtonSize))
+				NodeGridSystem::CreateGridAtLocation(scene.get(), glm::vec3{ 0,0,0 }, glm::vec3{ 10, 0, 10 }, 1);
+		}
+		else
+		{
+			glm::vec3& Location = scene->m_PathfindingNodeGrid->m_Location;
+			glm::ivec3& Extent = scene->m_PathfindingNodeGrid->m_Extent;
+			int& Resolution = scene->m_PathfindingNodeGrid->Resolution;
+
+			if (ImGui::Button("Update\nPathfindingGrid", ButtonSize))
+			{
+				glm::vec3 l = Location;
+				glm::ivec3 e = Extent;
+				int r = Resolution;
+				bool b = scene->m_PathfindingNodeGrid->bRenderNodegrid;
+
+				NodeGridSystem::CreateGridAtLocation(scene.get(), l, e, r, b);
+				scene->UpdateObstructionsToNewGrid();
+			}
+			ImGui::PushID(id--);
+			ImGui::Text("Extent");
+			ImGui::DragInt("X", &Extent.x, 0.05f);
+			ImGui::SameLine();
+			ImGui::DragInt("Y", &Extent.y, 0.05f);
+			ImGui::SameLine();
+			ImGui::DragInt("Z", &Extent.z, 0.05f);
+			ImGui::PopID();
+
+			ImGui::PushID(id--);
+			ImGui::DragInt("Grid Resolution", &Resolution, 0.5f, 1, 10);
+			ImGui::PopID();
+
+			ImGui::PushID(id--);
+			ImGui::Checkbox("Render Nodegrid", &scene->m_PathfindingNodeGrid->bRenderNodegrid);
+			ImGui::PopID();
+
+			ImGui::Separator();
+
+			if (ImGui::Button("Create\nObstruction", ButtonSize))
+			{
+				scene->CreateObstruction();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Delete\nObstruction", ButtonSize - ImVec2(0, 30)))
+			{
+				scene->DeleteObstruction();
+			}
+		}
+		ImGui::End();
 	}
 	
 	void ImGuiSystem::GuiEntitySettings_Transform(Scene* scene, int& id, Entity& m_Entity)
