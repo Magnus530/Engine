@@ -3,6 +3,7 @@
 #include "Engine/AssetInit/PrimitiveShapeFactory.h"
 #include "Engine/Scene/Components.h"
 #include "Platform/OpenGL/OpenGLCubemap.h"
+#include "../Terrain/Terrain.h"
 
 namespace Engine
 {
@@ -14,11 +15,16 @@ namespace Engine
 		std::vector<Engine::Vertex> vertices;
 		std::vector<uint32_t> indices;
 
-		Engine::ObjLoader::ReadFile(objname, vertices, indices);
+		if (objname == "Terrain") {
+			Terrain T;
+			T.init(vertices, indices);
+		}else{
+			Engine::ObjLoader::ReadFile(objname, vertices, indices);
+		}
 		vertexarr.reset(Engine::VertexArray::Create());
 		std::shared_ptr<Engine::VertexBuffer> ObjVB;
 		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
-
+		
 		ObjVB->SetLayout
 		({
 			{ Engine::ShaderDataType::Float3, "a_Position" },
@@ -133,6 +139,18 @@ namespace Engine
 			{
 				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Phong);
 				entity.AddComponent<PhongMaterialComponent>(glm::vec4{ color, 1.f }, tex.first, tex.second);
+				break;
+			}
+			case Engine::ShaderType::Particle:
+			{
+				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Particle);
+				entity.AddComponent<ParticleMaterialComponent>(glm::vec4{ color, 1.f }, tex.first, tex.second);
+				break;
+			}
+			case Engine::ShaderType::Terrain:
+			{
+				entity.AddComponent<MaterialComponent>(Engine::ShaderType::Terrain);
+				entity.AddComponent<TerrainMaterialComponent>(glm::vec4{ color, 1.f });
 				break;
 			}
 		}

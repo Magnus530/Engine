@@ -33,16 +33,45 @@ public:
 		Engine::TextureList::CreateTextures(m_ActiveScene);
 
 		//Create entities here
+		//if (MainLayer().m_ActiveScene && MainLayer().m_ActiveScene->m_AudioEngine)
+		//{
+		//	ImGui::Separator();
+		//	ImGui::Text("Sound Component");
 
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Forest"));
+
+		m_ParticleSourceEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Particle, "Source", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Leaf"));
+		Engine::TransformSystem::SetWorldPosition(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
+
+		//	//m_SoundEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sound Sources", m_SoundVA, m_ActiveScene, *m_ActiveScene->m_AudioEngine.find());
+		//	
+		//	if (ImGui::DragFloat("Volume"))
+		//	{
+
+		//	}
+		//	if (ImGui::DragFloat("Pitch"))
+		//	{
+
+		//	}
+		// 
+		//	//stopping
+		//	//starting
+		//	//looping
+		//	//not looping
+		//	//Reverb
+		//	//Not Reverb
+
+		//}
+		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Sky"));
 
 		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 0.0f });
 		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
-		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
+		//m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
+		//Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
 
 		//auto& rock = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Rock", m_RockVA, m_ActiveScene);
 		//rock.AddComponent<Engine::ObstructionSphereComponent>();
@@ -50,9 +79,17 @@ public:
 		m_Player = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_PlayerVA, m_ActiveScene, 0, glm::vec3(0.7, 0.4, 0.2));
 		m_Player.AddComponent<Engine::PathfindingComponent>();
 
-		Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
+		//Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
 
-		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 0.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Chess"));
+		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Fir"));
+		Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Tree"));
+
+		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Pine"));
+
+		m_Terrain = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Terrain, "Terrain", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
+
+		m_ParticleManager = new particles::BasicParticleManager(20);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -78,6 +115,11 @@ public:
 			if ((it)->second->HasComponent<Engine::BillboardMaterialComponent>())
 			{
 				Engine::BillboardSystem::UpdateBillboard(*(it)->second, m_PCameraController);
+			}
+
+			if ((it)->second->HasComponent<Engine::ParticleMaterialComponent>())
+			{
+				m_ParticleManager->update(static_cast<float>(ts), m_PCameraController.GetCamera());
 			}
 		}
 		Pathfinding_Update(ts);
@@ -196,12 +238,17 @@ private:
 	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_PlayerVA, m_RockVA;
 
 	// Entities
+	Engine::Entity m_SoundEntity;
 	Engine::Entity m_CubeEntity;
 	Engine::Entity m_PlaneEntity;
 	Engine::Entity m_LightEntity;
 	Engine::Entity m_SkyboxEntity;
 	Engine::Entity m_TempEntity;
 	Engine::Entity m_Player;
+	Engine::Entity m_ParticleSourceEntity;
+	Engine::Entity m_Terrain;
+
+	particles::BasicParticleManager* m_ParticleManager;
 
 	// Mouse position on screen
 	glm::vec2 mousePos;

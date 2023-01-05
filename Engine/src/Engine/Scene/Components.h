@@ -123,6 +123,30 @@ namespace Engine
 		}
 	};
 
+	struct ParticleMaterialComponent
+	{
+		std::pair<std::string, std::shared_ptr<Texture2D>> m_Tex;
+		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		ParticleMaterialComponent() = default;
+		ParticleMaterialComponent(const ParticleMaterialComponent&) = default;
+		ParticleMaterialComponent(const glm::vec4& color, const std::string name, const std::shared_ptr<Texture2D>& texture)
+			: m_Color(color)
+		{
+			m_Tex.first = name;
+			m_Tex.second = texture;
+		}
+	};
+
+	struct TerrainMaterialComponent
+	{
+		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+
+		TerrainMaterialComponent() = default;
+		TerrainMaterialComponent(const TerrainMaterialComponent&) = default;
+		TerrainMaterialComponent(const glm::vec4& color)
+			: m_Color(color) {}
+	};
+
 	struct SkyboxMaterialComponent
 	{
 		std::pair<std::string, std::shared_ptr<Engine::OpenGLCubemap>> m_CubeTex;

@@ -1510,6 +1510,10 @@
     <ClInclude Include="src\Platform\OpenGL\OpenGLCubemap.h" />
     <ClInclude Include="src\Engine\Renderer\TextureList.h" />
     <ClInclude Include="src\Engine\Scene\Systems\BillboardSystem.h" />
+    <ClInclude Include="src\Engine\Particles\basicparticlegenerators.h" />
+    <ClInclude Include="src\Engine\Particles\basicparticlemanager.h" />
+    <ClInclude Include="src\Engine\Particles\basicparticlerenderer.h" />
+    <ClInclude Include="src\Engine\Particles\basicparticles.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1642,5 +1646,9 @@
     <ClCompile Include="src\Platform\OpenGL\OpenGLCubemap.cpp" />
     <ClCompile Include="src\Engine\Renderer\TextureList.cpp" />
     <ClCompile Include="src\Engine\Scene\Systems\BillboardSystem.cpp" />
+    <ClCompile Include="src\Engine\Particles\basicparticlegenerators.cpp" />
+    <ClCompile Include="src\Engine\Particles\basicparticlemanager.cpp" />
+    <ClCompile Include="src\Engine\Particles\basicparticlerenderer.cpp" />
+    <ClCompile Include="src\Engine\Particles\basicparticles.cpp" />
   </ItemGroup>
 </Project>
