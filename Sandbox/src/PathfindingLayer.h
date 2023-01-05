@@ -80,7 +80,8 @@ public:
 			// Nodes
 		InitVertexArray("Plane", m_PlaneVA);
 			// Patrol Point
-		InitVertexArray("Flag", m_FlagVA);
+		//InitVertexArray("Flag", m_FlagVA);
+		Engine::InitVertexArray("Flag", m_FlagVA);
 
 
 		std::vector<Engine::Vertex> verts;
@@ -175,9 +176,12 @@ public:
 		}
 
 		/* ----- RENDER PATROL POINTS ----- */
+		glm::vec3 flagColor{ 1, 0.2, 0.3 };
+		int i{};
+		float colorStep = 1.f / (float)pathfinder.m_PatrolPath.size();
 		if (pathfinder.bRenderPatrolPoints)
 			for (const auto& it : pathfinder.m_PatrolPath)
-				Engine::Renderer::Submit(m_FlagVA, it, 1.f, { 1, 0.2, 0.3 });
+				Engine::Renderer::Submit(m_FlagVA, it, 1.f, flagColor - (flagColor * (colorStep * ++i)));
 
 
 		/* ------ RENDER COLLISION POLYGON --------- */
@@ -195,72 +199,9 @@ public:
 	//----------------------------------------------------------------IMGUI-------------------------------------------------------------------------------------------------------------------------
 	virtual void OnImGuiRender() override
 	{
-		ImGui::Begin("Pathfinder");
-		
-		ImGui::PushItemWidth(200.f);
-		ImGui::Text("Obstructors");
-		ImGui::PushID(1);
-		static glm::vec3 color{ 0.5,0.5,0.5 };
-		static bool bObstructor_ShowNormal{};
-		ImGui::ColorEdit3("", glm::value_ptr(color));
-		if (ImGui::Checkbox("Show Normals", &bObstructor_ShowNormal))
-			for (auto& it : m_Obstructors)
-				it.GetComponent<Engine::RendererComponent>().m_bCustomColor = bObstructor_ShowNormal;
-		if (!bObstructor_ShowNormal)
-			for (auto& it : m_Obstructors)
-				it.GetComponent<Engine::FlatMaterialComponent>().m_Color = glm::vec4(color, 1.f);
-		ImGui::PopID();
-
-
-
-		ImGui::TextDisabled("(?)");
-		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
-		{
-			ImGui::BeginTooltip();
-			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-			ImGui::TextUnformatted("Click within the nodegrid to move the monkey to that location");
-			ImGui::PopTextWrapPos();
-			ImGui::EndTooltip();
-		}
-		ImGui::Separator();
-
 		std::shared_ptr<Engine::ImGuiSystem> imGuiPtr = std::make_shared<Engine::ImGuiSystem>();
 		imGuiPtr->GuiEntitySettings(m_Scene);
 		imGuiPtr->GuiPathfindingGridSettings(m_Scene);
-
-		size_t size = m_Obstructors.size();
-
-		static auto ID = ImGui::GetActiveID();
-		for (size_t i{}; i < size; i++)
-		{
-			ImGui::Separator();
-			ImGui::PushID((int)i);
-			auto& obstruction = m_Obstructors[i].GetComponent<Engine::ObstructionSphereComponent>();
-			auto& transform = m_Obstructors[i].GetComponent<Engine::TransformComponent>();
-
-			std::string text = "Obstruction " + std::to_string(obstruction.m_ID);
-			ImGui::Text(text.c_str());
-			ImGui::PushItemWidth(150.f);
-			
-			const bool r = ImGui::SliderFloat("Radius", &obstruction.m_radius, 0.f, 5.f, "%.1f");
-
-			glm::vec3 pos = transform.GetLocation();
-			ImGui::PushItemWidth(100.f);
-
-			const bool x = ImGui::SliderFloat("X", &pos.x, -5.f, 5.f, "%0.1f");
-
-			ImGui::SameLine();
-			const bool z = ImGui::SliderFloat("Z", &pos.z, -5.f, 5.f, "%0.1f");
-
-			if (r || x || z) {
-				Engine::TransformSystem::SetWorldPosition(transform, pos);
-				Engine::NodeGridSystem::UpdateObstructionSphere(m_Scene.get(), obstruction.m_ID, obstruction.m_radius, transform.GetLocation());
-			}
-			ImGui::PopID();
-			ImGui::Separator();
-		}
-
-		ImGui::End();
 	}
 
 	//----------------------------------------------------------------ON EVENT-------------------------------------------------------------------------------------------------------------------------
