@@ -5,6 +5,15 @@
 #include <memory>
 #include <glm/vec4.hpp>
 
+/***************************************************************************************
+*    Title: <title of program/source code>
+*    Author: <author(s) names>
+*    Date: <date>
+*    Code version: <code version>
+*    Availability: <where it's located>
+*
+***************************************************************************************/
+
 namespace particles{
     class ParticleData
     {

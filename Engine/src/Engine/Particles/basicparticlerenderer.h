@@ -2,14 +2,21 @@
 #define BASICPARTICLERENDERER_H
 
 #include <memory>
-//#include <QOpenGLFunctions_4_1_Core>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <gl/GLU.h>
 
-//#include <QMatrix4x4>
 #include <glm/mat4x4.hpp>
 #include "Engine/Renderer/vertex.h"
+
+/***************************************************************************************
+*    Title: <title of program/source code>
+*    Author: <author(s) names>
+*    Date: <date>
+*    Code version: <code version>
+*    Availability: <where it's located>
+*
+***************************************************************************************/
 
 namespace particles
 {

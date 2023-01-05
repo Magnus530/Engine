@@ -4,8 +4,17 @@
 # define M_PI           3.14159265358979323846  /* pi */
 
 #include <vector>
-//#include <math.h>
 #include "basicparticles.h"
+
+/***************************************************************************************'
+*    Title: <title of program/source code>
+*    Author: <author(s) names>
+*    Date: <date>
+*    Code version: <code version>
+*    Availability: <where it's located>
+*
+***************************************************************************************/
+
 namespace particles
 {
     namespace generators
