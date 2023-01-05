@@ -6,6 +6,6 @@ namespace Engine
 {
 	void BillboardSystem::UpdateBillboard(Engine::Entity& entity, Engine::PerspectiveCameraController& pCam)
 	{
-		Engine::TransformSystem::RotateToDirectionVector(entity.GetComponent<Engine::TransformComponent>(), pCam.GetPos());
+		Engine::TransformSystem::RotateToPosition(entity.GetComponent<Engine::TransformComponent>(), pCam.GetPos());
 	}
 }
