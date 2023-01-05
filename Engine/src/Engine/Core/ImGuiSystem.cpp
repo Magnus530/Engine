@@ -368,7 +368,6 @@ break;
 	{
 		ImGui::Begin("Audio Settings");
 		ImVec2 ButtonSize(130, 80);
-		//
 
 		// Generate samples and plot them
 		float samples[9001];
@@ -405,6 +404,7 @@ break;
 		}
 		if (ImGui::Button("Add Reverb"))
 		{
+			audio->startReverb();
 			audio->setEnvironmentReverb(FMOD_PRESET_FOREST, glm::vec3(), 0.f, 1000.f);
 		}
 		ImGui::SameLine();
@@ -412,7 +412,7 @@ break;
 		{
 			audio->setEnvironmentReverb(FMOD_PRESET_OFF, glm::vec3(), 0.f, 0.1f);
 		}
-
+		ImGui::Text("Press R for starting reverb or press button above.\nHold down CTRL + R to stopp reverb.\nPress L for music and press K for sfx oneshot.\nPress space for stopping all sounds.");
 		ImGui::End();
 	}
 	

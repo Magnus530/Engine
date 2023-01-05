@@ -149,7 +149,6 @@ namespace Engine
 			{
 				AE->stopAllChannels();
 			}
-
 		}
 	}
 
@@ -367,6 +366,11 @@ namespace Engine
 	{
 		for (auto [name, channel] : sgpImplementation->mChannels)
 			AudioEngine::errorCheck(channel->stop());
+	}
+
+	void AudioEngine::startReverb()
+	{
+		sgpImplementation->mpSystem->createReverb3D(&sgpImplementation->mpReverb);
 	}
 
 	//------------------------------------------------
