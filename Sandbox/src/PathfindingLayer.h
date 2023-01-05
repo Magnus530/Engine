@@ -133,7 +133,7 @@ public:
 		if (m_Scene->m_PathfindingNodeGrid.get())
 			Engine::PathfindingSystem::MoveAlongPath(m_Scene.get(), pathfinder, transform, ts);
 		Engine::NodeGridSystem::UpdateFalseObstructionNodes(m_Scene.get());
-
+		Engine::TransformSystem::RotateToPosition(transform, m_PCameraController.GetPos());
 
 		/* --------------------- RENDERING ------------------------ */
 		for (auto& it = m_Scene->m_Entities.begin(); it != m_Scene->m_Entities.end(); it++)
@@ -157,7 +157,7 @@ public:
 					if (i == pathfinder.m_StartNode) {
 						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_Scene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, startColor);
 					}
-					else if (i == pathfinder.m_StartNode) {
+					else if (i == pathfinder.m_TargetNode) {
 						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_Scene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, targetColor);
 					}
 					else if (m_Scene->m_PathfindingNodeGrid->m_NodeObstructionStatus->at(i)) {
@@ -170,9 +170,9 @@ public:
 			}
 
 			/* ----- RENDER SPLINE PATH ----- */
-			scale /= 2.f;
-			for (auto& it : pathfinder.m_SplinePath->m_Controlpoints)
-				Engine::Renderer::Submit(m_PlaneVA, glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0), scale, {1,1,1});
+			if (pathfinder.bRenderPath)
+				for (auto& it : pathfinder.m_SplinePath->m_Controlpoints)
+					Engine::Renderer::Submit(m_PlaneVA, glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0), scale, { 1,1,1 });
 		}
 
 		/* ----- RENDER PATROL POINTS ----- */

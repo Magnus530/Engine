@@ -88,6 +88,9 @@ public:
 		Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
 
 		Engine::InitVertexArray("Flag", m_FlagVA);
+		Engine::InitVertexArray("HorizontalPlane", m_FlatPlaneVA);
+
+		m_ParticleManager = new particles::BasicParticleManager(20, glm::vec4{0,10,0,0});
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -138,7 +141,6 @@ public:
 				for (const auto& it : pathfinder.m_PatrolPath)
 					Engine::Renderer::Submit(m_FlagVA, it, 1.f, flagColor - (flagColor * (colorStep * ++i)));
 		}
-
 #endif
 
 		Engine::Renderer::EndScene();
@@ -226,19 +228,24 @@ public:
 				for (size_t i{ 0 }; i < m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->size(); i++)
 				{
 					if (i == pathfinder.m_StartNode) {
-						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, startColor);
+						Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, startColor);
 					}
-					else if (i == pathfinder.m_StartNode) {
-						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, targetColor);
+					else if (i == pathfinder.m_TargetNode) {
+						Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, targetColor);
 					}
 					else if (m_ActiveScene->m_PathfindingNodeGrid->m_NodeObstructionStatus->at(i)) {
-						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, blockColor);
+						Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, blockColor);
 					}
 					else {
-						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, nodeColor);
+						Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, nodeColor);
 					}
 				}
 			}
+			/* ----- RENDER SPLINE PATH ----- */
+			scale /= 2.f;
+			if (pathfinder.bRenderPath)
+				for (auto& it : pathfinder.m_SplinePath->m_Controlpoints)
+					Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0), scale, glm::vec3{ 1,1,1 });
 		}
 	}
 #endif
@@ -250,7 +257,7 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 
-	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_PlayerVA, m_RockVA, m_FlagVA;
+	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_PlayerVA, m_RockVA, m_FlagVA, m_FlatPlaneVA;
 
 	// Entities
 	Engine::Entity m_SoundEntity;

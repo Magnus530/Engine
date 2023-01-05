@@ -30,6 +30,9 @@ namespace Engine
 	};
 
 #ifdef E_DEBUG
+	/* Initalize a vertex array for a layer to hold.
+	*   Used mostly for rendering debug elements that are not entities themselves,
+	*	and thus are not placed in the ordinary rendering update */
 	inline static void InitVertexArray(std::string obj, std::shared_ptr<VertexArray>& va)
 	{
 		std::vector<Vertex> vertices;
@@ -38,7 +41,7 @@ namespace Engine
 		ObjLoader::ReadFile(obj, vertices, indices);
 		va.reset(VertexArray::Create());
 		std::shared_ptr<VertexBuffer> ObjVB;
-		ObjVB.reset(VertexBuffer::Create(vertices.data(), (uint32_t)vertices.size() * sizeof(Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
+		ObjVB.reset(VertexBuffer::Create(vertices.data(), (uint32_t)vertices.size() * sizeof(Vertex)));
 		ObjVB->SetLayout
 		({
 			{ ShaderDataType::Float3, "a_Position" },
@@ -48,7 +51,7 @@ namespace Engine
 		va->AddVertexBuffer(ObjVB);
 
 		std::shared_ptr<IndexBuffer> ObjIB;
-		ObjIB.reset(IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
+		ObjIB.reset(IndexBuffer::Create(indices)); 
 		va->SetIndexBuffer(ObjIB);
 	}
 #endif
