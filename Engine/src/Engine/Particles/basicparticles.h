@@ -174,7 +174,6 @@ namespace particles{
     {
     protected:
         ParticleData m_particles;
-        ParticleData m_aliveParticles;
 
         size_t m_count;
 

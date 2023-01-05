@@ -223,7 +223,6 @@ namespace particles
     {
         m_count = maxCount;
         m_particles.generate(maxCount);
-        m_aliveParticles.generate(maxCount);
 
         for(size_t i = 0; i < maxCount; ++i)
             m_particles.m_alive[i] = false;
