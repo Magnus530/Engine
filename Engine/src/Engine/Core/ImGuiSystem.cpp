@@ -307,6 +307,50 @@ namespace Engine
 		}
 	}
 
+	void ImGuiSystem::GuiAudioSettings(std::shared_ptr<Engine::AudioEngine>& audio)
+	{
+		ImGui::Begin("Audio Settings");	
+		ImVec2 ButtonSize(130, 80);
+		//
+
+		// Generate samples and plot them
+		float samples[9001];
+		for (int n = 0; n < 9001; n++)
+			samples[n] = sinf(n * 0.2f + ImGui::GetTime() * 5.f);
+		ImGui::PlotLines("Samples that are over 9000", samples, 9001);
+
+		std::string ambience = "assets/audio/Forest_amb.wav";
+		std::string musicPath1 = "assets/audio/Music.wav";
+		if (ImGui::Button("Reset to default", ButtonSize))
+		{
+			audio->stopAllChannels();
+			audio->setEnvironmentReverb(FMOD_PRESET_OFF, glm::vec3(), 0.f, 0.1f);
+		}
+		ImGui::SameLine(); 
+		ImGui::TextDisabled("(?)");
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+		{
+			ImGui::BeginTooltip();
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted("Reset to default causes to stop all sounds and reset the environment reverb that is put in the game.");
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+
+		if (ImGui::Button("Play music"))
+		{
+			audio->playSound(musicPath1, glm::vec3(), -15.f);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Play Environment"))
+		{
+			audio->playSound(ambience, glm::vec3(), -10.f);
+		}
+
+
+		ImGui::End();
+	}
+
 	void ImGuiSystem::GuiPathfindingGridSettings(std::shared_ptr<Engine::Scene>& scene)
 	{
 		ImGui::Begin("Pathfinding Node Grid Creation");
