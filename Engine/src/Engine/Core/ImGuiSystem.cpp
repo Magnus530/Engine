@@ -304,8 +304,8 @@ namespace Engine
 							entity->GetComponent<Engine::MaterialComponent>().m_ShaderType = Engine::ShaderType::Phong;
 							entity->RemoveComponent<Engine::FlatMaterialComponent>();
 							entity->AddComponent<Engine::PhongMaterialComponent>(glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f }, "White", Engine::Texture2D::Create("assets/textures/white.png"));
-							currShader = k;
-							break;
+currShader = k;
+break;
 						}
 						break;
 					}
@@ -366,7 +366,7 @@ namespace Engine
 
 	void ImGuiSystem::GuiAudioSettings(std::shared_ptr<Engine::AudioEngine>& audio)
 	{
-		ImGui::Begin("Audio Settings");	
+		ImGui::Begin("Audio Settings");
 		ImVec2 ButtonSize(130, 80);
 		//
 
@@ -383,7 +383,7 @@ namespace Engine
 			audio->stopAllChannels();
 			audio->setEnvironmentReverb(FMOD_PRESET_OFF, glm::vec3(), 0.f, 0.1f);
 		}
-		ImGui::SameLine(); 
+		ImGui::SameLine();
 		ImGui::TextDisabled("(?)");
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
 		{
@@ -396,14 +396,22 @@ namespace Engine
 
 		if (ImGui::Button("Play music"))
 		{
-			audio->playSound(musicPath1, glm::vec3(), -15.f);
+			audio->playSound(musicPath1, glm::vec3(), -15.f, 1.f);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Play Environment"))
 		{
-			audio->playSound(ambience, glm::vec3(), -10.f);
+			audio->playSound(ambience, glm::vec3(), -10.f, 1.f);
 		}
-
+		if (ImGui::Button("Add Reverb"))
+		{
+			audio->setEnvironmentReverb(FMOD_PRESET_FOREST, glm::vec3(), 0.f, 1000.f);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Stop reverb"))
+		{
+			audio->setEnvironmentReverb(FMOD_PRESET_OFF, glm::vec3(), 0.f, 0.1f);
+		}
 
 		ImGui::End();
 	}

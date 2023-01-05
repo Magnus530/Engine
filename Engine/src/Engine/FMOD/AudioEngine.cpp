@@ -82,7 +82,8 @@ namespace Engine
 	AudioEngine::AudioEngine()
 	{
 		init();
-		AE->loadSound("assets/audio/Cartoon_song.wav", false, true, true);
+		AE->loadSound("assets/audio/Music.wav", false, true, true);
+		AE->loadSound("assets/audio/Forest_amb.wav", true, true, true);
 	}
 
 	AudioEngine::~AudioEngine()
