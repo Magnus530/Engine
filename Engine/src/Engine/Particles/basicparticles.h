@@ -6,6 +6,7 @@
 #include <glm/vec4.hpp>
 
 /***************************************************************************************
+*   
 *    Title: <title of program/source code>
 *    Author: <author(s) names>
 *    Date: <date>
@@ -174,7 +175,6 @@ namespace particles{
     {
     protected:
         ParticleData m_particles;
-        ParticleData m_aliveParticles;
 
         size_t m_count;
 
@@ -198,8 +198,6 @@ namespace particles{
         void addUpater(std::shared_ptr<ParticleUpdater> up) { m_updaters.push_back(up); }
 
         ParticleData *finalData() { return &m_particles;}
-
-        static size_t computeMemoryUsage(const ParticleSystem &p);
     };
 }
 #endif // BASICPARTICLES_H

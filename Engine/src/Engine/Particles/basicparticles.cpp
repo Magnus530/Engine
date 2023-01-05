@@ -223,7 +223,6 @@ namespace particles
     {
         m_count = maxCount;
         m_particles.generate(maxCount);
-        m_aliveParticles.generate(maxCount);
 
         for(size_t i = 0; i < maxCount; ++i)
             m_particles.m_alive[i] = false;
@@ -242,11 +241,5 @@ namespace particles
     void ParticleSystem::reset()
     {
         m_particles.m_countAlive = 0;
-    }
-
-    size_t ParticleSystem::computeMemoryUsage(const ParticleSystem &p)
-    {
-//        return 2 * ParticleData::computeMemoryUsage(p.m_particles);
-        return 0;
     }
 }
