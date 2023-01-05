@@ -23,8 +23,5 @@ namespace Engine {
 
 		static float Bid(std::vector<float>& knotVector, float t, int it, int d);
 		static float Wid(std::vector<float>& knotVector, float t, int it, int d);
-
-	//private:
-		//static std::vector<float> m_KnotVector;
 	};
 }

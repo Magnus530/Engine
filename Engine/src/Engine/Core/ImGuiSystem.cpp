@@ -55,7 +55,15 @@ namespace Engine
 		{
 			ImGui::Separator();
 			auto& tag = (it)->second->GetComponent<Engine::TagComponent>().Tag;
+
+			ImFont* font = new ImFont(*ImGui::GetDefaultFont());
+			font->FontSize = 20.f;
+			ImGui::PushFont(font);
+			ImGui::SetWindowFontScale(1.5f);
 			ImGui::Text("%s", tag.c_str());
+			ImGui::SetWindowFontScale(1.f);
+			ImGui::PopFont();
+
 			switch ((it)->second->GetComponent<Engine::MaterialComponent>().m_ShaderType)
 			{
 			case Engine::ShaderType::Flat:
@@ -66,9 +74,7 @@ namespace Engine
 				ImGui::PushID(i);
 				glm::vec4& objColor = (it)->second->GetComponent<Engine::FlatMaterialComponent>().m_Color;
 				ImGui::ColorEdit4("Color", glm::value_ptr(objColor));
-				ImGui::Separator();
 				ShaderSelect(it->second, currentShader, comboShaderPreviewValue, shaderNames);
-				ImGui::Separator();
 				ImGui::Checkbox("Show Custom Color", &(it)->second->GetComponent<Engine::RendererComponent>().m_bCustomColor);
 				ImGui::PopID();
 				i++;
@@ -104,9 +110,7 @@ namespace Engine
 					}
 					ImGui::EndCombo();
 				}
-				ImGui::Separator();
 				ShaderSelect(it->second, currentShader, comboShaderPreviewValue, shaderNames);
-				ImGui::Separator();
 				ImGui::PopID();
 				i++;
 				break;
@@ -141,16 +145,12 @@ namespace Engine
 					}
 					ImGui::EndCombo();
 				}
-				ImGui::Separator();
 				glm::vec4& objColor = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_Color;
 				glm::vec3& objAColor = (it)->second->GetComponent<Engine::PhongMaterialComponent>().m_AmbientColor;
 				ImGui::ColorEdit4("Color", glm::value_ptr(objColor));
 				ImGui::ColorEdit3("Ambient Color", glm::value_ptr(objAColor));
-				ImGui::Separator();
 				ShaderSelect(it->second, currentShader, comboShaderPreviewValue, shaderNames);
-				ImGui::Separator();
 				ImGui::Checkbox("Show Custom Color", &(it)->second->GetComponent<Engine::RendererComponent>().m_bCustomColor);
-				ImGui::Separator();
 				ImGui::PopID();
 				i++;
 				break;
@@ -183,7 +183,6 @@ namespace Engine
 					}
 					ImGui::EndCombo();
 				}
-				ImGui::Separator();
 				ImGui::PopID();
 				i++;
 				break;
@@ -197,9 +196,8 @@ namespace Engine
 				GuiEntitySettings_Obstruction(scene.get(), id, *it->second);
 
 			id++;
+			ImGui::Separator();
 		}
-
-
 
 		ImGui::End();
 	}
@@ -207,8 +205,6 @@ namespace Engine
 	void ImGuiSystem::GuiPathfindingGridSettings(std::shared_ptr<Engine::Scene>& scene)
 	{
 		ImGui::Begin("Pathfinding Node Grid Creation");
-
-
 		int id{std::numeric_limits<int>::max()};
 		ImGui::PushItemWidth(75.f);
 		id--;
@@ -251,16 +247,14 @@ namespace Engine
 			ImGui::PopID();
 
 			ImGui::Separator();
+			ImGui::Separator();
 
+			// Manually Creating Obstructions in the scene
 			if (ImGui::Button("Create\nObstruction", ButtonSize))
-			{
-				scene->CreateObstruction();
-			}
+				scene->CreateObstruction(1.5f);
 			ImGui::SameLine();
 			if (ImGui::Button("Delete\nObstruction", ButtonSize - ImVec2(0, 30)))
-			{
 				scene->DeleteObstruction();
-			}
 		}
 		ImGui::End();
 	}
@@ -373,7 +367,6 @@ namespace Engine
 	{
 		auto& transform = m_Entity.GetComponent<Engine::TransformComponent>();
 		ImGui::PushItemWidth(100.f);
-		ImGui::Separator();
 
 		glm::vec3 Location	= transform.GetLocation();
 		glm::vec3& Rotator	= transform.m_Rotator;
@@ -438,12 +431,9 @@ namespace Engine
 			Scale = { 1,1,1 };
 			Engine::TransformSystem::ResetTransforms(transform);
 		}
-		ImGui::Separator();
 	}
 	void ImGuiSystem::GuiEntitySettings_Pathfinding(Scene* scene, int& id, Entity& m_Entity)
 	{
-		ImGui::Separator();
-		// SPLINE SPEED ------------------------------------------------------------------------------------
 		ImGui::PushItemWidth(150.f);
 		ImGui::DragFloat("MovementSpeed", &m_Entity.GetComponent<Engine::PathfindingComponent>().m_EntityPathSpeed, 0.3f, 0.0f, 1000.f);
 
@@ -486,13 +476,11 @@ namespace Engine
 			if (!bPatrolpaused)
 			{
 				Engine::PathfindingSystem::PausePatrol(scene, pathfinder, currentPos);
-				//Engine::PathfindingSystem::CancelMovementAlongPath(pathfinder);
 				bPatrolpaused = true;
 			}
 			else
 			{
 				Engine::PathfindingSystem::ResumePatrol(scene, pathfinder, currentPos, pathfinder.m_PatrolType);
-				//Engine::PathfindingSystem::ResumeMovementAlongPath(pathfinder, currentPos);
 				bPatrolpaused = false;
 			}
 		}

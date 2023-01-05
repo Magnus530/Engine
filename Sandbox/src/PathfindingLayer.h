@@ -23,7 +23,6 @@ private:
 private:
 	std::shared_ptr<Engine::VertexArray> m_VA;
 	std::shared_ptr<Engine::VertexArray> m_PlaneVA;
-	std::shared_ptr<Engine::VertexArray> m_BeveledCubeVA;
 	std::shared_ptr<Engine::VertexArray> m_FlagVA;
 	std::shared_ptr<Engine::Scene> m_Scene;
 	Engine::Entity m_Entity;
@@ -39,12 +38,8 @@ private:
 
 private: // Visual Aid & ImGui related elements
 	bool bRenderNodeGrid{ true };
-	//bool bRenderPatrolPath{ true };
 	bool bShowShaderColor{ true };
-	//int m_StartNode;
-	//int m_TargetNode;
 	std::vector<int> m_BlockedNodes;
-	//std::vector<glm::vec3> m_PatrolPoints;
 
 private: // Collision Visuals
 	Engine::ConvexPolygon m_Polygon;
@@ -58,43 +53,30 @@ private: // Collision Visuals
 
 private: // Screen RayCasting
 	glm::vec2 mousePos;
-	//Engine::Entity m_BeveledCube;
 
 
 public:
 	PathfindingLayer()
 		: Layer("PathfindingLayer"), m_PCameraController(50.0f, 1280.0f / 720.0f, 0.01f, 1000.0f)
 	{
-		/* Pathfinding */
-
-		/* Loading obj */
-		std::vector<Engine::Vertex> vertices;
-		std::vector<uint32_t> indices;
-
-		Engine::ObjLoader::ReadFile("Monkey", vertices, indices);
-
 		m_Scene = std::make_shared<Engine::Scene>();
+		Engine::Renderer::RenderInit();
+		Engine::TextureList::CreateTextures(m_Scene);
+
+
 		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_VA, m_Scene, 0, glm::vec3(0.7, 0.4, 0.2));
 		m_Entity.AddComponent<Engine::PathfindingComponent>();
-
-		//Engine::NodeGridSystem::CreateGridAtLocation(m_Scene.get(), glm::vec3(0,0,0), glm::vec3((int)20, 0, (int)20), 1);
 
 		// Audio
 		m_Audio = std::make_shared<Engine::AudioEngine>();
 
 		/* Set m_Entity location to Pathfinding Node 1 */
-		//glm::vec3 startPosition = Engine::NodeGridSystem::GetNodeLocation(m_Scene.get(), 0, 0);
 		glm::vec3 startPosition{ 0, 0, 0 };
 		Engine::TransformSystem::SetWorldPosition(m_Entity.GetComponent<Engine::TransformComponent>(), startPosition + glm::vec3(0, 0.5f, 0)); //Manually adding extra height
 		Engine::TransformSystem::RotateToDirectionVector(m_Entity.GetComponent<Engine::TransformComponent>(), glm::normalize(glm::vec3(-1, 0, 1)));
 
-		//m_Entity.GetComponent<Engine::PathfindingComponent>().m_StartNode;
-		//m_Entity.GetComponent<Engine::PathfindingComponent>().m_Grid = 0;
-
 
 		// Vertex Array Pathfinding 
-			// Obstructions
-		InitVertexArray("BeveledCube", m_BeveledCubeVA);	// Bruker denne vertex arrayen flere ganger, s� Initialiserer den for seg selv her
 			// Nodes
 		InitVertexArray("Plane", m_PlaneVA);
 			// Patrol Point
@@ -121,16 +103,6 @@ public:
 		m_Polygon.m_Normals.push_back({-1, 0, 0});
 
 
-			// - MAKE CUBE
-		//m_Polygon.m_Locations.push_back({-1, 1, 1 });
-		//m_Polygon.m_Locations.push_back({ 1, 1, 1 });
-		//m_Polygon.m_Locations.push_back({ 1, 1,-1 });
-		//m_Polygon.m_Locations.push_back({-1, 1,-1 });
-		//m_Polygon.m_Normals.push_back({ 0, 0, 1 });
-		//m_Polygon.m_Normals.push_back({ 1, 0, 0 });
-		//m_Polygon.m_Normals.push_back({ 0, 0,-1 });
-		//m_Polygon.m_Normals.push_back({-1, 0, 0 });
-		//
 		InitVertexArray(m_PolygonVA, m_Polygon);
 	}
 
@@ -164,9 +136,7 @@ public:
 
 		/* --------------------- RENDERING ------------------------ */
 		for (auto& it = m_Scene->m_Entities.begin(); it != m_Scene->m_Entities.end(); it++)
-		{
 			Engine::Renderer::Submit(*(it)->second);
-		}
 		
 #ifdef E_DEBUG
 		/* ------- RENDER NODEGRID -------- */
@@ -225,8 +195,6 @@ public:
 	//----------------------------------------------------------------IMGUI-------------------------------------------------------------------------------------------------------------------------
 	virtual void OnImGuiRender() override
 	{
-		//ImGui::ShowDemoWindow();
-
 		ImGui::Begin("Pathfinder");
 		
 		ImGui::PushItemWidth(200.f);
@@ -259,15 +227,6 @@ public:
 		std::shared_ptr<Engine::ImGuiSystem> imGuiPtr = std::make_shared<Engine::ImGuiSystem>();
 		imGuiPtr->GuiEntitySettings(m_Scene);
 		imGuiPtr->GuiPathfindingGridSettings(m_Scene);
-																																// ADD TO GUI
-		// ADJUST OBSTRTUCTION ENTITIES ------------------------------------------------------------------------------------
-		//ImGui::Separator();
-		//if (ImGui::Button("CREATE\nObstruction", ImVec2(100.f, 100.f)))
-		//	CreateObstructor();
-
-		//ImGui::SameLine();
-		//if (ImGui::Button("DELETE\nObstruction", ImVec2(100.f, 100.f)))
-		//	DeleteObstructor();
 
 		size_t size = m_Obstructors.size();
 
@@ -328,10 +287,6 @@ public:
 					glm::vec3 Intersection{};
 					glm::vec3 planeVector = m_Polygon.m_Locations[i + 1 >= m_Polygon.m_Locations.size() ? 0 : i + 1] - m_Polygon.m_Locations[i];
 
-					//glm::vec3 point{};
-					//if (Engine::RayCast::IntersectWithAlignedPlane(point, m_Polygon.m_Normals[i], m_Polygon.m_Locations[i], ray, pos))
-						//m_RayCastCollisionPoints.push_back(point);
-					
 					if (Engine::RayCast::IntersectWithPlane(Intersection, m_Polygon.m_Normals[i], m_Polygon.m_Locations[i], planeVector, ray, pos))
 						m_RayCastCollisionPoints.push_back(Intersection);
 				}
@@ -364,7 +319,6 @@ public:
 				pathfinder.m_StartNode = Engine::PathfindingSystem::GetNodeClosestToPosition(m_Scene.get(), transform.GetLocation());
 				pathfinder.m_TargetNode = Engine::PathfindingSystem::GetNodeClosestToPosition(m_Scene.get(), Intersection);
 
-				//pathfinder.m_TargetNode = m_TargetNode;
 				Engine::PathfindingSystem::FindPath(m_Scene.get(), pathfinder, transform.GetLocation() - glm::vec3(0, 0.5f, 0));
 			}
 		}

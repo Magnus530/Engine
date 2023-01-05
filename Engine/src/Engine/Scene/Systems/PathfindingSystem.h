@@ -41,11 +41,7 @@ namespace Engine {
 		//DEBUG
 		bool bRenderNodegrid{};
 		
-		// Node 
-			//	Position 
-			//	DistanceValues /F - G - H/ & Neighbors
-			//  Node Connection
-			//	Obstruction
+		// Node s
 		std::vector<glm::vec3>* m_NodeLocations;
 		PathNodes_DN* m_NodeDN;
 		std::vector<int>* m_NodePathConnection;
@@ -84,9 +80,6 @@ namespace Engine {
 			return (int)(glm::length(m_NodeLocations->at(node) - m_NodeLocations->at(targetNode)) * PATH_FLOATTOINT);
 		}
 	};
-#ifdef E_DEBUG
-	inline NodesAdditional* m_NodesAdditional = new NodesAdditional();
-#endif
 
 
 	// Given a Nodegrid, finds a path from A to B
@@ -95,7 +88,6 @@ namespace Engine {
 	public:
 		static void FindPath(Scene* scene, PathfindingComponent& comp, const glm::vec3 currentPosition);
 		// Deciding type of PathMovement - Regular, Patrol ... etc
-		static void PathMovement(Scene* scene, PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime);
 
 		// General Movement
 		static void MoveAlongPath(Scene* scene, PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime);
@@ -124,14 +116,14 @@ namespace Engine {
 
 	struct ObstructionUpdates
 	{
-		std::vector<int> m_ObstructionSpheres;
-		std::vector<int> m_CurrentSphereNodes;
-		std::vector<int> m_PotensiallyFalseObstructionNodes;
+		std::vector<int> m_ObstructionSpheres;	// Spheres that are checked for this ObstructionUpdate
+		std::vector<int> m_CurrentSphereNodes;	// Nodes currently within obstruction spheres
+		std::vector<int> m_PotensiallyFalse;	// Obstruction nodes that are potentially false
 
-		void AddNode_Potensial(int node)
+		void AddNode_PotensiallyFalse(int node)
 		{
-			if (std::find(m_PotensiallyFalseObstructionNodes.begin(), m_PotensiallyFalseObstructionNodes.end(), node) == m_PotensiallyFalseObstructionNodes.end())
-				m_PotensiallyFalseObstructionNodes.push_back(node);
+			if (std::find(m_PotensiallyFalse.begin(), m_PotensiallyFalse.end(), node) == m_PotensiallyFalse.end())
+				m_PotensiallyFalse.push_back(node);
 		}
 		void AddNode_Current(int node)
 		{

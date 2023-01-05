@@ -44,6 +44,9 @@ public:
 		m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
 
+		//auto& rock = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Rock", m_RockVA, m_ActiveScene);
+		//rock.AddComponent<Engine::ObstructionSphereComponent>();
+
 		m_Player = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_PlayerVA, m_ActiveScene, 0, glm::vec3(0.7, 0.4, 0.2));
 		m_Player.AddComponent<Engine::PathfindingComponent>();
 
@@ -190,7 +193,7 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 
-	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_PlayerVA;
+	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_PlayerVA, m_RockVA;
 
 	// Entities
 	Engine::Entity m_CubeEntity;

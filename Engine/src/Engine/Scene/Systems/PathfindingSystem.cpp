@@ -3,9 +3,9 @@
 #include "Engine/Scene/Scene.h"
 
 namespace Engine {
-    //static std::vector<std::shared_ptr<NodeGrid>> m_NodeGrids;
-
+    //**********************************************************************************************************************************************************************************************//
     //************************************************************************ PATHFINDING SYSTEM **********************************************************************************//
+    //**********************************************************************************************************************************************************************************************//
 	void PathfindingSystem::FindPath(Scene* scene, PathfindingComponent& comp, const glm::vec3 currentPosition)
 	{
         //** Init Pathfinding
@@ -14,10 +14,10 @@ namespace Engine {
         auto grid = scene->m_PathfindingNodeGrid.get();
         if (comp.bIsMovingAlongPath)
             comp.m_StartNode = PathfindingSystem::GetNodeClosestToPosition(scene, currentPosition);
-        comp.bIsMovingAlongPath = true;    // In init or FindPath?
+        comp.bIsMovingAlongPath = true;
 
 
-        // 
+        // Find path to target, Component stores vector<int>pathIndex 
         comp.m_CurrentPath = FindPathAStar(scene, comp.m_StartNode, comp.m_TargetNode, comp.m_IntermediateTargetNode, &comp.bIsObstructed);
         const bool NoMovIntermediate = comp.m_StartNode == comp.m_IntermediateTargetNode;
         if (NoMovIntermediate) {
@@ -47,7 +47,7 @@ namespace Engine {
         comp.bReachedTarget = false;
 
 
-        // Get length of spline path for accurate movement speed through spline
+        // Get length of spline path for accurate movement speed speed through spline
         comp.m_SplineLength = 0.f;
         glm::vec3 prevPos = currentPosition;
         for (float t{}; t < 1.f; t += 0.05)
@@ -61,23 +61,21 @@ namespace Engine {
         }
 	}
 
-    void PathfindingSystem::PathMovement(Scene* scene, PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime)
-    {
-    }
+
+
+
 
     void PathfindingSystem::MoveAlongPath(Scene* scene, PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime)
     {
         if (!pathfinder.bIsMovingAlongPath) return;
         if (pathfinder.bReachedTarget) return;
 
-        //float prevT = pathfinder.m_SplineMovement;
         float& t = pathfinder.m_SplineMovement;
         float speed = pathfinder.m_EntityPathSpeed / pathfinder.m_SplineLength;
         if (speed <= 0.f) return;
 
         if (t < 0.99f) {
             t = std::clamp<float>(t += deltatime * speed, 0.f, 0.99f);
-            //pathfinder.m_CurrentPatrolPoint += t - prevT;
         }
         else {  // Reached end of path
             t = 0.f;
@@ -343,7 +341,9 @@ namespace Engine {
         return path;
     }
 
+    //**********************************************************************************************************************************************************************************************//
     //************************************************************************* NODE GRID SYSTEM ***************************************************************************************************//
+    //**********************************************************************************************************************************************************************************************//
 
     // Vector of Obstruction Updates. Cleared each frame after ObstructionUpdate
     static std::vector<ObstructionUpdates> m_ObstructionUpdates;
@@ -359,7 +359,16 @@ namespace Engine {
         uint32_t sphereIndex = grid->m_ObstructionSpheres.CreateObstructionSphere(radius, location);
 
         // Set nodes within the sphere to Obstructions
-        UpdateObstructionSphere(scene, sphereIndex, radius, location);
+        for (int i = 0; i < grid->m_NodeLocations->size(); i++)
+        { 
+            int mRadius = (int)(radius * PATH_FLOATTOINT);
+            int distance = (int)(glm::length(location - grid->m_NodeLocations->at(i)) * PATH_FLOATTOINT);
+            if (distance <= mRadius)
+            {
+                grid->m_NodeObstructionStatus->at(i) = true;
+                grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex).push_back(i);
+            }
+        }
         return sphereIndex;
     }
 
@@ -367,44 +376,51 @@ namespace Engine {
     {
         auto grid = scene->m_PathfindingNodeGrid.get();
         std::vector<int> nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
-
+        
         ObstructionUpdates update;
         update.m_ObstructionSpheres.push_back(sphereIndex);
-        update.m_PotensiallyFalseObstructionNodes = nodes;
+            // Add nearby obstruction spheres   
+        
+        const auto& sphereLocations = grid->m_ObstructionSpheres.GetSphereLocations();
+        for (int i = 0; i < grid->m_ObstructionSpheres.GetSphereCount(); i++)
+            if (glm::length(sphereLocations[sphereIndex] - sphereLocations[i]) < grid->m_ObstructionSpheres.GetSphereRadiuses()[sphereIndex] + 100.f && i != sphereIndex)    // + 100.f is an arbitrary amount added to the radius, 
+                update.m_ObstructionSpheres.push_back(i);                                             // to make sure the nearby Obstructionspheres are added.
+        
+        update.m_PotensiallyFalse = nodes;
+
+        
         m_ObstructionUpdates.push_back(update);
+        UpdateFalseObstructionNodes(scene);
         grid->m_ObstructionSpheres.EraseSphere(sphereIndex);
     }   
 
     void NodeGridSystem::UpdateObstructionSphere(Scene* scene, uint32_t sphereIndex, float radius, glm::vec3 location)
     {
+        // Create ObstructionUpdate and add nearby spheres to it
+            // Add nearby obstruction spheres   
+        // Mark nodes in obstruction sphere as PotentiallyFalseObstructions
+        // Re add all nodes that are within the radius of the ObstructionUpdates' ObstructionSpheres
+
         auto grid = scene->m_PathfindingNodeGrid.get();
 
-
-        // Create ObstructionUpdate and add nearby spheres to it
         ObstructionUpdates update;
         update.m_ObstructionSpheres.push_back(sphereIndex);
-            // Add nearby obstruction spheres   // Missing spatial partitioning 
         grid->m_ObstructionSpheres.UpdateSphereData(sphereIndex, radius, location);
         const auto& sphereLocations = grid->m_ObstructionSpheres.GetSphereLocations();
         for (int i = 0; i < grid->m_ObstructionSpheres.GetSphereCount(); i++)
-        {
-            if (glm::length(location - sphereLocations[i]) < radius + 100.f && i != sphereIndex)
-                update.m_ObstructionSpheres.push_back(i);
-        }
+            if (glm::length(location - sphereLocations[i]) < radius + 100.f && i != sphereIndex)    // + 100.f is an arbitrary amount added to the radius, 
+                update.m_ObstructionSpheres.push_back(i);                                             // to make sure the nearby Obstructionspheres are added.
 
-        // Mark nodes in obstruction sphere as PotentiallyFalseObstructions
         auto& nodes = grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex);
-        for (const auto& it : update.m_ObstructionSpheres)
-            for (const auto& it2 : grid->m_ObstructionSpheres.GetObstructionSphereNodes(it))
-            {
-                int mRadius = (int)(grid->m_ObstructionSpheres.GetSphereRadiuses()[it] * PATH_FLOATTOINT);
-                int distance = (int)(glm::length(grid->m_ObstructionSpheres.GetSphereLocations()[it] - grid->m_NodeLocations->at(it2)) * PATH_FLOATTOINT);
-                if (distance > mRadius)
-                    update.AddNode_Potensial(it2);
-            }
+        for (const auto& it2 : grid->m_ObstructionSpheres.GetObstructionSphereNodes(sphereIndex))
+        {
+            int mRadius = (int)(grid->m_ObstructionSpheres.GetSphereRadiuses()[sphereIndex] * PATH_FLOATTOINT);
+            int distance = (int)(glm::length(grid->m_ObstructionSpheres.GetSphereLocations()[sphereIndex] - grid->m_NodeLocations->at(it2)) * PATH_FLOATTOINT);
+            if (distance > mRadius)
+                update.AddNode_PotensiallyFalse(it2);
+        }
         nodes.clear();
 
-        // Re add all nodes within the ObstructionUpdates ObstructionSpheres
         for (size_t i{}; i < grid->m_NodeLocations->size(); i++)
             for (const auto& it : update.m_ObstructionSpheres)
                 {
@@ -423,28 +439,33 @@ namespace Engine {
 
     void NodeGridSystem::UpdateFalseObstructionNodes(Scene* scene)
     {
+        // Iterate through every ObstructionUpdate object
+            // Iterate through current sphere nodes and compare with PotentiallyFalse
+                // Iterate through the nodes of m_PotensiallyFalse
+                    // Remove all nodes from m_PotensiallyFalse that exists within the m_CurrentSphereNodes vector
+        // Every then now remaining within m_PotensiallyFalse is guaranteed to be false
+        // Set obstructionstatus to every nodes remaining within m_PotensiallyFalse to false
+
         if (m_ObstructionUpdates.size() == 0) return;
         for (auto& it : m_ObstructionUpdates)
         {
-            if (it.m_PotensiallyFalseObstructionNodes.size() == 0) continue;
-            // Sammenlign med PotentiallyFalse og Current
+            if (it.m_PotensiallyFalse.size() == 0) continue;
             for (const auto& current : it.m_CurrentSphereNodes)
             {
-                for (int potfalse = 0; potfalse < it.m_PotensiallyFalseObstructionNodes.size(); potfalse++)
+                for (int potfalse = 0; potfalse < it.m_PotensiallyFalse.size(); potfalse++)
                 {
-                    if (it.m_PotensiallyFalseObstructionNodes.size() != 0) break;
-                    if (it.m_PotensiallyFalseObstructionNodes[potfalse] == current)
+                    if (it.m_PotensiallyFalse.size() != 0) break;
+                    if (it.m_PotensiallyFalse[potfalse] == current)
                     {
-                        it.m_PotensiallyFalseObstructionNodes.erase(std::next(it.m_PotensiallyFalseObstructionNodes.begin(), potfalse));
+                        it.m_PotensiallyFalse.erase(std::next(it.m_PotensiallyFalse.begin(), potfalse));
                         potfalse--;
                         if (potfalse < 0) potfalse = 0;
                     }
                 }
             }
         }
-        // Set false nodes to false
         for (auto& it : m_ObstructionUpdates)
-            for (auto& pot : it.m_PotensiallyFalseObstructionNodes)
+            for (auto& pot : it.m_PotensiallyFalse)
                 scene->m_PathfindingNodeGrid->m_NodeObstructionStatus->at(pot) = false;
         m_ObstructionUpdates.clear();
     }

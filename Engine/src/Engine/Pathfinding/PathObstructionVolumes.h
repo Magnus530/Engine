@@ -10,9 +10,15 @@ namespace Engine {
 	{
 		std::vector<int> m_nodes;
 	};
-
 	class PathObstructionSphereCollection
 	{
+
+	private:
+		uint32_t m_spherecount{};
+		std::vector<ObstructionSphereNodes>* m_spherecollection;
+		std::vector<glm::vec3>* m_SphereLocations;
+		std::vector<float>* m_SphereRadiuses;
+
 	public:
 		PathObstructionSphereCollection()
 		{
@@ -53,18 +59,13 @@ namespace Engine {
 		std::vector<ObstructionSphereNodes>&	GetSphereCollections()	{ return *m_spherecollection; }
 		std::vector<glm::vec3>&					GetSphereLocations()	{ return *m_SphereLocations; }
 		std::vector<float>&						GetSphereRadiuses()		{ return *m_SphereRadiuses; }
-		std::vector<int>&						GetObstructionSphereNodes(uint32_t index)	{ return m_spherecollection->at(index).m_nodes; }
+		std::vector<int>&						GetObstructionSphereNodes(uint32_t index)	
+		{ return m_spherecollection->at(index).m_nodes; }
 		void UpdateSphereData(uint32_t index, const float radius, const glm::vec3 location) 
 		{ 
 			m_SphereLocations->at(index) = location; 
 			m_SphereRadiuses->at(index) = radius;
 		}
-
-	private:
-		uint32_t m_spherecount{};
-		std::vector<ObstructionSphereNodes>* m_spherecollection;
-		std::vector<glm::vec3>* m_SphereLocations;
-		std::vector<float>* m_SphereRadiuses;
 	};
 
 }
