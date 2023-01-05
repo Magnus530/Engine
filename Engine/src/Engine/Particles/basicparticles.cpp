@@ -242,10 +242,4 @@ namespace particles
     {
         m_particles.m_countAlive = 0;
     }
-
-    size_t ParticleSystem::computeMemoryUsage(const ParticleSystem &p)
-    {
-//        return 2 * ParticleData::computeMemoryUsage(p.m_particles);
-        return 0;
-    }
 }
