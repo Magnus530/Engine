@@ -6,12 +6,13 @@
 #include <glm/vec4.hpp>
 
 /***************************************************************************************
-*   
-*    Title: <title of program/source code>
-*    Author: <author(s) names>
-*    Date: <date>
-*    Code version: <code version>
-*    Availability: <where it's located>
+*   This code was made follwing a guide called "Three Particel Effects"
+*    Title: <BasicParticles.hpp>    
+*           <ParticleUpdaters.hpp>
+*    Author: Bartlomiej Filipek>
+*    Date:  <Apr 27, 2014>
+*           <Jun  5, 2014>
+*    Availability: <https://gist.github.com/fenbfd>
 *
 ***************************************************************************************/
 

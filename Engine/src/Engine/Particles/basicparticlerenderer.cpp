@@ -5,10 +5,16 @@
 #include "basicparticles.h"
 #include <string>
 #include <assert.h>
-//#include "gl_includes.h"
-//#include <gl/GLU.h>
 
-
+/***************************************************************************************
+*   This code was made follwing a guide called "Three Particel Effects"
+*    Title: <glParticleRenderer.cpp>
+*           <particleRenderer.cpp>
+*    Author: Bartlomiej Filipek>
+*    Date:  <Jun 24, 2014>
+*    Availability: <https://gist.github.com/fenbfd>
+*
+***************************************************************************************/
 
 namespace particles
 {

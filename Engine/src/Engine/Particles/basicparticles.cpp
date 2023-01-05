@@ -6,6 +6,17 @@
 #include <algorithm>
 #include <glm/glm.hpp>
 
+/***************************************************************************************
+*   This code was made follwing a guide called "Three Particel Effects"
+*    Title: <BasicParticles.cpp>
+*           <ParticleUpdaters.cpp>
+*    Author: Bartlomiej Filipek>
+*    Date:  <Apr 27, 2014>
+*           <Jun  5, 2014>
+*    Availability: <https://gist.github.com/fenbfd>
+*
+***************************************************************************************/
+
 namespace particles
 {
 //******************************************************************************************************************************************************************************************************
