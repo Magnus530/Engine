@@ -27,6 +27,7 @@
 		void CreateTriangles(int index_1, int index_2, int index_3);
 		int BayericCreation(int counter, int size);
 		int Creation(int counter, int size);
+		int NaNCreation(int counter, int size);
 		glm::vec3 bayercentricCoordinates(glm::vec2 a, glm::vec2 b, glm::vec2 c, glm::vec2 d);
 	};
 //}
