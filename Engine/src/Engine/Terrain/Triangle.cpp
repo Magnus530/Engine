@@ -28,16 +28,6 @@
 				}
 			}
 		}
-		if (i1 != 10 && i1 != 11 && i1 != 12) {
-			if (i2 != 10 && i2 != 11 && i2 != 12) {
-				if (i3 != 10 && i3 != 11 && i3 != 12) {
-					bool c = child;
-					int f = PotentialChildren.size();
-					int k = 7;
-				}
-			}
-		}
-		int stop = 8;/**/
 	}
 
 	void Triangle::FindCenter(Engine::Vertex a, Engine::Vertex b, Engine::Vertex c) {
