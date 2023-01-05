@@ -4,6 +4,7 @@
 #include "Engine/Scene/Components.h"
 #include "Platform/OpenGL/OpenGLCubemap.h"
 #include "../Terrain/Terrain.h"
+#include "Engine/Scene/Systems/TransformSystem.h"
 
 namespace Engine
 {
@@ -18,7 +19,9 @@ namespace Engine
 		if (objname == "Terrain") {
 			Terrain T;
 			T.init(vertices, indices);
-		}else{
+		}
+		else
+		{
 			Engine::ObjLoader::ReadFile(objname, vertices, indices);
 		}
 		vertexarr.reset(Engine::VertexArray::Create());
@@ -173,6 +176,83 @@ namespace Engine
 		std::shared_ptr<Entity> sharedEntity = std::make_shared<Entity>(tempEntity);
 		scene->m_Entities.insert({ objname, sharedEntity });
 		return tempEntity;
+	}
+
+
+	void EntityInitializer::CreateForest(std::string objname, const float& trees, const glm::vec3& forestCenter, const float& extent, std::shared_ptr<Engine::Scene>& scene)
+	{
+		std::srand(time(0));
+		uint32_t rNum = 0;
+
+		std::shared_ptr<Engine::VertexArray> va;
+		Engine::Entity tempEntity;
+
+		glm::vec3 bottomLeft = glm::vec3{ forestCenter.x - extent, forestCenter.y, forestCenter.z + extent };
+		glm::vec3 bottomRight = glm::vec3{ forestCenter.x + extent, forestCenter.y, forestCenter.z + extent };
+		glm::vec3 topLeft = glm::vec3{ forestCenter.x - extent, forestCenter.y, forestCenter.z - extent };
+		glm::vec3 topRight = glm::vec3{ forestCenter.x + extent, forestCenter.y, forestCenter.z - extent };
+
+		float rX = 0;
+		float rZ = 0;
+		glm::vec3 rPos{0};
+		std::vector<std::shared_ptr<Engine::Entity>> treeVec;
+		std::vector<std::shared_ptr<Engine::Entity>> treeCircleVec;
+		float radius = extent / 2;
+
+		for (int i = 0; i < trees; i++)
+		{
+			rNum = (1 + (rand() % 4));
+			rX = (topLeft.x + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX/(topRight.x - topLeft.x))));
+			rZ = (topLeft.z + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (bottomRight.z - topLeft.z))));
+
+			//E_TRACE("rand num: {0}", rNum);
+
+			switch (rNum)
+			{
+			case 1:
+			{
+				tempEntity = EntityInit(Engine::ShaderType::Texture, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Pine"));
+				break;
+			}
+			case 2:
+			{
+				tempEntity = EntityInit(Engine::ShaderType::Texture, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Tree"));
+				break;
+			}
+			case 3:
+			{
+				tempEntity = EntityInit(Engine::ShaderType::Texture, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Cypress"));
+				break;
+			}
+			case 4:
+			{
+				tempEntity = EntityInit(Engine::ShaderType::Texture, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Fir"));
+				break;
+			}
+			}
+
+			rPos = glm::vec3{ rX, 0.f, rZ };
+			Engine::TransformSystem::SetWorldPosition(tempEntity.GetComponent<Engine::TransformComponent>(), rPos);
+			Engine::TransformSystem::SetScale(tempEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.1f, 2.0f, 0.f });
+			std::shared_ptr<Entity> sharedEntity = std::make_shared<Entity>(tempEntity);
+			treeVec.push_back(sharedEntity);
+		}
+
+		for (int i = 0; i < treeVec.size(); i++)
+		{
+			auto& tempTransform = treeVec[i]->GetComponent<Engine::TransformComponent>();
+			if (glm::distance(tempTransform.GetLocation(), forestCenter) <= radius && treeCircleVec.size() < radius)
+			{
+				treeCircleVec.push_back(treeVec[i]);
+			}
+			else
+			{
+				glm::vec3 tempDirVec = tempTransform.GetLocation() - forestCenter;
+				glm::normalize(tempDirVec);
+				tempDirVec * radius;
+				Engine::TransformSystem::SetWorldPosition(tempTransform, tempDirVec);
+			}
+		}
 	}
 
 	std::shared_ptr<VertexArray> EntityInitializer::VertexArrayInit(const std::string obj)
