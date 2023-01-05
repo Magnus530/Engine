@@ -13,6 +13,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+
+#include "Engine/Particles/basicparticlemanager.h"
 # define M_PI           3.14159265358979323846 
 
 
@@ -230,5 +232,19 @@ namespace Engine
 			: m_radius{radius}, m_ID{id}{}
 		float m_radius{ 2.f };
 		uint32_t m_ID{};
+	};
+
+	struct ParticleManagerComponent
+	{
+		particles::BasicParticleManager* m_ParticleManager;
+
+		ParticleManagerComponent() = default;
+		explicit ParticleManagerComponent(size_t maxCount, glm::vec4 loc)
+		{
+			m_ParticleManager = new particles::BasicParticleManager(maxCount, loc);
+		}
+		void update(double dt) {
+			m_ParticleManager->update(dt);
+		}
 	};
 }

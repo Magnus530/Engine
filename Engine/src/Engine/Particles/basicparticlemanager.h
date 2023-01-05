@@ -10,8 +10,8 @@ namespace particles{
     class BasicParticleManager
     {
     public:
-        explicit BasicParticleManager(size_t maxCount);
-        void update(double dt, Engine::Camera& camera);
+        explicit BasicParticleManager(size_t maxCount, glm::vec4 loc);
+        void update(double dt);
     private:
         particles::GLParticleRenderer* p_Render;
         particles::ParticleSystem* p_System;

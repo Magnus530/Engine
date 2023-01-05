@@ -1514,6 +1514,10 @@
     <ClInclude Include="src\Engine\Particles\basicparticlemanager.h" />
     <ClInclude Include="src\Engine\Particles\basicparticlerenderer.h" />
     <ClInclude Include="src\Engine\Particles\basicparticles.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioGeometry.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioListener.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioOcclusion.h" />
+    <ClInclude Include="src\Engine\Scene\Systems\ParticleSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1650,5 +1654,8 @@
     <ClCompile Include="src\Engine\Particles\basicparticlemanager.cpp" />
     <ClCompile Include="src\Engine\Particles\basicparticlerenderer.cpp" />
     <ClCompile Include="src\Engine\Particles\basicparticles.cpp" />
+    <ClCompile Include="src\Engine\FMOD\AudioGeometry.cpp" />
+    <ClCompile Include="src\Engine\FMOD\AudioListener.cpp" />
+    <ClCompile Include="src\Engine\Scene\Systems\ParticleSystem.cpp" />
   </ItemGroup>
 </Project>

@@ -43,6 +43,7 @@ public:
 		m_ParticleSourceEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Particle, "Source", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Leaf"));
 		Engine::TransformSystem::SetWorldPosition(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
+		m_ParticleSourceEntity.AddComponent<Engine::ParticleManagerComponent>(10000, glm::vec4(3.0f));
 
 		//	//m_SoundEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sound Sources", m_SoundVA, m_ActiveScene, *m_ActiveScene->m_AudioEngine.find());
 		//	
@@ -87,8 +88,6 @@ public:
 		Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
 
 		Engine::InitVertexArray("Flag", m_FlagVA);
-
-		m_ParticleManager = new particles::BasicParticleManager(20);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -118,7 +117,11 @@ public:
 
 			if ((it)->second->HasComponent<Engine::ParticleMaterialComponent>())
 			{
-				m_ParticleManager->update(static_cast<float>(ts), m_PCameraController.GetCamera());
+				//m_ParticleManager->update(static_cast<float>(ts));
+				if ((it)->second->HasComponent<Engine::ParticleManagerComponent>())
+				{
+					Engine::ParticleSystem::UpdateParticle((it)->second->GetComponent<Engine::ParticleManagerComponent>(), static_cast<float>(ts));
+				}
 			}
 		}
 		Pathfinding_Update(ts);

@@ -42,10 +42,10 @@ namespace particles
         class BasicColorGen : public ParticleGenerator
         {
         public:
-            glm::vec4 m_minStartCol{ 1.0, 1.0, 1.0, 1.0 };
-            glm::vec4 m_maxStartCol{ 1.0, 0.0, 1.0, 1.0 };
-            glm::vec4 m_minEndCol{ 0.7, 0.7, 1.0, 1.0 };
-            glm::vec4 m_maxEndCol{ 0.9, 0.9, 1.0, 1.0 };
+            glm::vec4 m_minStartCol{ 1.0f };
+            glm::vec4 m_maxStartCol{ 1.0f };
+            glm::vec4 m_minEndCol{ 0.0f };
+            glm::vec4 m_maxEndCol{ 0.0f };
         public:
             BasicColorGen() { }
 
@@ -55,8 +55,8 @@ namespace particles
         class BasicVelGen : public ParticleGenerator
         {
         public:
-            glm::vec4 m_minStartVel{ -0.0, -1.0, -0.0, 0.0 };
-            glm::vec4 m_maxStartVel{ 0.0, 0.0, 0.0, 0.0 };
+            glm::vec4 m_minStartVel{ 0.0f};
+            glm::vec4 m_maxStartVel{1.0f};
         public:
             BasicVelGen() { }
 
@@ -77,8 +77,8 @@ namespace particles
         class BasicTimeGen : public ParticleGenerator
         {
         public:
-            float m_minTime{ 5.0 };
-            float m_maxTime{ 20.0 };
+            float m_minTime{ 1.0 };
+            float m_maxTime{ 2.0 };
         public:
             BasicTimeGen() { }
 
