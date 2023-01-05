@@ -155,16 +155,6 @@ namespace Engine
 		}
 	};
 
-	struct TerrainMaterialComponent
-	{
-		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-
-		TerrainMaterialComponent() = default;
-		TerrainMaterialComponent(const TerrainMaterialComponent&) = default;
-		TerrainMaterialComponent(const glm::vec4& color)
-			: m_Color(color) {}
-	};
-
 	struct SkyboxMaterialComponent
 	{
 		std::pair<std::string, std::shared_ptr<Engine::OpenGLCubemap>> m_CubeTex;
@@ -188,6 +178,16 @@ namespace Engine
 			: s(ss) {}
 	};
 
+	struct TerrainMaterialComponent
+	{
+		glm::vec4 m_Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+
+		TerrainMaterialComponent() = default;
+		TerrainMaterialComponent(const TerrainMaterialComponent&) = default;
+		TerrainMaterialComponent(const glm::vec4& color)
+			: m_Color(color) {}
+	};
+
 	struct LightComponent
 	{
 		float m_AmbientStrength{ 1.f };
@@ -201,6 +201,12 @@ namespace Engine
 		LightComponent(const LightComponent&) = default;
 		LightComponent(const float lightStrength, const float specularStrength)
 			: m_LightStrength(lightStrength), m_SpecularStrength(specularStrength) {}
+	};
+
+	struct TreeComponent
+	{
+		uint32_t m_ID = 0;
+		std::shared_ptr<Texture2D> m_Tex = nullptr;
 	};
 
 		enum PatrolType

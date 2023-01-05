@@ -33,36 +33,12 @@ public:
 		Engine::TextureList::CreateTextures(m_ActiveScene);
 
 		//Create entities here
-		//if (MainLayer().m_ActiveScene && MainLayer().m_ActiveScene->m_AudioEngine)
-		//{
-		//	ImGui::Separator();
-		//	ImGui::Text("Sound Component");
-
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Forest"));
 
 		m_ParticleSourceEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Particle, "Source", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Leaf"));
 		Engine::TransformSystem::SetWorldPosition(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
 
-		//	//m_SoundEntity = Engine::EntityInitializer::GetInstance().EntityInit("Sound Sources", m_SoundVA, m_ActiveScene, *m_ActiveScene->m_AudioEngine.find());
-		//	
-		//	if (ImGui::DragFloat("Volume"))
-		//	{
-
-		//	}
-		//	if (ImGui::DragFloat("Pitch"))
-		//	{
-
-		//	}
-		// 
-		//	//stopping
-		//	//starting
-		//	//looping
-		//	//not looping
-		//	//Reverb
-		//	//Not Reverb
-
-		//}
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Sky"));
 
 		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 0.0f });
@@ -78,10 +54,10 @@ public:
 
 		//Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
 
-		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Fir"));
-		Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Tree"));
-
-		m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Pine"));
+		//m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Fir"));
+		//Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Tree"));
+		//m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Pine"));
+		Engine::EntityInitializer::GetInstance().CreateForest("Plane", 200, glm::vec3{4.f,0.f,0.f}, 50, m_ActiveScene);
 
 		m_Terrain = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Terrain, "Terrain", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });

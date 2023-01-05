@@ -14,6 +14,8 @@
 #include <unordered_set>
 #include <utility>
 #include <memory>
+#include <cstdlib>
+#include <ctime>
 
 
 #include "Engine/Core/Log.h"

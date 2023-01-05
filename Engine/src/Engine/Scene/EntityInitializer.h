@@ -46,6 +46,7 @@ namespace Engine
 			uint32_t id, Scene* scene, glm::vec3 color = glm::vec3{1,1,1}, 
 			std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex = std::make_pair("White", Engine::Texture2D::Create("assets/textures/white.png")));
 
+		static void CreateForest(std::string objname, const float& trees, const glm::vec3& forestCenter, const float& extent, std::shared_ptr<Engine::Scene>& scene);
 
 		static std::shared_ptr<VertexArray> VertexArrayInit(const std::string obj);
 	protected:
