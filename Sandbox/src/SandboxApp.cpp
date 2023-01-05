@@ -61,9 +61,9 @@ public:
 
 		Engine::EntityInitializer::GetInstance().CreateForest("Plane", 70, glm::vec3{4.f,0.f,0.f}, 50, m_ActiveScene);
 
-		//m_Terrain = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Terrain, "Terrain", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f });
-		//Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
-		Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Terr1", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Base"));
+		m_Terrain = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Terrain, "Terrain", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
+		//Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Terr1", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Base"));
 
 		Engine::InitVertexArray("Flag", m_FlagVA);
 	}
