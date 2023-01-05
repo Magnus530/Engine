@@ -36,32 +36,34 @@ public:
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Forest"));
 
 		m_ParticleSourceEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Particle, "Source", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Leaf"));
-		Engine::TransformSystem::SetWorldPosition(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 1.0f });
+		Engine::TransformSystem::SetWorldPosition(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 4.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
-		m_ParticleSourceEntity.AddComponent<Engine::ParticleManagerComponent>(10000, glm::vec4(3.0f));
+		m_ParticleSourceEntity.AddComponent<Engine::ParticleManagerComponent>(20, glm::vec4(3.0f));
+
+		m_ParticleSourceEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Particle, "Source", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Leaf"));
+		Engine::TransformSystem::SetWorldPosition(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 6.0f, 3.0f, 1.0f });
+		Engine::TransformSystem::SetScale(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
+		m_ParticleSourceEntity.AddComponent<Engine::ParticleManagerComponent>(2000, glm::vec4(3.0f));
 
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Sky"));
 
 		m_LightEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Sphere", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 0.0f });
 		m_LightEntity.AddComponent<Engine::LightComponent>(float{ 0.2f }, float { 2.f });
-		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 3.0f, 1.0f });
+		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 10.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
 		//m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
 		//Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
 
-		m_Player = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_PlayerVA, m_ActiveScene, 0, glm::vec3(0.7, 0.4, 0.2));
+		m_Player = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Monkey", m_PlayerVA, m_ActiveScene, 0, glm::vec3(0.7, 0.4, 0.2), *m_ActiveScene->m_Textures.find("Chess"));
 		m_Player.AddComponent<Engine::PathfindingComponent>();
+		Engine::TransformSystem::SetWorldPosition(m_Player.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 0.0f });
 
-		//Engine::TransformSystem::SetRotation(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.6f, 0.0f, 0.0f });
-
-		//m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Fir"));
-		//Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Tree"));
-		//m_TempEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 1, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Pine"));
-		Engine::EntityInitializer::GetInstance().CreateForest("Plane", 200, glm::vec3{4.f,0.f,0.f}, 50, m_ActiveScene);
+		Engine::EntityInitializer::GetInstance().CreateForest("Plane", 70, glm::vec3{4.f,0.f,0.f}, 50, m_ActiveScene);
 
 		m_Terrain = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Terrain, "Terrain", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
+		//Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Terr1", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Base"));
 
 		Engine::InitVertexArray("Flag", m_FlagVA);
 		Engine::InitVertexArray("HorizontalPlane", m_FlatPlaneVA);
@@ -184,7 +186,6 @@ public:
 				Engine::PathfindingSystem::FindPath(m_ActiveScene.get(), pathfinder, transform.GetLocation() - glm::vec3(0, 0.5f, 0));
 			}
 		}
-
 	}
 #ifdef E_DEBUG
 	void Pathfinding_RenderNodeGrid()

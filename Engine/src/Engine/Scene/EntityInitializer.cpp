@@ -211,29 +211,29 @@ namespace Engine
 			{
 			case 1:
 			{
-				tempEntity = EntityInit(Engine::ShaderType::Texture, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Pine"));
+				tempEntity = EntityInit(Engine::ShaderType::Phong, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Pine"));
 				break;
 			}
 			case 2:
 			{
-				tempEntity = EntityInit(Engine::ShaderType::Texture, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Tree"));
+				tempEntity = EntityInit(Engine::ShaderType::Phong, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Tree"));
 				break;
 			}
 			case 3:
 			{
-				tempEntity = EntityInit(Engine::ShaderType::Texture, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Cypress"));
+				tempEntity = EntityInit(Engine::ShaderType::Phong, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Cypress"));
 				break;
 			}
 			case 4:
 			{
-				tempEntity = EntityInit(Engine::ShaderType::Texture, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Fir"));
+				tempEntity = EntityInit(Engine::ShaderType::Phong, objname, va, scene, 1, glm::vec3{ 1.f, 1.f, 1.f }, *scene->m_Textures.find("Fir"));
 				break;
 			}
 			}
 
-			rPos = glm::vec3{ rX, 0.f, rZ };
+			rPos = glm::vec3{ rX, 2.7f, rZ };
 			Engine::TransformSystem::SetWorldPosition(tempEntity.GetComponent<Engine::TransformComponent>(), rPos);
-			Engine::TransformSystem::SetScale(tempEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.1f, 2.0f, 0.f });
+			Engine::TransformSystem::SetScale(tempEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 2.f, 4.0f, 0.f });
 			std::shared_ptr<Entity> sharedEntity = std::make_shared<Entity>(tempEntity);
 			treeVec.push_back(sharedEntity);
 		}

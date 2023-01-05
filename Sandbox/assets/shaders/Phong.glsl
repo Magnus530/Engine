@@ -74,4 +74,8 @@ void main()
 	{
         fragmentColor = vec4(-result, 1.0) * texture(textureSampler, UV);
     }
+
+    if( fragmentColor.a < 0.5)
+	discard;
+
 }
