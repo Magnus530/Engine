@@ -363,6 +363,110 @@ namespace Engine
 			ImGui::EndCombo();
 		}
 	}
+
+	void ImGuiSystem::GuiAudioSettings(std::shared_ptr<Engine::AudioEngine>& audio)
+	{
+		ImGui::Begin("Audio Settings");	
+		ImVec2 ButtonSize(130, 80);
+		//
+
+		// Generate samples and plot them
+		float samples[9001];
+		for (int n = 0; n < 9001; n++)
+			samples[n] = sinf(n * 0.2f + ImGui::GetTime() * 5.f);
+		ImGui::PlotLines("Samples that are over 9000", samples, 9001);
+
+		std::string ambience = "assets/audio/Forest_amb.wav";
+		std::string musicPath1 = "assets/audio/Music.wav";
+		if (ImGui::Button("Reset to default", ButtonSize))
+		{
+			audio->stopAllChannels();
+			audio->setEnvironmentReverb(FMOD_PRESET_OFF, glm::vec3(), 0.f, 0.1f);
+		}
+		ImGui::SameLine(); 
+		ImGui::TextDisabled("(?)");
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+		{
+			ImGui::BeginTooltip();
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted("Reset to default causes to stop all sounds and reset the environment reverb that is put in the game.");
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+
+		if (ImGui::Button("Play music"))
+		{
+			audio->playSound(musicPath1, glm::vec3(), -15.f);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Play Environment"))
+		{
+			audio->playSound(ambience, glm::vec3(), -10.f);
+		}
+
+
+		ImGui::End();
+	}
+
+	void ImGuiSystem::GuiPathfindingGridSettings(std::shared_ptr<Engine::Scene>& scene)
+	{
+		ImGui::Begin("Pathfinding Node Grid Creation");
+
+		int id{ std::numeric_limits<int>::max() };
+		ImGui::PushItemWidth(75.f);
+		id--;
+		ImVec2 ButtonSize(130, 80);
+		if (!scene->m_PathfindingNodeGrid.get()) {
+			if (ImGui::Button("Create\nPathfinding Grid", ButtonSize))
+				NodeGridSystem::CreateGridAtLocation(scene.get(), glm::vec3{ 0,0,0 }, glm::vec3{ 10, 0, 10 }, 1);
+		}
+		else
+		{
+			glm::vec3& Location = scene->m_PathfindingNodeGrid->m_Location;
+			glm::ivec3& Extent = scene->m_PathfindingNodeGrid->m_Extent;
+			int& Resolution = scene->m_PathfindingNodeGrid->Resolution;
+
+			if (ImGui::Button("Update\nPathfindingGrid", ButtonSize))
+			{
+				glm::vec3 l = Location;
+				glm::ivec3 e = Extent;
+				int r = Resolution;
+				bool b = scene->m_PathfindingNodeGrid->bRenderNodegrid;
+
+				NodeGridSystem::CreateGridAtLocation(scene.get(), l, e, r, b);
+				scene->UpdateObstructionsToNewGrid();
+			}
+			ImGui::PushID(id--);
+			ImGui::Text("Extent");
+			ImGui::DragInt("X", &Extent.x, 0.05f);
+			ImGui::SameLine();
+			ImGui::DragInt("Y", &Extent.y, 0.05f);
+			ImGui::SameLine();
+			ImGui::DragInt("Z", &Extent.z, 0.05f);
+			ImGui::PopID();
+
+			ImGui::PushID(id--);
+			ImGui::DragInt("Grid Resolution", &Resolution, 0.5f, 1, 10);
+			ImGui::PopID();
+
+			ImGui::PushID(id--);
+			ImGui::Checkbox("Render Nodegrid", &scene->m_PathfindingNodeGrid->bRenderNodegrid);
+			ImGui::PopID();
+
+			ImGui::Separator();
+
+			if (ImGui::Button("Create\nObstruction", ButtonSize))
+			{
+				scene->CreateObstruction();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Delete\nObstruction", ButtonSize - ImVec2(0, 30)))
+			{
+				scene->DeleteObstruction();
+			}
+		}
+		ImGui::End();
+	}
 	
 	void ImGuiSystem::GuiEntitySettings_Transform(Scene* scene, int& id, Entity& m_Entity)
 	{
