@@ -22,6 +22,7 @@
 #include "Engine/Scene/Systems/PathfindingSystem.h"
 #include "Engine/Scene/Systems/LightSystem.h"
 #include "Engine/Scene/Systems/BillboardSystem.h"
+#include "Engine/Scene/Systems/ParticleSystem.h"
 #include "Engine/Scene/EntityInitializer.h"
 #include "Engine/Core/ImGuiSystem.h"
 

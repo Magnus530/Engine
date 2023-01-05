@@ -58,6 +58,13 @@
 	}
 
 	void Triangle::Circle_Rad(Engine::Vertex a) {
-		radious = sqrt(((((a.GetX() - origo.GetX()) * (a.GetX() - origo.GetX()))) + ((a.GetZ() - origo.GetZ()) * (a.GetZ() - origo.GetZ()))));
+		float r = sqrt(((((a.GetX() - origo.GetX()) * (a.GetX() - origo.GetX()))) + ((a.GetZ() - origo.GetZ()) * (a.GetZ() - origo.GetZ()))));
+		bool isNumber = std::isfinite(r);
+		if (isNumber) {
+			radious = r;
+		}
+		else {
+			radious = (-1);
+		}
 	}
 //}

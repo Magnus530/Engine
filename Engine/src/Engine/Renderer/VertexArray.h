@@ -3,6 +3,9 @@
 #include <memory>
 #include "Engine/Renderer/Buffer.h"
 
+#include "Engine/Renderer/vertex.h"
+#include "Engine/AssetInit/ObjLoader.h"
+
 namespace Engine
 {
 	class VertexArray
@@ -25,4 +28,28 @@ namespace Engine
 		//static std::shared_ptr<VertexArray> Create();
 		static VertexArray* Create();
 	};
+
+#ifdef E_DEBUG
+	inline static void InitVertexArray(std::string obj, std::shared_ptr<VertexArray>& va)
+	{
+		std::vector<Vertex> vertices;
+		std::vector<uint32_t> indices;
+
+		ObjLoader::ReadFile(obj, vertices, indices);
+		va.reset(VertexArray::Create());
+		std::shared_ptr<VertexBuffer> ObjVB;
+		ObjVB.reset(VertexBuffer::Create(vertices.data(), (uint32_t)vertices.size() * sizeof(Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
+		ObjVB->SetLayout
+		({
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float3, "a_Normal" },
+			{ ShaderDataType::Float2, "a_TexCoord" }
+			});
+		va->AddVertexBuffer(ObjVB);
+
+		std::shared_ptr<IndexBuffer> ObjIB;
+		ObjIB.reset(IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
+		va->SetIndexBuffer(ObjIB);
+	}
+#endif
 }

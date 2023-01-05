@@ -13,6 +13,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+
+#include "Engine/Particles/basicparticlemanager.h"
 # define M_PI           3.14159265358979323846 
 
 
@@ -46,24 +48,6 @@ namespace Engine
 			float X = (float)std::atan2(m_Transform[1].z, m_Transform[2].z);
 			float Y = (float)std::atan2(-m_Transform[0].z, sqrt(pow(m_Transform[1].z,2) + pow(m_Transform[2].z,2)));
 			float Z = (float)std::atan2(m_Transform[0].y, m_Transform[0].x);
-			
-			//return { X, Y, Z };
-
-			//glm::quat q = glm::toQuat(m_Transform);
-			//// Pitch
-			//float sinP = sqrt(1 + 2 * (q.w * q.x - q.y * q.z));
-			//float cosP = sqrt(1 - 2 * (q.w * q.x - q.y * q.z));
-			//float X = std::atan2(sinP, cosP) - M_PI / 2;
-
-			//// Yaw
-			//float sinY = 2 * (q.w * q.z + q.x * q.y);
-			//float cosY = 2 * (q.y * q.y + q.z * q.z);
-			//float Y = std::atan2(sinY, cosY) - M_PI / 2;
-
-			//// Roll
-			//float sinR = 2 * (q.w * q.x + q.y * q.z);
-			//float cosR = 2 * (q.x * q.x + q.y * q.y);
-			//float Z = std::atan2(sinR, cosR) - M_PI / 2;
 
 			return { X,Y,Z };
 		}
@@ -211,22 +195,20 @@ namespace Engine
 
 		enum PatrolType
 		{
-			// In Order of m_PatrolPath
 			Single,
 			Loop,
 			Reverse,
 		};
 	struct PathfindingComponent
 	{
-		//int m_Grid{};
 		int m_StartNode{};
 		int m_TargetNode{};
 		int m_IntermediateTargetNode{};
 
 		// Moving Through Path
-		std::vector<int> m_CurrentPath;	// reduntant TODO: replace with glm::vec3 Positions
+		std::vector<int> m_CurrentPath;	
 		std::shared_ptr<struct BSpline> m_SplinePath = std::make_shared<BSpline>();
-		float m_SplineMovement{};	// How far along the spline has the Entity gone?
+		float m_SplineMovement{};	// How far along the spline the Entity has gone
 		bool bIsMovingAlongPath{};
 		bool bReachedTarget{};
 		bool bIsObstructed{};
@@ -237,9 +219,7 @@ namespace Engine
 
 		// Patrol
 		bool bPatrolling{};
-			/* Only relevant for PatrolType::Reverse 
-				Checks if entity is currently going the reverse way of the path */
-		bool bReverse{};
+		bool bReverse{};	// For PatrolType::Reverse
 		PatrolType m_PatrolType = PatrolType::Loop;
 		std::vector<glm::vec3> m_PatrolPath;
 		int m_CurrentPatrolPoint{};
@@ -258,5 +238,19 @@ namespace Engine
 			: m_radius{radius}, m_ID{id}{}
 		float m_radius{ 2.f };
 		uint32_t m_ID{};
+	};
+
+	struct ParticleManagerComponent
+	{
+		particles::BasicParticleManager* m_ParticleManager;
+
+		ParticleManagerComponent() = default;
+		explicit ParticleManagerComponent(size_t maxCount, glm::vec4 loc)
+		{
+			m_ParticleManager = new particles::BasicParticleManager(maxCount, loc);
+		}
+		void update(double dt) {
+			m_ParticleManager->update(dt);
+		}
 	};
 }

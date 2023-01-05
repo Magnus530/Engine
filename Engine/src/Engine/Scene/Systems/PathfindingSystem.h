@@ -10,8 +10,10 @@ namespace Engine {
 
 	struct NodeGrid
 	{
-		NodeGrid(glm::vec3 location, glm::vec3 extent, int resolution, int estimatedAmountofNodes = 1000, bool bDebugRenderEnabled = false)
-			: m_Location{ location }, m_Extent{ extent }, Resolution{ resolution }, bRenderNodegrid{ bDebugRenderEnabled }
+		NodeGrid(glm::vec3 location, glm::vec3 extent, int resolution, 
+			int estimatedAmountofNodes = 1000, bool bDebugRenderEnabled = false)
+			: m_Location{ location }, m_Extent{ extent }, 
+			Resolution{ resolution }, bRenderNodegrid{ bDebugRenderEnabled }
 		{
 			m_NodeLocations = new std::vector<glm::vec3>();
 			m_NodeDN = new PathNodes_DN();
@@ -39,18 +41,13 @@ namespace Engine {
 		//DEBUG
 		bool bRenderNodegrid{};
 		
-		//std::vector<std::shared_ptr<PNode>> m_Nodes;
-		// Node 
-			//	Position 
-			//	DistanceValues /F - G - H/ & Neighbors
-			//  Node Connection
-			//	Obstruction
+		// Node s
 		std::vector<glm::vec3>* m_NodeLocations;
 		PathNodes_DN* m_NodeDN;
 		std::vector<int>* m_NodePathConnection;
 		std::vector<bool>* m_NodeObstructionStatus;
 		
-		// Obstruction shapes
+		// Obstruction spheres
 		PathObstructionSphereCollection m_ObstructionSpheres;
 
 
@@ -83,9 +80,6 @@ namespace Engine {
 			return (int)(glm::length(m_NodeLocations->at(node) - m_NodeLocations->at(targetNode)) * PATH_FLOATTOINT);
 		}
 	};
-#ifdef E_PATHNODE_DEBUG
-	inline NodesAdditional* m_NodesAdditional = new NodesAdditional();
-#endif
 
 
 	// Given a Nodegrid, finds a path from A to B
@@ -94,7 +88,6 @@ namespace Engine {
 	public:
 		static void FindPath(Scene* scene, PathfindingComponent& comp, const glm::vec3 currentPosition);
 		// Deciding type of PathMovement - Regular, Patrol ... etc
-		static void PathMovement(Scene* scene, PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime);
 
 		// General Movement
 		static void MoveAlongPath(Scene* scene, PathfindingComponent& pathfinder, TransformComponent& transform, float deltatime);
@@ -114,26 +107,23 @@ namespace Engine {
 		static void AddToPatrolPathAt(PathfindingComponent& pathfinder, glm::vec3 pos, unsigned int index);
 		static void ClearPatrol(PathfindingComponent& pathfinder);
 
-		// 
-		//static std::shared_ptr<PNode> GetNodeClosestToPosition(uint32_t gridIndex, glm::vec3 position);
 		static int GetNodeClosestToPosition(Scene* scene, glm::vec3 position);
 
 	private:
-		//static std::vector<std::shared_ptr<PNode>> FindPathAStar(std::shared_ptr<PNode> start, std::shared_ptr<PNode> end, std::shared_ptr<PNode>& intermediate, bool* blocked = nullptr);
 		static std::vector<int> FindPathAStar(Scene* scene, int startNode, int endNode, int& intermediateNode, bool* blocked = nullptr);
 	};
 
 
 	struct ObstructionUpdates
 	{
-		std::vector<int> m_ObstructionSpheres;
-		std::vector<int> m_CurrentSphereNodes;
-		std::vector<int> m_PotensiallyFalseObstructionNodes;
+		std::vector<int> m_ObstructionSpheres;	// Spheres that are checked for this ObstructionUpdate
+		std::vector<int> m_CurrentSphereNodes;	// Nodes currently within obstruction spheres
+		std::vector<int> m_PotensiallyFalse;	// Obstruction nodes that are potentially false
 
-		void AddNode_Potensial(int node)
+		void AddNode_PotensiallyFalse(int node)
 		{
-			if (std::find(m_PotensiallyFalseObstructionNodes.begin(), m_PotensiallyFalseObstructionNodes.end(), node) == m_PotensiallyFalseObstructionNodes.end())
-				m_PotensiallyFalseObstructionNodes.push_back(node);
+			if (std::find(m_PotensiallyFalse.begin(), m_PotensiallyFalse.end(), node) == m_PotensiallyFalse.end())
+				m_PotensiallyFalse.push_back(node);
 		}
 		void AddNode_Current(int node)
 		{
@@ -145,25 +135,14 @@ namespace Engine {
 	class NodeGridSystem
 	{
 	public:
-		//static void CreateGrid();
 		static void CreateGridAtLocation(Scene* scene, glm::vec3 location, glm::ivec3 extent, int resolution, bool bDebugRenderEnabled = false);
-		//static std::shared_ptr<NodeGrid> GetGridAtIndex(Scene* scene, uint32_t index);
 
 		static glm::vec3 GetNodeLocation(Scene* scene, int NodeIndex);
-
-		//static std::shared_ptr<PNode> GetNodeAtIndexWithinGrid(uint32_t gridIndex, uint32_t nodeIndex);
 
 		static uint32_t CreateObstructionSphere(Scene* scene, float radius, glm::vec3 location);
 		static void DeleteObstructionSphere(Scene* scene, uint32_t sphereIndex);
 		static void UpdateObstructionSphere(Scene* scene, uint32_t sphereIndex, float radius, glm::vec3 location);
 		static void UpdateFalseObstructionNodes(Scene* scene);
-
-	private:
-		// Generate names for the nodes within a Node Grid
-		//static void GenerateNodeNamesForGrid(std::shared_ptr<NodeGrid> grid);
-		
-		// Obstruction Volumes
-		
 	};
 
 }

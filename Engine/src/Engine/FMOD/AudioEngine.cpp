@@ -112,7 +112,7 @@ namespace Engine
 	//------------------------------
 	void AudioEngine::update(float fTimeDeltaSeconds)
 	{
-		std::string musicPath1 = "assets/audio/Cartoon_song.wav";
+		std::string musicPath1 = "assets/audio/Music.wav";
 		std::string	oneShot1 = "assets/audio/sfx_sound.wav";
 		sgpImplementation->update(fTimeDeltaSeconds);
 		if (Input::IsKeyPressed(E_KEY_LEFT_CONTROL)) 
@@ -135,13 +135,13 @@ namespace Engine
 
 			if (Input::IsKeyPressed(E_KEY_L))
 			{
-				AE->playSound(musicPath1, glm::vec3(), -1.f);
+				AE->playSound(musicPath1, glm::vec3(), -6.f);
 
 				//AE->setChannelVolume(musicPath1, 12.f);
 			}
 			if (Input::IsKeyPressed(E_KEY_K))
 			{
-				AE->playSound(oneShot1, glm::vec3());
+				AE->playSound(oneShot1, glm::vec3(),-15.f);
 				//AE->setChannelVolume(musicPath1, -12.f);
 			}
 			if (Input::IsKeyPressed(E_KEY_SPACE))
@@ -207,13 +207,13 @@ namespace Engine
 	//--------------------------------------------------------
 	void AudioEngine::loadSound(const std::string& strSoundName, bool bIs3d, bool bIsLooping, bool bIsStreaming)
 	{
-		//FMOD_CREATESOUNDEXINFO exinfo;
-		//memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
-		//exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-		//exinfo.numchannels = 2;
-		//exinfo.defaultfrequency = 48000;
+		FMOD_CREATESOUNDEXINFO exinfo;
+		memset(&exinfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
+		exinfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+		exinfo.numchannels = 2;
+		exinfo.defaultfrequency = 48000;
 		//exinfo.length = exinfo.defaultfrequency * exinfo.numchannels * sizeof(signed short) * 5;
-		//exinfo.format = FMOD_SOUND_FORMAT_PCM24;
+		exinfo.format = FMOD_SOUND_FORMAT_PCM24;
 
 		// check cache, if we allready have loaded the sound previously
 		auto tFoundIt = sgpImplementation->mSounds.find(strSoundName);

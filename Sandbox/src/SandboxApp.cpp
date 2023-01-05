@@ -38,6 +38,7 @@ public:
 		m_ParticleSourceEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Particle, "Source", m_SphereVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Leaf"));
 		Engine::TransformSystem::SetWorldPosition(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_ParticleSourceEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
+		m_ParticleSourceEntity.AddComponent<Engine::ParticleManagerComponent>(10000, glm::vec4(3.0f));
 
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Sky"));
 
@@ -62,7 +63,7 @@ public:
 		m_Terrain = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Terrain, "Terrain", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
 
-		m_ParticleManager = new particles::BasicParticleManager(20);
+		Engine::InitVertexArray("Flag", m_FlagVA);
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -92,12 +93,28 @@ public:
 
 			if ((it)->second->HasComponent<Engine::ParticleMaterialComponent>())
 			{
-				m_ParticleManager->update(static_cast<float>(ts), m_PCameraController.GetCamera());
+				//m_ParticleManager->update(static_cast<float>(ts));
+				if ((it)->second->HasComponent<Engine::ParticleManagerComponent>())
+				{
+					Engine::ParticleSystem::UpdateParticle((it)->second->GetComponent<Engine::ParticleManagerComponent>(), static_cast<float>(ts));
+				}
 			}
 		}
 		Pathfinding_Update(ts);
 #ifdef E_DEBUG
 		Pathfinding_RenderNodeGrid();
+		/* ----- RENDER PATROL POINTS ----- */
+		if (m_Player)
+		{
+			auto& pathfinder = m_Player.GetComponent<Engine::PathfindingComponent>();
+			glm::vec3 flagColor{ 1, 0.2, 0.3 };
+			int i{};
+			float colorStep = 1.f / (float)pathfinder.m_PatrolPath.size();
+			if (pathfinder.bRenderPatrolPoints)
+				for (const auto& it : pathfinder.m_PatrolPath)
+					Engine::Renderer::Submit(m_FlagVA, it, 1.f, flagColor - (flagColor * (colorStep * ++i)));
+		}
+
 #endif
 
 		Engine::Renderer::EndScene();
@@ -108,6 +125,7 @@ public:
 		std::shared_ptr<Engine::ImGuiSystem> imGuiPtr = std::make_shared<Engine::ImGuiSystem>();
 		imGuiPtr->GuiEntitySettings(m_ActiveScene);
 		imGuiPtr->GuiPathfindingGridSettings(m_ActiveScene);
+		imGuiPtr->GuiAudioSettings(m_Audio);
 	}
 
 	void OnEvent(Engine::Event& e) override
@@ -208,7 +226,7 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 
-	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_PlayerVA;
+	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_PlayerVA, m_RockVA, m_FlagVA;
 
 	// Entities
 	Engine::Entity m_SoundEntity;

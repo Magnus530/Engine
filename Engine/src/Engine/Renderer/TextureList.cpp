@@ -48,6 +48,7 @@ namespace Engine
 		Engine::Renderer::CreateTexture("Chess", "assets/textures/checkerboard.png", scene);
 		Engine::Renderer::CreateTexture("Wolf", "assets/textures/wolf.png", scene);
 		Engine::Renderer::CreateTexture("White", "assets/textures/white.png", scene);
+		Engine::Renderer::CreateTexture("Rock", "assets/textures/Rock.png", scene);
 		Engine::Renderer::CreateTexture("Tree", "assets/textures/tree.png", scene);
 		Engine::Renderer::CreateTexture("Pine", "assets/textures/pine.png", scene);
 		Engine::Renderer::CreateTexture("Fir", "assets/textures/fir.png", scene);

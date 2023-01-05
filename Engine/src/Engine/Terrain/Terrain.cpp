@@ -210,8 +210,9 @@
 		int g{ 1 };
 		while (c != g) {
 			if (Triangles[c].havechild()) {
-				g = Creation(c, Triangles.size()); //slightly wrong
+				//g = Creation(c, Triangles.size()); //slightly wrong
 				//g = BayericCreation(c, Triangles.size()); //slightly wrong in a diffrent way
+				g = NaNCreation(c, Triangles.size()); //best so far
 			}
 			c++;
 		}
@@ -588,6 +589,53 @@
 			}
 		}
 		return g;
+	}
+
+	int Terrain::NaNCreation(int c, int s) {
+		for (int a = 0; a < Triangles[c].amountofchildren(); a++) {
+			bool e{ false };
+
+			Triangle temptri = Triangle(Triangles[c].point[0], Triangles[c].point[1], Triangles[c].currentchild(a), mVertices);
+			if (temptri.rad() != (-1)){
+				for (int d = 0; d < Triangles.size(); d++) {
+					if (Triangles[d].center().GetPosition() == temptri.center().GetPosition() && Triangles[d].rad() == temptri.rad()) {
+						e = true;
+					}
+				}
+				if (!e) {
+					Triangles.push_back(temptri);
+					s++;
+				}
+				e = false;
+			}
+			temptri = Triangle(Triangles[c].point[1], Triangles[c].point[2], Triangles[c].currentchild(a), mVertices);
+			if (temptri.rad() != (-1)) {
+				for (int d = 0; d < Triangles.size(); d++) {
+					if (Triangles[d].center().GetPosition() == temptri.center().GetPosition() && Triangles[d].rad() == temptri.rad()) {
+						e = true;
+					}
+				}
+				if (!e) {
+					Triangles.push_back(temptri);
+					s++;
+				}
+				e = false;
+			}
+			temptri = Triangle(Triangles[c].point[2], Triangles[c].point[0], Triangles[c].currentchild(a), mVertices);
+			if (temptri.rad() != (-1)) {
+				for (int d = 0; d < Triangles.size(); d++) {
+					if (Triangles[d].center().GetPosition() == temptri.center().GetPosition() && Triangles[d].rad() == temptri.rad()) {
+						e = true;
+					}
+				}
+				if (!e) {
+					Triangles.push_back(temptri);
+					s++;
+				}
+				e = false;
+			}
+		}
+		return s;
 	}
 
 	glm::vec3 Terrain::bayercentricCoordinates(glm::vec2 a, glm::vec2 b, glm::vec2 c, glm::vec2 d) {

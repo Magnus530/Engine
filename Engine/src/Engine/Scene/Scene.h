@@ -39,20 +39,4 @@ namespace Engine
 		friend class Entity;
 
 	};
-
-#ifdef E_DEBUG
-	class SceneMiscData
-	{
-	public:
-	private:
-
-	};
-//#include "Engine/Scene/Systems/PathfindingSystem.h"
-//#include "Engine/Renderer/Renderer.h"
-//#include "Engine/Renderer/VertexArray.h"
-//#include "Engine/Scene/Components.h"
-//	inline std::shared_ptr<Engine::VertexArray> m_PlaneVA;
-//
-//	inline void RenderPathfindingNodeGrid(Scene* scene, PathfindingComponent& pathfinder);
-#endif
 }

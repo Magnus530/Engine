@@ -162,6 +162,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Engine\Scene\Systems\ParticleSystem.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Engine\AssetInit\ObjLoader.h" />
     <ClInclude Include="src\Engine\AssetInit\PrimitiveShape.h" />
@@ -651,6 +652,7 @@ copy /B /Y $(SolutionDir)Engine\vendor\FMOD\libs\fmodstudioL.dll $(TargetDir)</C
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine\Scene\Systems\ParticleSystem.cpp" />
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp" />
     <ClCompile Include="src\Engine\Core\Application.cpp" />
     <ClCompile Include="src\Engine\Core\ImGuiSystem.cpp" />

@@ -22,6 +22,9 @@
     <Filter Include="src\Engine\ImGui">
       <UniqueIdentifier>{BC1B88A8-A814-A7FA-D146-8C7FBD9E8606}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Engine\Particles">
+      <UniqueIdentifier>{68E4A3AA-5473-2D74-FD91-416FE9FF3D1A}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Engine\Pathfinding">
       <UniqueIdentifier>{0D4C45E0-F945-6E32-E2B2-0443CE4BD49E}</UniqueIdentifier>
     </Filter>
@@ -39,6 +42,9 @@
     </Filter>
     <Filter Include="src\Engine\Scene\Systems">
       <UniqueIdentifier>{B6A886B6-A2CD-D536-CB18-BBC6B79CD454}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine\Terrain">
+      <UniqueIdentifier>{76B61D2A-629A-DE7F-CBFA-D8D2B7FDC801}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Platform">
       <UniqueIdentifier>{21CA02E5-0D2D-9289-B6B2-CA3FA2F45D0C}</UniqueIdentifier>
@@ -138,8 +144,29 @@
     <ClInclude Include="src\Engine\FMOD\AudioEngine.h">
       <Filter>src\Engine\FMOD</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\FMOD\AudioGeometry.h">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\FMOD\AudioListener.h">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\FMOD\AudioOcclusion.h">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\ImGui\ImGuiLayer.h">
       <Filter>src\Engine\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Particles\basicparticlegenerators.h">
+      <Filter>src\Engine\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Particles\basicparticlemanager.h">
+      <Filter>src\Engine\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Particles\basicparticlerenderer.h">
+      <Filter>src\Engine\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Particles\basicparticles.h">
+      <Filter>src\Engine\Particles</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Pathfinding\PNode.h">
       <Filter>src\Engine\Pathfinding</Filter>
@@ -216,6 +243,9 @@
     <ClInclude Include="src\Engine\Scene\Splines\BSpline.h">
       <Filter>src\Engine\Scene\Splines</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Scene\Systems\BillboardSystem.h">
+      <Filter>src\Engine\Scene\Systems</Filter>
+    </ClInclude>
     <ClInclude Include="src\Engine\Scene\Systems\LightSystem.h">
       <Filter>src\Engine\Scene\Systems</Filter>
     </ClInclude>
@@ -224,6 +254,12 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Scene\Systems\TransformSystem.h">
       <Filter>src\Engine\Scene\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Terrain\Terrain.h">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Terrain\Triangle.h">
+      <Filter>src\Engine\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h">
       <Filter>src\Platform\OpenGL</Filter>
@@ -1514,6 +1550,10 @@
     <ClInclude Include="src\Engine\Particles\basicparticlemanager.h" />
     <ClInclude Include="src\Engine\Particles\basicparticlerenderer.h" />
     <ClInclude Include="src\Engine\Particles\basicparticles.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioGeometry.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioListener.h" />
+    <ClInclude Include="src\Engine\FMOD\AudioOcclusion.h" />
+    <ClInclude Include="src\Engine\Scene\Systems\ParticleSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\AssetInit\ObjLoader.cpp">
@@ -1537,11 +1577,29 @@
     <ClCompile Include="src\Engine\FMOD\AudioEngine.cpp">
       <Filter>src\Engine\FMOD</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\FMOD\AudioGeometry.cpp">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\FMOD\AudioListener.cpp">
+      <Filter>src\Engine\FMOD</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\ImGui\ImGuiBuild.cpp">
       <Filter>src\Engine\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\ImGui\ImGuiLayer.cpp">
       <Filter>src\Engine\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Particles\basicparticlegenerators.cpp">
+      <Filter>src\Engine\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Particles\basicparticlemanager.cpp">
+      <Filter>src\Engine\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Particles\basicparticlerenderer.cpp">
+      <Filter>src\Engine\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Particles\basicparticles.cpp">
+      <Filter>src\Engine\Particles</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Pathfinding\PNode.cpp">
       <Filter>src\Engine\Pathfinding</Filter>
@@ -1600,6 +1658,9 @@
     <ClCompile Include="src\Engine\Scene\Splines\BSpline.cpp">
       <Filter>src\Engine\Scene\Splines</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Scene\Systems\BillboardSystem.cpp">
+      <Filter>src\Engine\Scene\Systems</Filter>
+    </ClCompile>
     <ClCompile Include="src\Engine\Scene\Systems\LightSystem.cpp">
       <Filter>src\Engine\Scene\Systems</Filter>
     </ClCompile>
@@ -1608,6 +1669,12 @@
     </ClCompile>
     <ClCompile Include="src\Engine\Scene\Systems\TransformSystem.cpp">
       <Filter>src\Engine\Scene\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Terrain\Terrain.cpp">
+      <Filter>src\Engine\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Terrain\Triangle.cpp">
+      <Filter>src\Engine\Terrain</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp">
       <Filter>src\Platform\OpenGL</Filter>
@@ -1650,5 +1717,8 @@
     <ClCompile Include="src\Engine\Particles\basicparticlemanager.cpp" />
     <ClCompile Include="src\Engine\Particles\basicparticlerenderer.cpp" />
     <ClCompile Include="src\Engine\Particles\basicparticles.cpp" />
+    <ClCompile Include="src\Engine\FMOD\AudioGeometry.cpp" />
+    <ClCompile Include="src\Engine\FMOD\AudioListener.cpp" />
+    <ClCompile Include="src\Engine\Scene\Systems\ParticleSystem.cpp" />
   </ItemGroup>
 </Project>

@@ -6,7 +6,6 @@ namespace Engine {
 	void BSplineCreator::MakeKnotVector(BSpline& bspline)
 	{
 		bspline.m_KnotVector.clear();
-		// Is data now doubleb up?
 		std::vector<float> knots;
 		std::vector<glm::vec3> nodelocations = bspline.m_Controlpoints;
 		int splineDegree = bspline.m_Degree;

@@ -5,6 +5,7 @@
 #include "Engine/Renderer/RenderContext.h"
 #include "Engine/Core/ImGuiSystem.h"
 
+
 namespace Engine
 {
 	Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData;
