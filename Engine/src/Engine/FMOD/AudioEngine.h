@@ -180,7 +180,7 @@ namespace Engine {
         void stopChannel(int nChannelId, float fFadeOutTime = 0.0f);
         void stopEvent(const std::string& strEventName, bool bImmediate = false);
         void stopAllChannels();
-
+        void startReverb();
         // check playback
         bool isPlaying(int nChannelId) const;
         bool isEventPlaying(const std::string& strEventName) const;
