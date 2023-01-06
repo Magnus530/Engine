@@ -7,6 +7,7 @@
 
 #include "Entity.h"
 
+#include "Engine/Renderer/VertexArray.h"
 #include "Engine/Scene/Systems/PathfindingSystem.h"
 
 namespace Engine
@@ -71,13 +72,14 @@ namespace Engine
 	}
 
 	// Pathfinding
-	void Scene::CreateObstruction(float radius, glm::vec3 location)
+	void Scene::CreateObstruction(std::shared_ptr<VertexArray> va, float radius, glm::vec3 location)
 	{
 		auto group = m_Registry.group<TransformComponent>(entt::get<ObstructionSphereComponent>);
 		std::string name = "Obstruction" + std::to_string(group.size());
 
 		uint32_t id = Engine::NodeGridSystem::CreateObstructionSphere(this, radius, location);
-		Engine::Entity ent = Engine::EntityInitializer::GetInstance().ObstructorEntityInit(Engine::ShaderType::Texture, name, "Rock", radius, id, this, glm::vec3(0.2), std::make_pair("Rock", Engine::Texture2D::Create("assets/textures/Rock.png")));
+		Engine::Entity ent = Engine::EntityInitializer::GetInstance().ObstructorEntityInit(Engine::ShaderType::Texture, name, va, radius, id, this, glm::vec3(0.2), std::make_pair("Rock", Engine::Texture2D::Create("assets/textures/Rock.png")));
+		Engine::TransformSystem::SetWorldPosition(ent.GetComponent<TransformComponent>(), location);
 		m_Obstructions.push_back(name);
 	}
 	void Scene::UpdateObstructionsToNewGrid()
@@ -98,6 +100,40 @@ namespace Engine
 		m_Entities.erase(*--m_Obstructions.end());
 		m_Obstructions.erase(--m_Obstructions.end());
 		Engine::NodeGridSystem::DeleteObstructionSphere(this, m_Obstructions.size());
+	}
+	void Scene::ClearObstructions()
+	{
+		//for (int i = 0; i < m_Obstructions.size())
+		while (m_Obstructions.size() != 0)
+			DeleteObstruction();
+	}
+	void Scene::CreateSceneObstructions(unsigned int amount, glm::vec3 avoidLocation, std::shared_ptr<VertexArray> va)
+	{
+		glm::vec3 extent = this->m_PathfindingNodeGrid->m_Extent;
+		//int times = 1000;
+		int Xlength = extent.x /** 2 * times*/;
+		int Zlength = extent.z /** 2 * times*/;
+
+		float limit = 3.f;
+		std::function<bool(glm::vec3&)> validLocation = [limit, avoidLocation](glm::vec3& loc) {
+			if (loc.x < avoidLocation.x+limit && loc.x > avoidLocation.x-limit || loc.z < avoidLocation.z+limit && loc.z > avoidLocation.z-limit)
+				return false;
+			return true;
+		};
+		std::function<glm::vec3()> randomLocation = [Xlength, Zlength, extent, &randomLocation, validLocation]() {
+			float x = (-extent.x + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (Xlength))));
+			float z = (-extent.z + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (Zlength))));
+			glm::vec3 loc{ x, 0, z };
+			if (!validLocation(loc))
+				loc = randomLocation();
+			return loc;
+		};
+		srand(time(0));
+		for (int i = 0; i < amount; i++)
+		{
+			glm::vec3 loc = randomLocation();
+			CreateObstruction(va, 1.5f, (loc) + (extent/2.f));
+		}
 	}
 }
 

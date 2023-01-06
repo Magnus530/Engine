@@ -226,6 +226,7 @@ namespace Engine
 		glm::vec3 m_PatrolPauseLocation;
 #ifdef E_DEBUG
 		bool bRenderPatrolPoints{};
+		bool bRenderPath{};
 #endif
 
 		PathfindingComponent() = default;

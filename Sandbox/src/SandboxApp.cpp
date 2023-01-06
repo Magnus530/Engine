@@ -32,6 +32,8 @@ public:
 		Engine::Renderer::RenderInit();
 		Engine::TextureList::CreateTextures(m_ActiveScene);
 
+		Engine::NodeGridSystem::CreateGridAtLocation(m_ActiveScene.get(), glm::vec3{ 0,0,0 }, glm::vec3{ 50, 0, 50 }, 1);
+
 		//Create entities here
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Forest"));
 
@@ -50,9 +52,6 @@ public:
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 10.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		//m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
-		//Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
-
 		m_Player = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Monkey", m_PlayerVA, m_ActiveScene, 0, glm::vec3(0.7, 0.4, 0.2), *m_ActiveScene->m_Textures.find("Chess"));
 		m_Player.AddComponent<Engine::PathfindingComponent>();
 		Engine::TransformSystem::SetWorldPosition(m_Player.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 0.0f });
@@ -64,6 +63,9 @@ public:
 		Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Terr1", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Base"));
 
 		Engine::InitVertexArray("Flag", m_FlagVA);
+		Engine::InitVertexArray("HorizontalPlane", m_FlatPlaneVA);
+
+		m_ParticleManager = new particles::BasicParticleManager(20, glm::vec4{0,10,0,0});
 	}
 
 	void OnUpdate(Engine::Timestep ts) override
@@ -114,7 +116,6 @@ public:
 				for (const auto& it : pathfinder.m_PatrolPath)
 					Engine::Renderer::Submit(m_FlagVA, it, 1.f, flagColor - (flagColor * (colorStep * ++i)));
 		}
-
 #endif
 
 		Engine::Renderer::EndScene();
@@ -201,19 +202,24 @@ public:
 				for (size_t i{ 0 }; i < m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->size(); i++)
 				{
 					if (i == pathfinder.m_StartNode) {
-						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, startColor);
+						Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, startColor);
 					}
-					else if (i == pathfinder.m_StartNode) {
-						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, targetColor);
+					else if (i == pathfinder.m_TargetNode) {
+						Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, targetColor);
 					}
 					else if (m_ActiveScene->m_PathfindingNodeGrid->m_NodeObstructionStatus->at(i)) {
-						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, blockColor);
+						Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, blockColor);
 					}
 					else {
-						Engine::Renderer::Submit(m_PlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, nodeColor);
+						Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->at(i) / scale), scale, nodeColor);
 					}
 				}
 			}
+			/* ----- RENDER SPLINE PATH ----- */
+			scale /= 2.f;
+			if (pathfinder.bRenderPath)
+				for (auto& it : pathfinder.m_SplinePath->m_Controlpoints)
+					Engine::Renderer::Submit(m_FlatPlaneVA, glm::vec3(it / scale) + glm::vec3(0, 0.2f, 0), scale, glm::vec3{ 1,1,1 });
 		}
 	}
 #endif
@@ -225,7 +231,7 @@ private:
 	Engine::PerspectiveCameraController m_PCameraController;
 	Engine::OrthographicCameraController m_OCameraController;
 
-	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_PlayerVA, m_RockVA, m_FlagVA;
+	std::shared_ptr<Engine::VertexArray> m_PlaneVA, m_CubeVA, m_SphereVA, m_SkyboxVA, m_PlayerVA, m_RockVA, m_FlagVA, m_FlatPlaneVA;
 
 	// Entities
 	Engine::Entity m_SoundEntity;
