@@ -32,6 +32,8 @@ public:
 		Engine::Renderer::RenderInit();
 		Engine::TextureList::CreateTextures(m_ActiveScene);
 
+		Engine::NodeGridSystem::CreateGridAtLocation(m_ActiveScene.get(), glm::vec3{ 0,0,0 }, glm::vec3{ 50, 0, 50 }, 1);
+
 		//Create entities here
 		m_SkyboxEntity = Engine::EntityInitializer::GetInstance().EntityInit("Skybox", m_SkyboxVA, m_ActiveScene, *m_ActiveScene->m_Skyboxes.find("Forest"));
 
@@ -52,9 +54,6 @@ public:
 		Engine::TransformSystem::SetWorldPosition(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 10.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_LightEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.5f, 0.5f, 0.5f });
 
-		//m_PlaneEntity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Plane", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 0.0f, 0.0f, 1.0f });
-		//Engine::TransformSystem::SetScale(m_PlaneEntity.GetComponent<Engine::TransformComponent>(), glm::vec3{ 3.0f, 3.0f, 3.0f });
-
 		m_Player = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Texture, "Monkey", m_PlayerVA, m_ActiveScene, 0, glm::vec3(0.7, 0.4, 0.2), *m_ActiveScene->m_Textures.find("Chess"));
 		m_Player.AddComponent<Engine::PathfindingComponent>();
 		Engine::TransformSystem::SetWorldPosition(m_Player.GetComponent<Engine::TransformComponent>(), glm::vec3{ 0.0f, 2.0f, 0.0f });
@@ -63,7 +62,6 @@ public:
 
 		m_Terrain = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Terrain, "Terrain", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f });
 		Engine::TransformSystem::SetScale(m_Terrain.GetComponent<Engine::TransformComponent>(), glm::vec3{ 1.0f, 1.0f, 1.0f });
-		//Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Phong, "Terr1", m_PlaneVA, m_ActiveScene, 0, glm::vec3{ 1.0f, 1.0f, 1.0f }, *m_ActiveScene->m_Textures.find("Base"));
 
 		Engine::InitVertexArray("Flag", m_FlagVA);
 		Engine::InitVertexArray("HorizontalPlane", m_FlatPlaneVA);

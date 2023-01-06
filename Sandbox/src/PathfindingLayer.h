@@ -63,6 +63,7 @@ public:
 		Engine::Renderer::RenderInit();
 		Engine::TextureList::CreateTextures(m_Scene);
 
+		Engine::NodeGridSystem::CreateGridAtLocation(m_Scene.get(), glm::vec3{0,0,0}, glm::vec3{50, 0, 50}, 1);
 
 		m_Entity = Engine::EntityInitializer::GetInstance().EntityInit(Engine::ShaderType::Flat, "Monkey", m_VA, m_Scene, 0, glm::vec3(0.7, 0.4, 0.2));
 		m_Entity.AddComponent<Engine::PathfindingComponent>();
@@ -78,9 +79,8 @@ public:
 
 		// Vertex Array Pathfinding 
 			// Nodes
-		InitVertexArray("Plane", m_PlaneVA);
+		Engine::InitVertexArray("HorizontalPlane", m_PlaneVA);
 			// Patrol Point
-		//InitVertexArray("Flag", m_FlagVA);
 		Engine::InitVertexArray("Flag", m_FlagVA);
 
 
@@ -133,7 +133,6 @@ public:
 		if (m_Scene->m_PathfindingNodeGrid.get())
 			Engine::PathfindingSystem::MoveAlongPath(m_Scene.get(), pathfinder, transform, ts);
 		Engine::NodeGridSystem::UpdateFalseObstructionNodes(m_Scene.get());
-		Engine::TransformSystem::RotateToPosition(transform, m_PCameraController.GetPos());
 
 		/* --------------------- RENDERING ------------------------ */
 		for (auto& it = m_Scene->m_Entities.begin(); it != m_Scene->m_Entities.end(); it++)
@@ -269,32 +268,32 @@ public:
 
 
 	//----------------------------------------------------------------Smaller Specific Functions-------------------------------------------------------------------------------------------------------------------------
-	void InitVertexArray(std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr)
-	{
-		std::vector<Engine::Vertex> vertices;
-		std::vector<uint32_t> indices;
+	//void InitVertexArray(std::string objname, std::shared_ptr<Engine::VertexArray>& vertexarr)
+	//{
+	//	std::vector<Engine::Vertex> vertices;
+	//	std::vector<uint32_t> indices;
 
-		Engine::ObjLoader::ReadFile(objname, vertices, indices);
-		vertexarr.reset(Engine::VertexArray::Create());
-		std::shared_ptr<Engine::VertexBuffer> ObjVB;
-		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), (uint32_t)vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
-		ObjVB->SetLayout
-		({
-			{ Engine::ShaderDataType::Float3, "a_Position" },
-			{ Engine::ShaderDataType::Float3, "a_Normal" },
-			{ Engine::ShaderDataType::Float2, "a_TexCoord" }
-			});
-		vertexarr->AddVertexBuffer(ObjVB);
+	//	Engine::ObjLoader::ReadFile(objname, vertices, indices);
+	//	vertexarr.reset(Engine::VertexArray::Create());
+	//	std::shared_ptr<Engine::VertexBuffer> ObjVB;
+	//	ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), (uint32_t)vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
+	//	ObjVB->SetLayout
+	//	({
+	//		{ Engine::ShaderDataType::Float3, "a_Position" },
+	//		{ Engine::ShaderDataType::Float3, "a_Normal" },
+	//		{ Engine::ShaderDataType::Float2, "a_TexCoord" }
+	//		});
+	//	vertexarr->AddVertexBuffer(ObjVB);
 
-		std::shared_ptr<Engine::IndexBuffer> ObjIB;
-		ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
-		vertexarr->SetIndexBuffer(ObjIB);
-	}
+	//	std::shared_ptr<Engine::IndexBuffer> ObjIB;
+	//	ObjIB.reset(Engine::IndexBuffer::Create(indices)); // OpenGLIndexBuffer*
+	//	vertexarr->SetIndexBuffer(ObjIB);
+	//}
 	void InitVertexArray(std::shared_ptr<Engine::VertexArray>& vertexarr, Engine::ConvexPolygon& poly)
 	{
 		std::vector<Engine::Vertex> vertices; 
 		std::vector<uint32_t> indices;
-
+	
 		for (int i = 0; i < poly.m_Locations.size(); i++)
 		{
 			Engine::Vertex vert(poly.m_Locations[i], poly.m_Normals[i]);
@@ -322,7 +321,7 @@ public:
 		std::vector<uint32_t> indices;
 		for (int i = 0; i < vertices.size(); i++)
 			indices.push_back(i);
-
+		
 		vertexarr.reset(Engine::VertexArray::Create());
 		std::shared_ptr<Engine::VertexBuffer> ObjVB;
 		ObjVB.reset(Engine::VertexBuffer::Create(vertices.data(), (uint32_t)vertices.size() * sizeof(Engine::Vertex))); // OpenGLVertexBuffer*	// for en vector av floats
@@ -339,21 +338,21 @@ public:
 		vertexarr->SetIndexBuffer(ObjIB);
 	}
 
-	void CreateObstructor() {
-		CreateObstructor(glm::vec3(0.f));
-	}
-	void CreateObstructor(glm::vec3 pos, float radius = 2.f)
-	{
-		int id = Engine::NodeGridSystem::CreateObstructionSphere(m_Scene.get(), radius, pos);
-		Engine::Entity ent = Engine::EntityInitializer::GetInstance().ObstructorEntityInit(Engine::ShaderType::Flat, "Obstructor" + std::to_string(id), "BeveledCube", radius, id, m_Scene.get());
-		m_Obstructors.push_back(ent);
-	}
-	void DeleteObstructor()
-	{
-		size_t size = m_Obstructors.size();
-		if (size == 0) return;
-		Engine::NodeGridSystem::DeleteObstructionSphere(m_Scene.get(), (uint32_t)size - 1);
+	//void CreateObstructor() {
+	//	CreateObstructor(glm::vec3(0.f));
+	//}
+	//void CreateObstructor(glm::vec3 pos, float radius = 2.f)
+	//{
+	//	int id = Engine::NodeGridSystem::CreateObstructionSphere(m_Scene.get(), radius, pos);
+	//	Engine::Entity ent = Engine::EntityInitializer::GetInstance().ObstructorEntityInit(Engine::ShaderType::Flat, "Obstructor" + std::to_string(id), "BeveledCube", radius, id, m_Scene.get());
+	//	m_Obstructors.push_back(ent);
+	//}
+	//void DeleteObstructor()
+	//{
+	//	size_t size = m_Obstructors.size();
+	//	if (size == 0) return;
+	//	Engine::NodeGridSystem::DeleteObstructionSphere(m_Scene.get(), (uint32_t)size - 1);
 
-		m_Obstructors.erase(--m_Obstructors.end());
-	}
+	//	m_Obstructors.erase(--m_Obstructors.end());
+	//}
 };

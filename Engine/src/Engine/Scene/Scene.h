@@ -29,9 +29,11 @@ namespace Engine
 		// Pathfinding
 		std::shared_ptr<struct NodeGrid> m_PathfindingNodeGrid;
 		std::vector<std::string> m_Obstructions;
-		void CreateObstruction(float radius = 2.f, glm::vec3 location = glm::vec3(0.f));
+		void CreateObstruction(std::shared_ptr<class VertexArray> va, float radius = 2.f, glm::vec3 location = glm::vec3(0.f));
 		void UpdateObstructionsToNewGrid();
 		void DeleteObstruction();
+		void ClearObstructions();
+		void CreateSceneObstructions(unsigned int amount, glm::vec3 avoidLocation, std::shared_ptr<class VertexArray> va);
 
 	private:
 		entt::registry m_Registry;

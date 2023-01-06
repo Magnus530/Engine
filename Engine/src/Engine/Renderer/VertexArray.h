@@ -33,7 +33,7 @@ namespace Engine
 	/* Initalize a vertex array for a layer to hold.
 	*   Used mostly for rendering debug elements that are not entities themselves,
 	*	and thus are not placed in the ordinary rendering update */
-	inline static void InitVertexArray(std::string obj, std::shared_ptr<VertexArray>& va)
+	inline static void InitVertexArray(const std::string obj, std::shared_ptr<VertexArray>& va)
 	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
@@ -53,6 +53,12 @@ namespace Engine
 		std::shared_ptr<IndexBuffer> ObjIB;
 		ObjIB.reset(IndexBuffer::Create(indices)); 
 		va->SetIndexBuffer(ObjIB);
+	}
+	inline static std::shared_ptr<VertexArray> LoadObjectGetVertexArray(const std::string obj)
+	{
+		std::shared_ptr<VertexArray> va;
+		InitVertexArray(obj, va);
+		return va;
 	}
 #endif
 }

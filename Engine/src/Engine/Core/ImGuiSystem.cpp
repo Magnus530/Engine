@@ -210,53 +210,49 @@ namespace Engine
 		ImGui::PushItemWidth(75.f);
 		id--;
 		ImVec2 ButtonSize(130, 80);
-		if (!scene->m_PathfindingNodeGrid.get()) {
-			if (ImGui::Button("Create\nPathfinding Grid", ButtonSize))
-				NodeGridSystem::CreateGridAtLocation(scene.get(), glm::vec3{ 0,0,0 }, glm::vec3{ 10, 0, 10 }, 1);
-		}
-		else
+
+		glm::vec3& Location = scene->m_PathfindingNodeGrid->m_Location;
+		glm::ivec3& Extent = scene->m_PathfindingNodeGrid->m_Extent;
+		int& Resolution = scene->m_PathfindingNodeGrid->Resolution;
+
+		if (ImGui::Button("Update\nPathfindingGrid", ButtonSize))
 		{
-			glm::vec3& Location = scene->m_PathfindingNodeGrid->m_Location;
-			glm::ivec3& Extent = scene->m_PathfindingNodeGrid->m_Extent;
-			int& Resolution = scene->m_PathfindingNodeGrid->Resolution;
+			glm::vec3 l = Location;
+			glm::ivec3 e = Extent;
+			int r = Resolution;
+			bool b = scene->m_PathfindingNodeGrid->bRenderNodegrid;
 
-			if (ImGui::Button("Update\nPathfindingGrid", ButtonSize))
-			{
-				glm::vec3 l = Location;
-				glm::ivec3 e = Extent;
-				int r = Resolution;
-				bool b = scene->m_PathfindingNodeGrid->bRenderNodegrid;
-
-				NodeGridSystem::CreateGridAtLocation(scene.get(), l, e, r, b);
-				scene->UpdateObstructionsToNewGrid();
-			}
-			ImGui::PushID(id--);
-			ImGui::Text("Extent");
-			ImGui::DragInt("X", &Extent.x, 0.05f);
-			ImGui::SameLine();
-			ImGui::DragInt("Y", &Extent.y, 0.05f);
-			ImGui::SameLine();
-			ImGui::DragInt("Z", &Extent.z, 0.05f);
-			ImGui::PopID();
-
-			ImGui::PushID(id--);
-			ImGui::DragInt("Grid Resolution", &Resolution, 0.5f, 1, 10);
-			ImGui::PopID();
-
-			ImGui::PushID(id--);
-			ImGui::Checkbox("Render Nodegrid", &scene->m_PathfindingNodeGrid->bRenderNodegrid);
-			ImGui::PopID();
-
-			ImGui::Separator();
-			ImGui::Separator();
-
-			// Manually Creating Obstructions in the scene
-			if (ImGui::Button("Create\nObstruction", ButtonSize))
-				scene->CreateObstruction(1.5f);
-			ImGui::SameLine();
-			if (ImGui::Button("Delete\nObstruction", ButtonSize - ImVec2(0, 30)))
-				scene->DeleteObstruction();
+			NodeGridSystem::CreateGridAtLocation(scene.get(), l, e, r, b);
+			scene->UpdateObstructionsToNewGrid();
 		}
+		ImGui::PushID(id--);
+		ImGui::Text("Extent");
+		ImGui::DragInt("X", &Extent.x, 0.05f);
+		ImGui::SameLine();
+		ImGui::DragInt("Y", &Extent.y, 0.05f);
+		ImGui::SameLine();
+		ImGui::DragInt("Z", &Extent.z, 0.05f);
+		ImGui::PopID();
+
+		ImGui::PushID(id--);
+		ImGui::DragInt("Grid Resolution", &Resolution, 0.5f, 1, 10);
+		ImGui::PopID();
+
+		ImGui::PushID(id--);
+		ImGui::Checkbox("Render Nodegrid", &scene->m_PathfindingNodeGrid->bRenderNodegrid);
+		ImGui::PopID();
+
+		static int obstructionAmount{ 50 };
+		if (ImGui::Button("Create\nObstructions", ButtonSize)) {
+			scene->ClearObstructions();
+			auto& player = scene->m_Entities["Monkey"]->GetComponent<TransformComponent>();
+			scene->CreateSceneObstructions(obstructionAmount, player.GetLocation(), LoadObjectGetVertexArray("Rock"));
+		}
+		ImGui::SameLine();
+		ImGui::DragInt("Amount of Obstructions", &obstructionAmount, 1, 0, 1000);
+		if (ImGui::Button("Delete\nObstruction", ButtonSize - ImVec2(0, 30)))
+			scene->ClearObstructions();
+
 		ImGui::End();
 	}
 
@@ -523,18 +519,15 @@ break;
 			}
 			ImGui::EndCombo();
 		}
-		static bool bPatrolpaused{};
-		if (ImGui::Button(bPatrolpaused ? "Resume Patrol" : "Exit Patrol", ImVec2(100, 70)))
+		if (ImGui::Button(pathfinder.bPatrolling ? "Exit Patrol" : "Resume Patrol", ImVec2(100, 70)))
 		{
-			if (!bPatrolpaused)
+			if (pathfinder.bPatrolling)
 			{
 				Engine::PathfindingSystem::PausePatrol(scene, pathfinder, currentPos);
-				bPatrolpaused = true;
 			}
 			else
 			{
 				Engine::PathfindingSystem::ResumePatrol(scene, pathfinder, currentPos, pathfinder.m_PatrolType);
-				bPatrolpaused = false;
 			}
 		}
 #ifdef E_DEBUG

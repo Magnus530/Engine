@@ -291,7 +291,7 @@ namespace Engine {
 
             /* FOUND PATH: Setting Path */
             if (current == endNode) {
-                /* Går bakover fra Target til Start */
+                /* Go Backwards from Target node to Start, using the m_NodePathConnection at each node */
                 int currentTile = endNode;
                 while (currentTile != startNode) {
                     path.push_back(currentTile);
