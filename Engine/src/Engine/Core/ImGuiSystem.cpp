@@ -395,12 +395,12 @@ break;
 
 		if (ImGui::Button("Play music"))
 		{
-			audio->playSound(musicPath1, glm::vec3(), -15.f, 1.f);
+			audio->playSound(musicPath1, glm::vec3(), -5.f, 1.f);
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Play Environment"))
 		{
-			audio->playSound(ambience, glm::vec3(), -10.f, 1.f);
+			audio->playSound(ambience, glm::vec3(), -5.f, 1.f);
 		}
 		if (ImGui::Button("Add Reverb"))
 		{
