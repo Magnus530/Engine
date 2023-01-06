@@ -369,7 +369,7 @@ break;
 		float samples[9001];
 		for (int n = 0; n < 9001; n++)
 			samples[n] = sinf(n * 0.2f + ImGui::GetTime() * 5.f);
-		ImGui::PlotLines("Samples that are over 9000", samples, 9001);
+		ImGui::PlotLines("Samples", samples, 9001);
 
 		std::string ambience = "assets/audio/Forest_amb.wav";
 		std::string musicPath1 = "assets/audio/Music.wav";
