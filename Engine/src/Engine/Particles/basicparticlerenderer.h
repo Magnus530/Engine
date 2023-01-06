@@ -10,11 +10,12 @@
 #include "Engine/Renderer/vertex.h"
 
 /***************************************************************************************
-*    Title: <title of program/source code>
-*    Author: <author(s) names>
-*    Date: <date>
-*    Code version: <code version>
-*    Availability: <where it's located>
+*   This code was made follwing a guide called "Three Particel Effects"
+*    Title: <glParticleRenderer.hpp>
+*           <particleRenderer.hpp>
+*    Author: Bartlomiej Filipek>
+*    Date:  <Jun 24, 2014>
+*    Availability: <https://gist.github.com/fenbfd>
 *
 ***************************************************************************************/
 

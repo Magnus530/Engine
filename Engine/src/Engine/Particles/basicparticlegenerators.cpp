@@ -5,7 +5,15 @@
 #include <algorithm>
 #include <glm/common.hpp>
 #include <glm/gtc/random.hpp>
-//a
+
+/***************************************************************************************
+*   This code was made follwing a guide called "Three Particel Effects"
+*    Title: <BasicParticleGenerators.cpp>
+*    Author: Bartlomiej Filipek>
+*    Date:  <May 12, 2014>
+*    Availability: <https://gist.github.com/fenbfd>
+*
+***************************************************************************************/
 
 namespace particles
 {
