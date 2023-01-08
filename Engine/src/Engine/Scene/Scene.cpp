@@ -10,6 +10,8 @@
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Scene/Systems/PathfindingSystem.h"
 
+
+
 namespace Engine
 {
 	static void DoMath(const glm::mat4& transform)
@@ -78,7 +80,13 @@ namespace Engine
 		std::string name = "Obstruction" + std::to_string(group.size());
 
 		uint32_t id = Engine::NodeGridSystem::CreateObstructionSphere(this, radius, location);
-		Engine::Entity ent = Engine::EntityInitializer::GetInstance().ObstructorEntityInit(Engine::ShaderType::Texture, name, va, radius, id, this, glm::vec3(0.2), std::make_pair("Rock", Engine::Texture2D::Create("assets/textures/Rock.png")));
+		//Engine::Entity ent = Engine::EntityInitializer::GetInstance().ObstructorEntityInit(Engine::ShaderType::Flat, name, va, radius, id, this/*, glm::vec3(0.2), std::make_pair("Rock", Engine::Texture2D::Create("assets/textures/Rock.png"))*/);
+		Engine::Entity ent = Engine::EntityInitializer::GetInstance().ObstructorEntityInit(Engine::ShaderType::Flat, name, va, radius, id, this);
+
+		//Entity ent = CreateEntity(name);
+		//ent.AddComponent<RendererComponent>(va);
+		//ent.AddComponent<ObstructionSphereComponent>(radius, id);
+
 		Engine::TransformSystem::SetWorldPosition(ent.GetComponent<TransformComponent>(), location);
 		m_Obstructions.push_back(name);
 	}
@@ -107,12 +115,13 @@ namespace Engine
 		while (m_Obstructions.size() != 0)
 			DeleteObstruction();
 	}
+
 	void Scene::CreateSceneObstructions(unsigned int amount, glm::vec3 avoidLocation, std::shared_ptr<VertexArray> va)
 	{
+		// Init and Lambda functions
 		glm::vec3 extent = this->m_PathfindingNodeGrid->m_Extent;
-		//int times = 1000;
-		int Xlength = extent.x /** 2 * times*/;
-		int Zlength = extent.z /** 2 * times*/;
+		int Xlength = extent.x;
+		int Zlength = extent.z;
 
 		float limit = 3.f;
 		std::function<bool(glm::vec3&)> validLocation = [limit, avoidLocation](glm::vec3& loc) {
@@ -128,12 +137,34 @@ namespace Engine
 				loc = randomLocation();
 			return loc;
 		};
+		
+		// Creating Obstructions at 
+		E_INFO("CreateSceneObstructions Time");
+		TIMER t1 = TIMENOW();
 		srand(time(0));
+		std::vector<std::future<void>> asyncs;
 		for (int i = 0; i < amount; i++)
 		{
-			glm::vec3 loc = randomLocation();
-			CreateObstruction(va, 1.5f, (loc) + (extent/2.f));
+			/*asyncs.push_back(*/std::async([this, randomLocation](glm::vec3 ex, std::shared_ptr<VertexArray> va)
+				{
+					glm::vec3 loc = randomLocation();
+					CreateObstruction(va, 1.5f, (loc)+(ex / 2.f));
+				}, extent, va);
 		}
+		TIME_MILLI("CREATION = ", t1);
+		
+		
+		// Getting Obstruction Texture
+		TIMER t2 = TIMENOW();
+		auto tex = std::make_pair("Rock", Engine::Texture2D::Create("assets/textures/Rock.png"));
+		TIME_MILLI("GETTING TEXTURE = ", t2);
+		
+		// Setting the texture for obstruction objects 
+		TIMER t3 = TIMENOW();
+		for (const auto& it : m_Obstructions)
+			std::async([this, it, tex](){ m_Entities[it]->GetComponent<TextureMaterialComponent>().m_Tex = tex; });
+		TIME_MILLI("TIME SET TEXTURE = ", t3);
+		TIME_SECOND("TIME TOTAL = ", t1);
 	}
 }
 

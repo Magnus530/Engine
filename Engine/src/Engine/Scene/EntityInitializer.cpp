@@ -168,9 +168,23 @@ namespace Engine
 	Entity EntityInitializer::ObstructorEntityInit(const ShaderType shaderType, const std::string objname, std::shared_ptr<VertexArray> va, float radius, uint32_t id, Scene* scene, glm::vec3 color, std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex)
 	{
 		Entity tempEntity = scene->CreateEntity(objname);
-		//tempEntity.AddComponent<Engine::RendererComponent>(VertexArrayInit(mesh));
 		tempEntity.AddComponent<Engine::RendererComponent>(va);
 		MaterialInit(shaderType, tempEntity, 0, color, tex);
+
+		tempEntity.AddComponent<ObstructionSphereComponent>(radius, id);
+
+		std::shared_ptr<Entity> sharedEntity = std::make_shared<Entity>(tempEntity);
+		scene->m_Entities.insert({ objname, sharedEntity });
+		return tempEntity;
+	}
+
+	Entity EntityInitializer::ObstructorEntityInit(const ShaderType shaderType, const std::string objname, std::shared_ptr<VertexArray> va, float radius, uint32_t id, Scene* scene)
+	{
+		Entity tempEntity = scene->CreateEntity(objname);
+		tempEntity.AddComponent<Engine::RendererComponent>(va);
+		tempEntity.AddComponent<MaterialComponent>(Engine::ShaderType::Texture);
+		//tempEntity.AddComponent<FlatMaterialComponent>(glm::vec4{ glm::vec3{.3, .2, .5}, 1.f});
+		tempEntity.AddComponent<TextureMaterialComponent>();
 
 		tempEntity.AddComponent<ObstructionSphereComponent>(radius, id);
 
