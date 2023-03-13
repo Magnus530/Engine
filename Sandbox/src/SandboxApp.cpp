@@ -200,6 +200,7 @@ public:
 				glm::vec4 blockColor(0, 0, 0, 1);
 
 				bool alteredColor{};
+				Engine::Renderer::BindDebugShader();
 				for (size_t i{ 0 }; i < m_ActiveScene->m_PathfindingNodeGrid->m_NodeLocations->size(); i++)
 				{
 					if (i == pathfinder.m_StartNode) {

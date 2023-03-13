@@ -26,6 +26,7 @@ namespace Engine
 		static void Submit(Entity& entity);
 
 #ifdef E_DEBUG
+		static void BindDebugShader();
 		static void DebugShader(const glm::mat4& transform, const glm::vec3& color);
 		static void Submit(const std::shared_ptr<VertexArray> va, glm::vec3 location, float scale = 1.f, glm::vec3 color = {0.f, .7f, .7f});
 		static void Submit(const std::shared_ptr<VertexArray> va, ConvexPolygon& poly, glm::mat4 transform, glm::vec3 color = { 1,1,1 });

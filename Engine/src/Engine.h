@@ -26,6 +26,8 @@
 #include "Engine/Scene/EntityInitializer.h"
 #include "Engine/Core/ImGuiSystem.h"
 
+#include "Engine/Core/TimerMacros.h"
+
 // ---------------Renderer---------------
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RenderCommand.h"

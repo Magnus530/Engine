@@ -5,6 +5,7 @@
 #include "Engine/Renderer/RenderContext.h"
 #include "Engine/Core/ImGuiSystem.h"
 
+#include "Engine/Core/TimerMacros.h"
 
 namespace Engine
 {
@@ -99,10 +100,14 @@ namespace Engine
 	}
 
 #ifdef E_DEBUG 
-	void Renderer::DebugShader(const glm::mat4& transform, const glm::vec3& color)
+	void Renderer::BindDebugShader()	// Bind shader once, reduces draw call of 50x50 nodegrid på 8 milliseconds approximately (28->20 milliseconds ish)
 	{
 		auto flatShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_ShaderLibrary->Get("Flat"));
 		flatShader->Bind();
+	}
+	void Renderer::DebugShader(const glm::mat4& transform, const glm::vec3& color)
+	{
+		auto flatShader = std::dynamic_pointer_cast<Engine::OpenGLShader>(m_ShaderLibrary->Get("Flat"));
 		flatShader->UploadUniformMat4("u_ProjectionView", m_SceneData->ProjectionMatrix);
 		flatShader->UploadUniformMat4("u_ViewMatrix", m_SceneData->ViewMatrix);
 		flatShader->UploadUniformMat4("u_Transform", transform);

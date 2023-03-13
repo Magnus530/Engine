@@ -43,8 +43,10 @@ namespace Engine
 		static void MaterialInit(Engine::Entity& entity, std::pair<std::string, std::shared_ptr<Engine::OpenGLCubemap>> cubetex);
 
 		static Entity ObstructorEntityInit(const ShaderType shaderType, const std::string objname, std::shared_ptr<VertexArray> va, float radius,
-			uint32_t id, Scene* scene, glm::vec3 color = glm::vec3{1,1,1}, 
+			uint32_t id, Scene* scene, glm::vec3 color, 
 			std::pair<std::string, std::shared_ptr<Engine::Texture2D>> tex = std::make_pair("White", Engine::Texture2D::Create("assets/textures/white.png")));
+		static Entity ObstructorEntityInit(const ShaderType shaderType, const std::string objname, std::shared_ptr<VertexArray> va, float radius,
+			uint32_t id, Scene* scene);
 
 		static void CreateForest(std::string objname, const float& trees, const glm::vec3& forestCenter, const float& extent, std::shared_ptr<Engine::Scene>& scene);
 
