@@ -6,4 +6,4 @@ To access files or create a new folder, locate the specific file in cmd, and wri
 git clone --recursive https://github.com/Magnus530/Engine
 ```
 
-Everything, included the submodules should be included
+Everything, including the submodules should be included
